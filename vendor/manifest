@@ -1,0 +1,46 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/alecthomas/template",
+			"repository": "https://github.com/alecthomas/template",
+			"vcs": "git",
+			"revision": "a0175ee3bccc567396460bf5acd36800cb10c49c",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/alecthomas/units",
+			"repository": "https://github.com/alecthomas/units",
+			"vcs": "git",
+			"revision": "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/pkg/term",
+			"repository": "https://github.com/pkg/term",
+			"vcs": "git",
+			"revision": "b1f72af2d63057363398bec5873d16a98b453312",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/sys/unix",
+			"repository": "https://go.googlesource.com/sys",
+			"vcs": "git",
+			"revision": "c200b10b5d5e122be351b67af224adc6128af5bf",
+			"branch": "master",
+			"path": "/unix",
+			"notests": true
+		},
+		{
+			"importpath": "gopkg.in/alecthomas/kingpin.v2",
+			"repository": "https://gopkg.in/alecthomas/kingpin.v2",
+			"vcs": "git",
+			"revision": "e9044be3ab2a8e11d4e1f418d12f0790d57e8d70",
+			"branch": "master",
+			"notests": true
+		}
+	]
+}
