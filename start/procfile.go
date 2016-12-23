@@ -24,14 +24,20 @@ func parseProcfile(procfile string, portBase, portStep int) (pf procfile) {
 	utils.FatalOnErr(err)
 
 	port := portBase
+	names := make(map[string]bool)
 
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		if len(scanner.Text()) > 0 {
 			params := re.FindStringSubmatch(scanner.Text())
-			if len(params) < 2 {
+			if len(params) < 3 {
 				utils.Fatal("Invalid process format: ", scanner.Text())
 			}
+
+			if names[params[1]] {
+				utils.Fatal("Process names must be uniq")
+			}
+			names[params[1]] = true
 
 			pf = append(pf, procfileEntry{
 				params[1],
