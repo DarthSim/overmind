@@ -19,11 +19,11 @@ type cmdConnectHandler struct {
 
 func (h *cmdConnectHandler) Run(c *cli.Context) error {
 	if !c.Args().Present() {
-		utils.Fatal("Specify name of process to connect")
+		utils.Fatal("Specify a name of process to connect")
 	}
 
 	if c.NArg() > 1 {
-		utils.Fatal("Specify a single name of processe")
+		utils.Fatal("Specify a single name of process")
 	}
 
 	conn, err := net.Dial("unix", h.SocketPath)
