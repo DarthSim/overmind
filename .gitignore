@@ -3,5 +3,9 @@ overmind
 
 # Test Procfile
 Procfile
+Procfile.local
+
+.overmind.env
+.overmind.sock
 
 tmp/

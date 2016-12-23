@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"math/rand"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -23,12 +25,12 @@ func setupStartCmd() cli.Command {
 		Usage:   "Run procfile",
 		Action:  c.Run,
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "procfile, f", Usage: "Specify a Procfile to load", Value: "./Procfile", Destination: &c.Procfile},
+			cli.StringFlag{Name: "procfile, f", EnvVar: "OVERMIND_PROCFILE", Usage: "Specify a Procfile to load", Value: "./Procfile", Destination: &c.Procfile},
 			cli.StringFlag{Name: "processes", Usage: "Specify process names to lunch. Process should be specified in the Procfile.", Destination: &c.ProcNames},
 			cli.StringFlag{Name: "root, d", Usage: "Specify a working directory of application. Default: directory containing the Procfile", Destination: &c.Root},
-			cli.IntFlag{Name: "timeout, t", Usage: "Specify the amount of time (in seconds) processes have to shut down gracefully before being brutally killed", Value: 5, Destination: &c.Timeout},
-			cli.IntFlag{Name: "port, p", Usage: "Specify a port to use as the base", Value: 5000, Destination: &c.PortBase},
-			cli.IntFlag{Name: "port-step, P", Usage: "Specify a step to increase port number", Value: 100, Destination: &c.PortStep},
+			cli.IntFlag{Name: "timeout, t", EnvVar: "OVERMIND_TIMEOUT", Usage: "Specify the amount of time (in seconds) processes have to shut down gracefully before being brutally killed", Value: 5, Destination: &c.Timeout},
+			cli.IntFlag{Name: "port, p", EnvVar: "OVERMIND_PORT", Usage: "Specify a port to use as the base", Value: 5000, Destination: &c.PortBase},
+			cli.IntFlag{Name: "port-step, P", EnvVar: "OVERMIND_PORT_STEP", Usage: "Specify a step to increase port number", Value: 100, Destination: &c.PortStep},
 			cli.StringFlag{Name: "socket, s", Usage: "Specify a path to the command center socket", Value: "./.overmind.sock", Destination: &c.SocketPath},
 		},
 	}
@@ -93,6 +95,8 @@ func init() {
 }
 
 func main() {
+	loadEnvFile()
+
 	app := cli.NewApp()
 
 	app.Name = "Overmind"
@@ -115,4 +119,20 @@ func main() {
 	}
 
 	app.Run(os.Args)
+}
+
+func loadEnvFile() {
+	re, _ := regexp.Compile("^(\\w+)=(.+)$")
+
+	f, err := os.Open("./.overmind.env")
+	if err != nil {
+		return
+	}
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		if env := re.FindStringSubmatch(scanner.Text()); len(env) == 3 {
+			os.Setenv(env[1], env[2])
+		}
+	}
 }
