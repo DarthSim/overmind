@@ -1,6 +1,7 @@
 package start
 
 import (
+	"errors"
 	"os"
 	"os/signal"
 	"sync"
@@ -50,6 +51,10 @@ func newCommand(h *Handler) (*command, error) {
 }
 
 func (c *command) Run() error {
+	if !c.checkTmux() {
+		return errors.New("Can't find tmux. Did you forget to install it?")
+	}
+
 	c.startCommandCenter()
 	defer c.stopCommandCenter()
 
@@ -60,6 +65,10 @@ func (c *command) Run() error {
 	c.doneWg.Wait()
 
 	return nil
+}
+
+func (c *command) checkTmux() bool {
+	return utils.RunCmd("which", "tmux") == nil
 }
 
 func (c *command) startCommandCenter() {
