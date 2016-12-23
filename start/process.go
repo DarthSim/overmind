@@ -23,11 +23,11 @@ type process struct {
 
 type processesMap map[string]*process
 
-func newProcess(name string, color int, command, root string, output *multiOutput) *process {
+func newProcess(name, hash string, color int, command, root string, output *multiOutput) *process {
 	return &process{
 		command:   command,
 		root:      root,
-		sessionID: fmt.Sprintf("overmind-%v-%v", name, utils.RandomString(32)),
+		sessionID: fmt.Sprintf("overmind-%v-%v", name, hash),
 		output:    output,
 		Name:      name,
 		Color:     color,

@@ -19,6 +19,7 @@ type command struct {
 	doneWg    sync.WaitGroup
 	stopTrig  chan os.Signal
 	processes processesMap
+	hash      string
 }
 
 func newCommand(h *Handler) (*command, error) {
@@ -29,6 +30,7 @@ func newCommand(h *Handler) (*command, error) {
 		doneTrig:  make(chan bool, len(pf)),
 		stopTrig:  make(chan os.Signal),
 		processes: make(processesMap),
+		hash:      utils.RandomString(32),
 	}
 
 	root, err := h.AbsRoot()
@@ -39,7 +41,7 @@ func newCommand(h *Handler) (*command, error) {
 	c.output = newMultiOutput(pf.MaxNameLength())
 
 	for i, e := range pf {
-		c.processes[e.Name] = newProcess(e.Name, baseColor+i, e.Command, root, c.output)
+		c.processes[e.Name] = newProcess(e.Name, c.hash, baseColor+i, e.Command, root, c.output)
 	}
 
 	c.cmdCenter = newCommandCenter(c.processes, h.SocketPath, c.output)
