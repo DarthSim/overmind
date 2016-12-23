@@ -5,7 +5,7 @@ import (
 
 	"github.com/DarthSim/overmind/utils"
 
-	"gopkg.in/alecthomas/kingpin.v2"
+	"gopkg.in/urfave/cli.v1"
 )
 
 // Handler handles args and flags for the start command
@@ -32,7 +32,7 @@ func (h *Handler) AbsRoot() (string, error) {
 }
 
 // Run runs the start command
-func (h *Handler) Run(_ *kingpin.ParseContext) error {
+func (h *Handler) Run(_ *cli.Context) error {
 	cmd, err := newCommand(h)
 	utils.FatalOnErr(err)
 

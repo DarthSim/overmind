@@ -9,7 +9,7 @@ import (
 
 	"github.com/DarthSim/overmind/utils"
 
-	"gopkg.in/alecthomas/kingpin.v2"
+	"gopkg.in/urfave/cli.v1"
 )
 
 type cmdConnectHandler struct {
@@ -17,11 +17,19 @@ type cmdConnectHandler struct {
 	SocketPath  string
 }
 
-func (c *cmdConnectHandler) Run(_ *kingpin.ParseContext) error {
-	conn, err := net.Dial("unix", c.SocketPath)
+func (h *cmdConnectHandler) Run(c *cli.Context) error {
+	if !c.Args().Present() {
+		return cli.NewExitError("Specify name of process to connect", 1)
+	}
+
+	if c.NArg() > 1 {
+		return cli.NewExitError("Specify a single name of processe", 1)
+	}
+
+	conn, err := net.Dial("unix", h.SocketPath)
 	utils.FatalOnErr(err)
 
-	fmt.Fprintf(conn, "get-session %v\n", c.ProcessName)
+	fmt.Fprintf(conn, "get-session %v\n", c.Args().First())
 
 	sid, err := bufio.NewReader(conn).ReadString('\n')
 	utils.FatalOnErr(err)

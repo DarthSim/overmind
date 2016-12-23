@@ -16,11 +16,11 @@ type command struct {
 	proc        *process
 }
 
-func newCommand(h *Handler) (*command, error) {
+func newCommand(procName, cmdLine, socketPath string) (*command, error) {
 	return &command{
-		processName: h.ProcessName,
-		cmdLine:     h.CmdLine,
-		socketPath:  h.SocketPath,
+		processName: procName,
+		cmdLine:     cmdLine,
+		socketPath:  socketPath,
 	}, nil
 }
 

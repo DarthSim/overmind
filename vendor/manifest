@@ -2,18 +2,10 @@
 	"version": 0,
 	"dependencies": [
 		{
-			"importpath": "github.com/alecthomas/template",
-			"repository": "https://github.com/alecthomas/template",
+			"importpath": "github.com/BurntSushi/toml",
+			"repository": "https://github.com/BurntSushi/toml",
 			"vcs": "git",
-			"revision": "a0175ee3bccc567396460bf5acd36800cb10c49c",
-			"branch": "master",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/alecthomas/units",
-			"repository": "https://github.com/alecthomas/units",
-			"vcs": "git",
-			"revision": "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a",
+			"revision": "99064174e013895bbd9b025c31100bd1d9b590ca",
 			"branch": "master",
 			"notests": true
 		},
@@ -29,17 +21,25 @@
 			"importpath": "golang.org/x/sys/unix",
 			"repository": "https://go.googlesource.com/sys",
 			"vcs": "git",
-			"revision": "c200b10b5d5e122be351b67af224adc6128af5bf",
+			"revision": "d75a52659825e75fff6158388dddc6a5b04f9ba5",
 			"branch": "master",
 			"path": "/unix",
 			"notests": true
 		},
 		{
-			"importpath": "gopkg.in/alecthomas/kingpin.v2",
-			"repository": "https://gopkg.in/alecthomas/kingpin.v2",
+			"importpath": "gopkg.in/urfave/cli.v1",
+			"repository": "https://gopkg.in/urfave/cli.v1",
 			"vcs": "git",
-			"revision": "e9044be3ab2a8e11d4e1f418d12f0790d57e8d70",
+			"revision": "0bdeddeeb0f650497d603c4ad7b20cfe685682f6",
 			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "gopkg.in/yaml.v2",
+			"repository": "https://gopkg.in/yaml.v2",
+			"vcs": "git",
+			"revision": "a5b47d31c556af34a302ce5d659e6fea44d90de0",
+			"branch": "v2",
 			"notests": true
 		}
 	]

@@ -3,19 +3,12 @@ package launch
 import (
 	"github.com/DarthSim/overmind/utils"
 
-	"gopkg.in/alecthomas/kingpin.v2"
+	"gopkg.in/urfave/cli.v1"
 )
 
-// Handler handles args and flags for the launch command
-type Handler struct {
-	ProcessName string
-	CmdLine     string
-	SocketPath  string
-}
-
 // Run runs the launch command
-func (h *Handler) Run(_ *kingpin.ParseContext) error {
-	cmd, err := newCommand(h)
+func Run(c *cli.Context) error {
+	cmd, err := newCommand(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
 	utils.FatalOnErr(err)
 
 	utils.FatalOnErr(cmd.Run())

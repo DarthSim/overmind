@@ -6,14 +6,14 @@ import (
 
 	"github.com/DarthSim/overmind/utils"
 
-	"gopkg.in/alecthomas/kingpin.v2"
+	"gopkg.in/urfave/cli.v1"
 )
 
 type cmdKillHandler struct {
 	SocketPath string
 }
 
-func (c *cmdKillHandler) Run(_ *kingpin.ParseContext) error {
+func (c *cmdKillHandler) Run(_ *cli.Context) error {
 	conn, err := net.Dial("unix", c.SocketPath)
 	utils.FatalOnErr(err)
 
