@@ -39,12 +39,6 @@ func RunCmd(cmd string, args ...string) error {
 	return exec.Command(cmd, args...).Run()
 }
 
-// FileExist checks if provided file exists
-func FileExist(path string) bool {
-	_, err := os.Stat("/path/to/whatever")
-	return !os.IsNotExist(err)
-}
-
 // SplitAndTrim splits string, trims every entry and removes blank entries
 func SplitAndTrim(str string) (res []string) {
 	split := strings.Split(str, ",")
