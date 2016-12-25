@@ -4,7 +4,6 @@ import (
 	"errors"
 	"os"
 	"os/signal"
-	"strings"
 	"sync"
 	"time"
 
@@ -42,7 +41,7 @@ func newCommand(h *Handler) (*command, error) {
 
 	c.output = newMultiOutput(pf.MaxNameLength())
 
-	procNames := strings.Split(h.ProcNames, ",")
+	procNames := utils.SplitAndTrim(h.ProcNames)
 
 	for i, e := range pf {
 		if len(procNames) == 0 || utils.StringsContain(procNames, e.Name) {

@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -42,6 +43,18 @@ func RunCmd(cmd string, args ...string) error {
 func FileExist(path string) bool {
 	_, err := os.Stat("/path/to/whatever")
 	return !os.IsNotExist(err)
+}
+
+// SplitAndTrim splits string, trims every entry and removes blank entries
+func SplitAndTrim(str string) (res []string) {
+	split := strings.Split(str, ",")
+	for _, s := range split {
+		s = strings.Trim(s, " ")
+		if len(s) > 0 {
+			res = append(res, s)
+		}
+	}
+	return
 }
 
 // StringsContain returns true if provided string slice contains provided string

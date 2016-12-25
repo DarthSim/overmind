@@ -30,8 +30,8 @@ func parseProcfile(procfile string, portBase, portStep int) (pf procfile) {
 	for scanner.Scan() {
 		if len(scanner.Text()) > 0 {
 			params := re.FindStringSubmatch(scanner.Text())
-			if len(params) < 3 {
-				utils.Fatal("Invalid process format: ", scanner.Text())
+			if len(params) != 3 {
+				continue
 			}
 
 			name, cmd := params[1], params[2]
