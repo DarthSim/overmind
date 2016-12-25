@@ -16,6 +16,7 @@ type Handler struct {
 	PortBase, PortStep int
 	ProcNames          string
 	SocketPath         string
+	CanDie             string
 }
 
 // AbsRoot returns absolute path to the working directory

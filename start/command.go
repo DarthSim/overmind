@@ -21,6 +21,7 @@ type command struct {
 	stopTrig  chan os.Signal
 	processes processesMap
 	hash      string
+	canDie    []string
 }
 
 func newCommand(h *Handler) (*command, error) {
@@ -48,6 +49,8 @@ func newCommand(h *Handler) (*command, error) {
 			c.processes[e.Name] = newProcess(e.Name, c.hash, baseColor+i, e.Command, root, c.output)
 		}
 	}
+
+	c.canDie = utils.SplitAndTrim(h.CanDie)
 
 	c.cmdCenter = newCommandCenter(c.processes, h.SocketPath, c.output)
 
@@ -89,7 +92,11 @@ func (c *command) runProcesses() {
 
 		go func(p *process, trig chan bool, wg *sync.WaitGroup) {
 			defer wg.Done()
-			defer func() { trig <- true }()
+			defer func() {
+				if !utils.StringsContain(c.canDie, p.Name) {
+					trig <- true
+				}
+			}()
 
 			if err := p.Run(c.cmdCenter.SocketPath); err != nil {
 				c.output.WriteErr(p, err)
