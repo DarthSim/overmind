@@ -44,6 +44,16 @@ func FileExist(path string) bool {
 	return !os.IsNotExist(err)
 }
 
+// StringsContain returns true if provided string slice contains provided string
+func StringsContain(strs []string, str string) bool {
+	for _, s := range strs {
+		if s == str {
+			return true
+		}
+	}
+	return false
+}
+
 // Max finds max integer
 func Max(a, b int) int {
 	if b > a {

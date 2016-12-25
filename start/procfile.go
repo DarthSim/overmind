@@ -34,14 +34,16 @@ func parseProcfile(procfile string, portBase, portStep int) (pf procfile) {
 				utils.Fatal("Invalid process format: ", scanner.Text())
 			}
 
-			if names[params[1]] {
+			name, cmd := params[1], params[2]
+
+			if names[name] {
 				utils.Fatal("Process names must be uniq")
 			}
-			names[params[1]] = true
+			names[name] = true
 
 			pf = append(pf, procfileEntry{
-				params[1],
-				strings.Replace(params[2], "$PORT", strconv.Itoa(port), -1),
+				name,
+				strings.Replace(cmd, "$PORT", strconv.Itoa(port), -1),
 			})
 
 			port += portStep

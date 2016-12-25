@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"time"
 
@@ -41,8 +42,12 @@ func newCommand(h *Handler) (*command, error) {
 
 	c.output = newMultiOutput(pf.MaxNameLength())
 
+	procNames := strings.Split(h.ProcNames, ",")
+
 	for i, e := range pf {
-		c.processes[e.Name] = newProcess(e.Name, c.hash, baseColor+i, e.Command, root, c.output)
+		if len(procNames) == 0 || utils.StringsContain(procNames, e.Name) {
+			c.processes[e.Name] = newProcess(e.Name, c.hash, baseColor+i, e.Command, root, c.output)
+		}
 	}
 
 	c.cmdCenter = newCommandCenter(c.processes, h.SocketPath, c.output)
