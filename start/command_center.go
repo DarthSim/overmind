@@ -1,10 +1,11 @@
 package start
 
 import (
-	"bufio"
 	"fmt"
 	"net"
 	"regexp"
+
+	"github.com/DarthSim/overmind/utils"
 )
 
 type commandCenter struct {
@@ -55,14 +56,11 @@ func (c *commandCenter) Stop() {
 func (c *commandCenter) handleConnection(conn net.Conn) {
 	re := regexp.MustCompile("\\S+")
 
-	scanner := bufio.NewScanner(conn)
-	for scanner.Scan() {
-		args := re.FindAllString(scanner.Text(), -1)
-
-		// c.serviceMsg("%v", args)
+	utils.ScanLines(conn, func(b []byte) bool {
+		args := re.FindAllString(string(b), -1)
 
 		if len(args) == 0 {
-			continue
+			return true
 		}
 
 		cmd := args[0]
@@ -76,7 +74,7 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 		switch cmd {
 		case "attach":
 			c.processAttach(cmd, args, conn)
-			return
+			return false
 		case "restart":
 			c.processRestart(cmd, args)
 		case "kill":
@@ -84,7 +82,9 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 		case "get-session":
 			c.processGetSession(cmd, args, conn)
 		}
-	}
+
+		return true
+	})
 }
 
 func (c *commandCenter) processAttach(cmd string, args []string, conn net.Conn) {

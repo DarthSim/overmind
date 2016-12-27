@@ -9,7 +9,7 @@ type writerHelper struct {
 	writer io.Writer
 }
 
-func (w writerHelper) Write(p []byte) (n int, err error) {
+func (w writerHelper) Write(p []byte) (int, error) {
 	return w.writer.Write(p)
 }
 

@@ -1,8 +1,9 @@
 package launch
 
 import (
-	"bufio"
 	"net"
+
+	"github.com/DarthSim/overmind/utils"
 )
 
 type commandCenter struct {
@@ -18,19 +19,18 @@ func newCommandCenter(command *command, conn net.Conn) *commandCenter {
 }
 
 func (c *commandCenter) Start() {
-	scanner := bufio.NewScanner(c.conn)
-	for scanner.Scan() {
+	utils.ScanLines(c.conn, func(b []byte) bool {
 		if c.command.proc == nil {
-			continue
+			return true
 		}
 
-		cmd := scanner.Text()
-
-		switch cmd {
+		switch string(b) {
 		case "stop":
 			c.command.Stop()
 		case "restart":
 			c.command.Restart()
 		}
-	}
+
+		return true
+	})
 }

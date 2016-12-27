@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"math/rand"
 	"os"
 	"regexp"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/DarthSim/overmind/launch"
 	"github.com/DarthSim/overmind/start"
+	"github.com/DarthSim/overmind/utils"
 
 	"gopkg.in/urfave/cli.v1"
 )
@@ -130,10 +130,10 @@ func loadEnvFile() {
 		return
 	}
 
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		if env := re.FindStringSubmatch(scanner.Text()); len(env) == 3 {
+	utils.ScanLines(f, func(b []byte) bool {
+		if env := re.FindStringSubmatch(string(b)); len(env) == 3 {
 			os.Setenv(env[1], env[2])
 		}
-	}
+		return true
+	})
 }

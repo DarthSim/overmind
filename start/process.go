@@ -1,7 +1,6 @@
 package start
 
 import (
-	"bufio"
 	"fmt"
 	"net"
 	"os"
@@ -102,9 +101,12 @@ func (p *process) AttachConnection(conn net.Conn) {
 }
 
 func (p *process) scanConn() {
-	scanner := bufio.NewScanner(p.conn.Reader())
-	for scanner.Scan() {
-		p.output.WriteLine(p, scanner.Bytes())
+	err := utils.ScanLines(p.conn.Reader(), func(b []byte) bool {
+		p.output.WriteLine(p, b)
+		return true
+	})
+	if err != nil {
+		p.serviceMsg("Connection error:", err)
 	}
 	p.conn.Closed = true
 }

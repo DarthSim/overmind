@@ -1,7 +1,6 @@
 package start
 
 import (
-	"bufio"
 	"os"
 	"regexp"
 	"strconv"
@@ -26,31 +25,34 @@ func parseProcfile(procfile string, portBase, portStep int) (pf procfile) {
 	port := portBase
 	names := make(map[string]bool)
 
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		if len(scanner.Text()) > 0 {
-			params := re.FindStringSubmatch(scanner.Text())
-			if len(params) != 3 {
-				continue
-			}
-
-			name, cmd := params[1], params[2]
-
-			if names[name] {
-				utils.Fatal("Process names must be uniq")
-			}
-			names[name] = true
-
-			pf = append(pf, procfileEntry{
-				name,
-				strings.Replace(cmd, "$PORT", strconv.Itoa(port), -1),
-			})
-
-			port += portStep
+	err = utils.ScanLines(f, func(b []byte) bool {
+		if len(b) == 0 {
+			return true
 		}
-	}
 
-	utils.FatalOnErr(scanner.Err())
+		params := re.FindStringSubmatch(string(b))
+		if len(params) != 3 {
+			return true
+		}
+
+		name, cmd := params[1], params[2]
+
+		if names[name] {
+			utils.Fatal("Process names must be uniq")
+		}
+		names[name] = true
+
+		pf = append(pf, procfileEntry{
+			name,
+			strings.Replace(cmd, "$PORT", strconv.Itoa(port), -1),
+		})
+
+		port += portStep
+
+		return true
+	})
+
+	utils.FatalOnErr(err)
 
 	if len(pf) == 0 {
 		utils.Fatal("No entries was found in Procfile")
