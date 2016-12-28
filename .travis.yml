@@ -1,8 +1,7 @@
 language: go
 go:
-  - 1.5
   - 1.6
   - 1.7
   - tip
 script:
-  - GO15VENDOREXPERIMENT="1" go build
+  - go build
