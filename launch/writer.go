@@ -22,5 +22,5 @@ func (w writerHelper) WriteBoldLine(str string) {
 }
 
 func (w writerHelper) WriteErr(err error) {
-	fmt.Fprintf(w.writer, "\033[1;31m%v\033[0m\n", err)
+	fmt.Fprintf(w.writer, "\033[0;31m%v\033[0m\n", err)
 }

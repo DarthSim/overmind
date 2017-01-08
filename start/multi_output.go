@@ -60,6 +60,10 @@ func (o *multiOutput) WriteBoldLine(proc *process, p []byte) {
 	))
 }
 
+func (o *multiOutput) WriteBoldLinef(proc *process, format string, i ...interface{}) {
+	o.WriteBoldLine(proc, []byte(fmt.Sprintf(format, i...)))
+}
+
 func (o *multiOutput) WriteErr(proc *process, err error) {
-	o.WriteLine(proc, []byte(fmt.Sprintf("\033[1;31m%v\033[0m", err)))
+	o.WriteLine(proc, []byte(fmt.Sprintf("\033[0;31m%v\033[0m", err)))
 }

@@ -41,6 +41,12 @@ func RunCmd(cmd string, args ...string) error {
 	return exec.Command(cmd, args...).Run()
 }
 
+// RunCmdOutput runs shell command and returns it's output and running error
+func RunCmdOutput(cmd string, args ...string) (string, error) {
+	o, err := exec.Command(cmd, args...).Output()
+	return string(o), err
+}
+
 // SplitAndTrim splits string, trims every entry and removes blank entries
 func SplitAndTrim(str string) (res []string) {
 	split := strings.Split(str, ",")

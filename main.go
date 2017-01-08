@@ -83,7 +83,7 @@ func setupKillCmd() cli.Command {
 	return cli.Command{
 		Name:    "kill",
 		Aliases: []string{"k"},
-		Usage:   "Kills tmux sessions of all processes",
+		Usage:   "Kills all processes",
 		Action:  c.Run,
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "socket, s", Usage: "Path to overmind socket", Value: "./.overmind.sock", Destination: &c.SocketPath},
@@ -104,7 +104,7 @@ func main() {
 	app.HelpName = "overmind"
 	app.Usage = "The mind to rule processes of your development environment"
 	app.Description = strings.Join([]string{
-		"Overmind runs commands specified in procfile in separate tmux sessions.",
+		"Overmind runs commands specified in procfile in a tmux session.",
 		"This allows to connect to each process and manage processes on fly.",
 	}, " ")
 	app.Author = "Sergey \"DarthSim\" Alexandrovich"

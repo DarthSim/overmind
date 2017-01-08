@@ -7,8 +7,7 @@ import (
 )
 
 type processConnection struct {
-	conn   net.Conn
-	Closed bool
+	conn net.Conn
 }
 
 func (c *processConnection) Reader() io.Reader {

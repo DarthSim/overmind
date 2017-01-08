@@ -2,6 +2,7 @@ package start
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -20,7 +21,7 @@ type command struct {
 	doneWg    sync.WaitGroup
 	stopTrig  chan os.Signal
 	processes processesMap
-	hash      string
+	sessionID string
 	canDie    []string
 }
 
@@ -32,7 +33,7 @@ func newCommand(h *Handler) (*command, error) {
 		doneTrig:  make(chan bool, len(pf)),
 		stopTrig:  make(chan os.Signal),
 		processes: make(processesMap),
-		hash:      utils.RandomString(32),
+		sessionID: fmt.Sprintf("overmind-%v", utils.RandomString(32)),
 	}
 
 	root, err := h.AbsRoot()
@@ -46,13 +47,16 @@ func newCommand(h *Handler) (*command, error) {
 
 	for i, e := range pf {
 		if len(procNames) == 0 || utils.StringsContain(procNames, e.Name) {
-			c.processes[e.Name] = newProcess(e.Name, c.hash, baseColor+i, e.Command, root, c.output)
+			c.processes[e.Name] = newProcess(e.Name, c.sessionID, baseColor+i, e.Command, root, c.output)
 		}
 	}
 
 	c.canDie = utils.SplitAndTrim(h.CanDie)
 
-	c.cmdCenter = newCommandCenter(c.processes, h.SocketPath, c.output)
+	c.cmdCenter, err = newCommandCenter(c.processes, h.SocketPath, c.output)
+	if err != nil {
+		return nil, err
+	}
 
 	return &c, nil
 }
@@ -71,6 +75,9 @@ func (c *command) Run() error {
 
 	c.doneWg.Wait()
 
+	// Session should be killed after all windows exit, but just for sure...
+	c.killSession()
+
 	return nil
 }
 
@@ -87,7 +94,20 @@ func (c *command) stopCommandCenter() {
 }
 
 func (c *command) runProcesses() {
+	c.output.WriteBoldLinef(nil, "Tmux session ID: %v", c.sessionID)
+
+	newSession := true
+
 	for _, p := range c.processes {
+		if err := p.Start(c.cmdCenter.SocketPath, newSession); err != nil {
+			c.output.WriteErr(p, err)
+			c.doneTrig <- true
+			break
+		}
+
+		newSession = false
+
+		c.output.WriteBoldLinef(p, "Started with pid %v...", p.Pid)
 		c.doneWg.Add(1)
 
 		go func(p *process, trig chan bool, wg *sync.WaitGroup) {
@@ -98,10 +118,9 @@ func (c *command) runProcesses() {
 				}
 			}()
 
-			if err := p.Run(c.cmdCenter.SocketPath); err != nil {
-				c.output.WriteErr(p, err)
-				return
-			}
+			p.Wait()
+
+			c.output.WriteBoldLine(p, []byte("Exited"))
 		}(p, c.doneTrig, &c.doneWg)
 	}
 }
@@ -113,7 +132,7 @@ func (c *command) waitForExit() {
 
 	for {
 		for _, proc := range c.processes {
-			go proc.Stop()
+			proc.Stop()
 		}
 
 		c.waitForTimeoutOrStop()
@@ -132,4 +151,8 @@ func (c *command) waitForTimeoutOrStop() {
 	case <-time.After(time.Duration(c.timeout) * time.Second):
 	case <-c.stopTrig:
 	}
+}
+
+func (c *command) killSession() {
+	utils.RunCmd("tmux", "kill-session", "-t", c.sessionID)
 }

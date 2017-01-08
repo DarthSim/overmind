@@ -29,7 +29,7 @@ func (h *cmdConnectHandler) Run(c *cli.Context) error {
 	conn, err := net.Dial("unix", h.SocketPath)
 	utils.FatalOnErr(err)
 
-	fmt.Fprintf(conn, "get-session %v\n", c.Args().First())
+	fmt.Fprintf(conn, "get-window %v\n", c.Args().First())
 
 	sid, err := bufio.NewReader(conn).ReadString('\n')
 	utils.FatalOnErr(err)

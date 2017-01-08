@@ -3,6 +3,7 @@ package start
 import (
 	"fmt"
 	"net"
+	"path/filepath"
 	"regexp"
 
 	"github.com/DarthSim/overmind/utils"
@@ -17,13 +18,15 @@ type commandCenter struct {
 	SocketPath string
 }
 
-func newCommandCenter(processes processesMap, socket string, output *multiOutput) *commandCenter {
+func newCommandCenter(processes processesMap, socket string, output *multiOutput) (*commandCenter, error) {
+	s, err := filepath.Abs(socket)
+
 	return &commandCenter{
 		processes: processes,
 		output:    output,
 
-		SocketPath: socket,
-	}
+		SocketPath: s,
+	}, err
 }
 
 func (c *commandCenter) Start() (err error) {
@@ -31,7 +34,7 @@ func (c *commandCenter) Start() (err error) {
 		return
 	}
 
-	c.serviceMsg("Command center opened at %v", c.SocketPath)
+	c.output.WriteBoldLinef(nil, "Listening at %v", c.SocketPath)
 
 	go func(c *commandCenter) {
 		for {
@@ -50,7 +53,6 @@ func (c *commandCenter) Start() (err error) {
 func (c *commandCenter) Stop() {
 	c.stop = true
 	c.listener.Close()
-	c.serviceMsg("Command center closed")
 }
 
 func (c *commandCenter) handleConnection(conn net.Conn) {
@@ -79,8 +81,8 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 			c.processRestart(cmd, args)
 		case "kill":
 			c.processKill()
-		case "get-session":
-			c.processGetSession(cmd, args, conn)
+		case "get-window":
+			c.processGetWindow(cmd, args, conn)
 		}
 
 		return true
@@ -109,14 +111,10 @@ func (c *commandCenter) processKill() {
 	}
 }
 
-func (c *commandCenter) serviceMsg(f string, i ...interface{}) {
-	c.output.WriteBoldLine(nil, []byte(fmt.Sprintf(f, i...)))
-}
-
-func (c *commandCenter) processGetSession(cmd string, args []string, conn net.Conn) {
+func (c *commandCenter) processGetWindow(cmd string, args []string, conn net.Conn) {
 	if len(args) > 0 {
 		if proc, ok := c.processes[args[0]]; ok {
-			fmt.Fprintln(conn, proc.sessionID)
+			fmt.Fprintln(conn, proc.WindowID())
 		} else {
 			fmt.Fprintf(conn, "Unknown process: %v\n", args[0])
 		}
