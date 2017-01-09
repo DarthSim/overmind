@@ -96,7 +96,7 @@ func init() {
 }
 
 func main() {
-	loadEnvFile()
+	loadEnvFiles()
 
 	app := cli.NewApp()
 
@@ -122,18 +122,17 @@ func main() {
 	app.Run(os.Args)
 }
 
-func loadEnvFile() {
+func loadEnvFiles() {
 	re, _ := regexp.Compile("^(\\w+)=(.+)$")
 
-	f, err := os.Open("./.overmind.env")
-	if err != nil {
-		return
-	}
-
-	utils.ScanLines(f, func(b []byte) bool {
-		if env := re.FindStringSubmatch(string(b)); len(env) == 3 {
-			os.Setenv(env[1], env[2])
+	for _, path := range []string{"~/.overmind.env", "./.overmind.env"} {
+		if f, err := os.Open(path); err == nil {
+			utils.ScanLines(f, func(b []byte) bool {
+				if env := re.FindStringSubmatch(string(b)); len(env) == 3 {
+					os.Setenv(env[1], env[2])
+				}
+				return true
+			})
 		}
-		return true
-	})
+	}
 }
