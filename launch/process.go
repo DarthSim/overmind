@@ -10,6 +10,8 @@ import (
 	"github.com/pkg/term/termios"
 )
 
+const runningCheckInterval = 100 * time.Millisecond
+
 type process struct {
 	cmd         *exec.Cmd
 	writer      writerHelper
@@ -57,8 +59,10 @@ func runProcess(cmdLine string, writer writerHelper, tp termParams) (*process, e
 }
 
 func (p *process) Wait() {
-	for p.Running() {
-		time.Sleep(10 * time.Millisecond)
+	for _ = range time.Tick(runningCheckInterval) {
+		if !p.Running() {
+			return
+		}
 	}
 }
 

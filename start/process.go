@@ -4,11 +4,15 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/DarthSim/overmind/utils"
 )
+
+const runningCheckInterval = 100 * time.Millisecond
 
 type process struct {
 	command   string
@@ -16,10 +20,10 @@ type process struct {
 	sessionID string
 	output    *multiOutput
 	conn      *processConnection
+	proc      *os.Process
 
 	Name  string
 	Color int
-	Pid   string
 }
 
 type processesMap map[string]*process
@@ -56,24 +60,32 @@ func (p *process) Start(socketPath string, newSession bool) (err error) {
 		args = append([]string{"neww", "-t", p.sessionID}, args...)
 	}
 
-	p.Pid, err = utils.RunCmdOutput("tmux", args...)
-	p.Pid = strings.TrimSpace(p.Pid)
+	if pid, err := utils.RunCmdOutput("tmux", args...); err == nil {
+		if pid, err := strconv.Atoi(strings.TrimSpace(pid)); err == nil {
+			p.proc, err = os.FindProcess(pid)
+		}
+	}
 
 	return
 }
 
+func (p *process) Pid() int {
+	return p.proc.Pid
+}
+
 func (p *process) Wait() {
-	for p.Running() {
-		time.Sleep(100 * time.Millisecond)
+	for _ = range time.Tick(runningCheckInterval) {
+		if !p.Running() {
+			return
+		}
 	}
 }
 
 func (p *process) Running() bool {
-	if len(p.Pid) == 0 {
+	if p.proc == nil {
 		return false
 	}
-
-	return utils.RunCmd("/bin/sh", "-c", fmt.Sprintf("kill -0 %v", p.Pid)) == nil
+	return p.proc.Signal(syscall.Signal(0)) == nil
 }
 
 func (p *process) Stop() {
@@ -92,7 +104,8 @@ func (p *process) Kill() {
 	}
 
 	p.output.WriteBoldLine(p, []byte("Killing..."))
-	utils.RunCmd("/bin/sh", "-c", fmt.Sprintf("kill -9 %v", p.Pid))
+
+	p.proc.Signal(syscall.SIGKILL)
 }
 
 func (p *process) Restart() {
