@@ -9,3 +9,4 @@ Procfile.local
 .overmind.sock
 
 tmp/
+dist/
