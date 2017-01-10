@@ -20,6 +20,8 @@ There are a lot of Procfile runners written in different languages, but Overmind
 
 _Don't need all this powers? You may be interested in the Overmind's little sister - [Hivemind](https://github.com/DarthSim/hivemind)_
 
+![Overmind screenshot](http://img.darthsim.me/overmind.png)
+
 ## Installation
 
 _Because of using pty and tmux, Overmind doesn't support Windows._
