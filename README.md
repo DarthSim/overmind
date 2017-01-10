@@ -37,11 +37,11 @@ __Note:__ You can find installation manual for other systems here: https://githu
 
 There are two ways to install Overmind itself:
 
-#### Download the last Overmind release binary
+### Download the last Overmind release binary
 
 You can download the last release [here](https://github.com/DarthSim/overmind/releases/latest).
 
-#### Build Overmind from source
+### Build Overmind from source
 
 You need Go 1.6 or later to build the project.
 
