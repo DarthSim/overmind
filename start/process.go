@@ -61,8 +61,8 @@ func (p *process) Start(socketPath string, newSession bool) (err error) {
 	}
 
 	if pid, err := utils.RunCmdOutput("tmux", args...); err == nil {
-		if pid, err := strconv.Atoi(strings.TrimSpace(pid)); err == nil {
-			p.proc, err = os.FindProcess(pid)
+		if ipid, err := strconv.Atoi(strings.TrimSpace(pid)); err == nil {
+			p.proc, err = os.FindProcess(ipid)
 		}
 	}
 
