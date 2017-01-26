@@ -107,7 +107,7 @@ func (c *command) runProcesses() {
 
 		newSession = false
 
-		c.output.WriteBoldLinef(p, "Started with pid %v...", p.Pid)
+		c.output.WriteBoldLinef(p, "Started with pid %v...", p.Pid())
 		c.doneWg.Add(1)
 
 		go func(p *process, trig chan bool, wg *sync.WaitGroup) {
