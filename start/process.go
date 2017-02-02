@@ -82,48 +82,33 @@ func (p *process) Wait() {
 }
 
 func (p *process) Running() bool {
-	if p.proc == nil {
-		return false
-	}
-	return p.proc.Signal(syscall.Signal(0)) == nil
+	return p.proc != nil && p.proc.Signal(syscall.Signal(0)) == nil
 }
 
 func (p *process) Stop() {
-	if !p.Running() {
-		return
-	}
-
-	if p.conn != nil {
+	if p.Running() && p.conn != nil {
 		p.conn.Stop()
 	}
 }
 
 func (p *process) Kill() {
-	if !p.Running() {
-		return
+	if p.Running() {
+		p.output.WriteBoldLine(p, []byte("Killing..."))
+		p.proc.Signal(syscall.SIGKILL)
 	}
-
-	p.output.WriteBoldLine(p, []byte("Killing..."))
-
-	p.proc.Signal(syscall.SIGKILL)
 }
 
 func (p *process) Restart() {
-	if p.conn == nil {
-		return
+	if p.conn != nil {
+		p.conn.Restart()
 	}
-
-	p.conn.Restart()
 }
 
 func (p *process) AttachConnection(conn net.Conn) {
-	if p.conn != nil {
-		return
+	if p.conn == nil {
+		p.conn = &processConnection{conn}
+		go p.scanConn()
 	}
-
-	p.conn = &processConnection{conn}
-
-	go p.scanConn()
 }
 
 func (p *process) scanConn() {
