@@ -38,8 +38,9 @@ func (c *commandCenter) Start() (err error) {
 
 	go func(c *commandCenter) {
 		for {
-			conn, _ := c.listener.Accept()
-			go c.handleConnection(conn)
+			if conn, err := c.listener.Accept(); err == nil {
+				go c.handleConnection(conn)
+			}
 
 			if c.stop {
 				break
