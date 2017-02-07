@@ -1,5 +1,8 @@
 # Overmind
 
+<img align="right" width="224" height="74" title="Overmind logo"
+     src="https://cdn.rawgit.com/DarthSim/overmind/master/logo.svg">
+
 [![Build Status](https://travis-ci.org/DarthSim/overmind.svg?branch=master)](https://travis-ci.org/DarthSim/overmind)
 
 Overmind is a process manager for Procfile-based applications and [tmux](https://tmux.github.io/). With Overmind, you can easily run several processes from your `Procfile` in a single terminal.
@@ -172,6 +175,8 @@ $ overmind kill -s path/to/socket
 Sergey "DarthSim" Aleksandrovich
 
 Highly inspired by [Foreman](https://github.com/ddollar/foreman).
+
+Many thanks to @antiflasher for the awesome logo.
 
 ## License
 
