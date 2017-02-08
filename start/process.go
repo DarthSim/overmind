@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/DarthSim/overmind/term"
 	"github.com/DarthSim/overmind/utils"
 )
 
@@ -55,7 +56,12 @@ func (p *process) Start(socketPath string, newSession bool) (err error) {
 	}
 
 	if newSession {
-		args = append([]string{"new", "-d", "-s", p.sessionID}, args...)
+		ws, err := term.GetSize(os.Stdout)
+		if err != nil {
+			return err
+		}
+
+		args = append([]string{"new", "-d", "-s", p.sessionID, "-x", strconv.Itoa(int(ws.Cols)), "-y", strconv.Itoa(int(ws.Rows))}, args...)
 	} else {
 		args = append([]string{"neww", "-t", p.sessionID}, args...)
 	}
