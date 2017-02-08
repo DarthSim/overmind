@@ -10,10 +10,10 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/pkg/term",
-			"repository": "https://github.com/pkg/term",
+			"importpath": "github.com/kr/pty",
+			"repository": "https://github.com/kr/pty",
 			"vcs": "git",
-			"revision": "b1f72af2d63057363398bec5873d16a98b453312",
+			"revision": "ce7fa45920dc37a92de8377972e52bc55ffa8d57",
 			"branch": "master",
 			"notests": true
 		},

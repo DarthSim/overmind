@@ -7,7 +7,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/pkg/term/termios"
+	"github.com/DarthSim/overmind/term"
+	"github.com/kr/pty"
 )
 
 const runningCheckInterval = 100 * time.Millisecond
@@ -18,13 +19,13 @@ type process struct {
 	interrupted bool
 }
 
-func runProcess(cmdLine string, writer writerHelper, tp termParams) (*process, error) {
-	pty, tty, err := termios.Pty()
+func runProcess(cmdLine string, writer writerHelper, tp term.Params) (*process, error) {
+	pty, tty, err := pty.Open()
 	if err != nil {
 		return nil, err
 	}
 
-	if err := applyTermParams(pty, tp); err != nil {
+	if err := term.SetParams(pty, tp); err != nil {
 		return nil, err
 	}
 

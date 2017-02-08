@@ -5,6 +5,8 @@ import (
 	"io"
 	"net"
 	"os"
+
+	"github.com/DarthSim/overmind/term"
 )
 
 type command struct {
@@ -31,17 +33,17 @@ func (c *command) Run() error {
 	}
 
 	c.writer = writerHelper{io.MultiWriter(conn, os.Stdout)}
+	// c.writer = writerHelper{os.Stdout}
 
-	tp, err := getTermParams(os.Stdin)
+	tp, err := term.GetParams(os.Stdin)
 	if err != nil {
 		return err
 	}
 
-	t, err := rawTerm()
-	if err != nil {
+	if err := term.MakeRaw(os.Stdin); err != nil {
 		return err
 	}
-	defer closeTerm(t)
+	defer term.SetParams(os.Stdin, tp)
 
 	for {
 		if c.proc, err = runProcess(c.cmdLine, c.writer, tp); err != nil {
