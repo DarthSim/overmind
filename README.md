@@ -31,7 +31,7 @@ You may know several Procfile process management tools, but Overmind has some un
 
 ## Installation
 
-**Note:** At the moment, overmind supports Linux, *BSD, and macOS only.
+**Note:** At the moment, Overmind supports Linux, *BSD, and macOS only.
 
 Overmind works with [tmux](https://tmux.github.io/), so you need to install it first:
 
