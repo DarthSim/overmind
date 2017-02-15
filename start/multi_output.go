@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/DarthSim/overmind/utils"
@@ -65,5 +66,7 @@ func (o *multiOutput) WriteBoldLinef(proc *process, format string, i ...interfac
 }
 
 func (o *multiOutput) WriteErr(proc *process, err error) {
-	o.WriteLine(proc, []byte(fmt.Sprintf("\033[0;31m%v\033[0m", err)))
+	for _, str := range strings.Split(err.Error(), "\n") {
+		o.WriteLine(proc, []byte(fmt.Sprintf("\033[0;31m%v\033[0m", str)))
+	}
 }

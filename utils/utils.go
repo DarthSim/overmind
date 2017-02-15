@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand"
@@ -99,4 +100,13 @@ func ScanLines(r io.Reader, callback func([]byte) bool) error {
 		return err
 	}
 	return nil
+}
+
+// ConvertError converts specific errors to the standard error type
+func ConvertError(err error) error {
+	if exErr, ok := err.(*exec.ExitError); ok {
+		return errors.New(string(exErr.Stderr))
+	}
+
+	return err
 }

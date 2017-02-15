@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/DarthSim/overmind/term"
+	"github.com/DarthSim/overmind/utils"
 	"github.com/kr/pty"
 )
 
@@ -43,7 +44,7 @@ func runProcess(cmdLine string, writer writerHelper, tp term.Params) (*process, 
 	proc.cmd.SysProcAttr = &syscall.SysProcAttr{Setctty: true, Setsid: true}
 
 	if err := proc.cmd.Start(); err != nil {
-		proc.writer.WriteErr(err)
+		proc.writer.WriteErr(utils.ConvertError(err))
 		return nil, err
 	}
 
@@ -52,7 +53,7 @@ func runProcess(cmdLine string, writer writerHelper, tp term.Params) (*process, 
 		defer tty.Close()
 
 		if err := p.cmd.Wait(); err != nil {
-			p.writer.WriteErr(err)
+			p.writer.WriteErr(utils.ConvertError(err))
 		}
 	}(&proc, pty, tty)
 
