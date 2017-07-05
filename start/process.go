@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"syscall"
@@ -51,14 +52,14 @@ func (p *process) Start(socketPath string, newSession bool) (err error) {
 
 	args := []string{
 		"-n", p.Name, "-P", "-F", "#{pane_pid}",
-		"-c", p.root, os.Args[0], "launch", p.Name, p.command, socketPath,
+		os.Args[0], "launch", p.Name, p.command, socketPath,
 		"\\;", "allow-rename", "off",
 	}
 
 	if newSession {
-		ws, err := term.GetSize(os.Stdout)
-		if err != nil {
-			return err
+		ws, e := term.GetSize(os.Stdout)
+		if e != nil {
+			return e
 		}
 
 		args = append([]string{"new", "-d", "-s", p.sessionID, "-x", strconv.Itoa(int(ws.Cols)), "-y", strconv.Itoa(int(ws.Rows))}, args...)
@@ -66,11 +67,14 @@ func (p *process) Start(socketPath string, newSession bool) (err error) {
 		args = append([]string{"neww", "-t", p.sessionID}, args...)
 	}
 
-	var pid string
+	var pid []byte
 	var ipid int
 
-	if pid, err = utils.RunCmdOutput("tmux", args...); err == nil {
-		if ipid, err = strconv.Atoi(strings.TrimSpace(pid)); err == nil {
+	cmd := exec.Command("tmux", args...)
+	cmd.Dir = p.root
+
+	if pid, err = cmd.Output(); err == nil {
+		if ipid, err = strconv.Atoi(strings.TrimSpace(string(pid))); err == nil {
 			p.proc, err = os.FindProcess(ipid)
 		}
 	}
