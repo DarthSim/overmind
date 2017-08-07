@@ -45,7 +45,13 @@ $ apt-get install tmux
 
 **Note:** You can find installation manual for other systems here: https://github.com/tmux/tmux
 
-There are two ways to install Overmind:
+There are three ways to install Overmind:
+
+### With Homebrew (macOS)
+
+```bash
+brew install overmind
+```
 
 ### Download the latest Overmind release binary
 
