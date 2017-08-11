@@ -3,8 +3,6 @@ package start
 import (
 	"os"
 	"regexp"
-	"strconv"
-	"strings"
 
 	"github.com/DarthSim/overmind/utils"
 )
@@ -12,6 +10,7 @@ import (
 type procfileEntry struct {
 	Name    string
 	Command string
+	Port    int
 }
 
 type procfile []procfileEntry
@@ -42,10 +41,7 @@ func parseProcfile(procfile string, portBase, portStep int) (pf procfile) {
 		}
 		names[name] = true
 
-		pf = append(pf, procfileEntry{
-			name,
-			strings.Replace(cmd, "$PORT", strconv.Itoa(port), -1),
-		})
+		pf = append(pf, procfileEntry{name, cmd, port})
 
 		port += portStep
 

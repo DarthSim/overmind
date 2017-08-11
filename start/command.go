@@ -47,7 +47,7 @@ func newCommand(h *Handler) (*command, error) {
 
 	for i, e := range pf {
 		if len(procNames) == 0 || utils.StringsContain(procNames, e.Name) {
-			c.processes[e.Name] = newProcess(e.Name, c.sessionID, baseColor+i, e.Command, root, c.output)
+			c.processes[e.Name] = newProcess(e.Name, c.sessionID, baseColor+i, e.Command, root, e.Port, c.output)
 		}
 	}
 

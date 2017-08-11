@@ -12,16 +12,18 @@ import (
 type command struct {
 	processName string
 	cmdLine     string
+	port        string
 	socketPath  string
 	restart     bool
 	writer      writerHelper
 	proc        *process
 }
 
-func newCommand(procName, cmdLine, socketPath string) (*command, error) {
+func newCommand(procName, cmdLine, port, socketPath string) (*command, error) {
 	return &command{
 		processName: procName,
 		cmdLine:     cmdLine,
+		port:        port,
 		socketPath:  socketPath,
 	}, nil
 }
@@ -40,10 +42,12 @@ func (c *command) Run() error {
 		return err
 	}
 
-	if err := term.MakeRaw(os.Stdin); err != nil {
+	if err = term.MakeRaw(os.Stdin); err != nil {
 		return err
 	}
 	defer term.SetParams(os.Stdin, tp)
+
+	os.Setenv("PORT", c.port)
 
 	for {
 		if c.proc, err = runProcess(c.cmdLine, c.writer, tp); err != nil {

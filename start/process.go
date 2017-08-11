@@ -19,6 +19,7 @@ const runningCheckInterval = 100 * time.Millisecond
 type process struct {
 	command   string
 	root      string
+	port      int
 	sessionID string
 	output    *multiOutput
 	conn      *processConnection
@@ -30,10 +31,11 @@ type process struct {
 
 type processesMap map[string]*process
 
-func newProcess(name, sessionID string, color int, command, root string, output *multiOutput) *process {
+func newProcess(name, sessionID string, color int, command, root string, port int, output *multiOutput) *process {
 	return &process{
 		command:   command,
 		root:      root,
+		port:      port,
 		sessionID: sessionID,
 		output:    output,
 		Name:      name,
@@ -52,7 +54,7 @@ func (p *process) Start(socketPath string, newSession bool) (err error) {
 
 	args := []string{
 		"-n", p.Name, "-P", "-F", "#{pane_pid}",
-		os.Args[0], "launch", p.Name, p.command, socketPath,
+		os.Args[0], "launch", p.Name, p.command, strconv.Itoa(p.port), socketPath,
 		"\\;", "allow-rename", "off",
 	}
 
