@@ -8,10 +8,14 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 )
 
 const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+var badTitleCharsRe = regexp.MustCompile(`[^a-zA-Z0-9]`)
+var dashesRe = regexp.MustCompile(`-{2,}`)
 
 // FatalOnErr prints error and exits if errir is not nil
 func FatalOnErr(err error) {
@@ -35,6 +39,13 @@ func RandomString(strlen int) string {
 		result[i] = chars[rand.Intn(charsLen)]
 	}
 	return string(result)
+}
+
+// EscapeTitle makes title usable for tmux session name
+func EscapeTitle(title string) string {
+	return strings.ToLower(
+		dashesRe.ReplaceAllString(badTitleCharsRe.ReplaceAllString(title, "-"), "-"),
+	)
 }
 
 // RunCmd runs shell command and returns running error

@@ -25,6 +25,7 @@ func setupStartCmd() cli.Command {
 		Usage:   "Run procfile",
 		Action:  c.Run,
 		Flags: []cli.Flag{
+			cli.StringFlag{Name: "title, w", EnvVar: "OVERMIND_TITLE", Usage: "Specify a title of the application", Destination: &c.Title},
 			cli.StringFlag{Name: "procfile, f", EnvVar: "OVERMIND_PROCFILE", Usage: "Specify a Procfile to load", Value: "./Procfile", Destination: &c.Procfile},
 			cli.StringFlag{Name: "processes, l", EnvVar: "OVERMIND_PROCESSES", Usage: "Specify process names to launch. Divide names with comma", Destination: &c.ProcNames},
 			cli.StringFlag{Name: "root, d", Usage: "Specify a working directory of application. Default: directory containing the Procfile", Destination: &c.Root},

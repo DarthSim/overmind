@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 const baseColor = 32
 
 type command struct {
+	title     string
 	timeout   int
 	output    *multiOutput
 	cmdCenter *commandCenter
@@ -33,13 +35,20 @@ func newCommand(h *Handler) (*command, error) {
 		doneTrig:  make(chan bool, len(pf)),
 		stopTrig:  make(chan os.Signal),
 		processes: make(processesMap),
-		sessionID: fmt.Sprintf("overmind-%v", utils.RandomString(32)),
 	}
 
 	root, err := h.AbsRoot()
 	if err != nil {
 		return nil, err
 	}
+
+	if len(h.Title) > 0 {
+		c.title = h.Title
+	} else {
+		c.title = filepath.Base(root)
+	}
+
+	c.sessionID = fmt.Sprintf("overmind-%s-%s", utils.EscapeTitle(c.title), utils.RandomString(32))
 
 	c.output = newMultiOutput(pf.MaxNameLength())
 
@@ -62,6 +71,8 @@ func newCommand(h *Handler) (*command, error) {
 }
 
 func (c *command) Run() error {
+	fmt.Printf("\033]0;%s | overmind\007", c.title)
+
 	if !c.checkTmux() {
 		return errors.New("Can't find tmux. Did you forget to install it?")
 	}

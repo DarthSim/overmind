@@ -10,6 +10,7 @@ import (
 
 // Handler handles args and flags for the start command
 type Handler struct {
+	Title              string
 	Procfile           string
 	Root               string
 	Timeout            int
