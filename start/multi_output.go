@@ -33,10 +33,10 @@ func (o *multiOutput) WriteLine(proc *process, p []byte) {
 		color = proc.Color
 	} else {
 		name = "system"
-		color = 37
+		color = 7
 	}
 
-	colorStr := fmt.Sprintf("\033[1;%vm", color)
+	colorStr := fmt.Sprintf("\033[1;38;5;%vm", color)
 
 	buf.WriteString(colorStr)
 	buf.WriteString(name)

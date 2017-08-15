@@ -12,7 +12,7 @@ import (
 	"github.com/DarthSim/overmind/utils"
 )
 
-const baseColor = 32
+var colors = []int{2, 3, 4, 5, 6, 42, 130, 103, 129, 108}
 
 type command struct {
 	title     string
@@ -56,7 +56,7 @@ func newCommand(h *Handler) (*command, error) {
 
 	for i, e := range pf {
 		if len(procNames) == 0 || utils.StringsContain(procNames, e.Name) {
-			c.processes[e.Name] = newProcess(e.Name, c.sessionID, baseColor+i, e.Command, root, e.Port, c.output)
+			c.processes[e.Name] = newProcess(e.Name, c.sessionID, colors[i%len(colors)], e.Command, root, e.Port, c.output)
 		}
 	}
 
