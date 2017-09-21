@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/DarthSim/overmind/utils"
 
@@ -34,8 +35,14 @@ func (h *cmdConnectHandler) Run(c *cli.Context) error {
 	sid, err := bufio.NewReader(conn).ReadString('\n')
 	utils.FatalOnErr(err)
 
+	sid = strings.TrimSpace(sid)
+
+	if sid == "" {
+		utils.Fatal(fmt.Sprintf("Unknown process name: %s", c.Args().First()))
+	}
+
 	// For some reason this doesn't work without sh
-	cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf("tmux attach -t %v", sid))
+	cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf("tmux attach -t %s", sid))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin

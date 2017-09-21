@@ -117,7 +117,7 @@ func (c *commandCenter) processGetWindow(cmd string, args []string, conn net.Con
 		if proc, ok := c.processes[args[0]]; ok {
 			fmt.Fprintln(conn, proc.WindowID())
 		} else {
-			fmt.Fprintf(conn, "Unknown process: %v\n", args[0])
+			fmt.Fprintln(conn, "")
 		}
 	}
 }
