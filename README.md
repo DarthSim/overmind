@@ -102,6 +102,21 @@ $ overmind start -f path/to/your/Procfile
 $ OVERMIND_PROCFILE=path/to/your/Procfile overmind start
 ```
 
+#### Specifying the ports
+
+Overmind sets environment variable `PORT` for each process in your Procfile so that you can do things like this:
+
+```Procfile
+web: bin/rails server -p $PORT
+```
+
+Overmind assigns the port base (5000 by default) to `PORT` for the first process and increases `PORT` by port step (100 by default) for the each next one. You can specify port base and port step like this:
+
+```bash
+$ overmind start -p 3000 -P 10
+$ OVERMIND_PORT=3000 OVERMIND_PORT_STEP=10 overmind start
+```
+
 #### Running only the specified processes
 
 You can specify the names of processes you want to run:
