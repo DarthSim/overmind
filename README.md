@@ -157,7 +157,7 @@ If you need to set specific environment variables before running a `Procfile`, y
 ```
 PATH=$PATH:/additional/path
 OVERMIND_CAN_DIE=npm_install
-OVERMIND_PORT_BASE=3000
+OVERMIND_PORT=3000
 ```
 
 ### Specifying a socket
