@@ -39,8 +39,8 @@ func (h *Handler) AbsRoot() (string, error) {
 
 // Run runs the start command
 func (h *Handler) Run(c *cli.Context) error {
-	colors := strings.Split(c.String("colors"), ",")
-	if len(colors) > 0 {
+	if len(c.String("colors")) > 0 {
+		colors := strings.Split(c.String("colors"), ",")
 		h.Colors = make([]int, len(colors))
 		for i, s := range colors {
 			c, err := strconv.Atoi(strings.TrimSpace(s))
