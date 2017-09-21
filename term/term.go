@@ -22,7 +22,7 @@ type Params struct {
 }
 
 func ioctl(fd, request, argp uintptr) error {
-	if _, _, err := unix.Syscall(unix.SYS_IOCTL, fd, request, argp); err != 0 {
+	if _, _, err := unix.Syscall6(unix.SYS_IOCTL, fd, request, argp, 0, 0, 0); err != 0 {
 		return err
 	}
 	return nil
@@ -77,11 +77,11 @@ func MakeRaw(f *os.File) error {
 		return err
 	}
 
-	termios.Iflag &^= unix.BRKINT | unix.ICRNL | unix.INPCK | unix.ISTRIP | unix.IXON
+	termios.Iflag &^= unix.IGNBRK | unix.BRKINT | unix.PARMRK | unix.ISTRIP | unix.INLCR | unix.IGNCR | unix.ICRNL | unix.IXON
 	termios.Oflag &^= unix.OPOST
 	termios.Cflag &^= unix.CSIZE | unix.PARENB
 	termios.Cflag |= unix.CS8
-	termios.Lflag &^= unix.ECHO | unix.ICANON | unix.IEXTEN | unix.ISIG
+	termios.Lflag &^= unix.ECHO | unix.ECHONL | unix.ICANON | unix.ISIG | unix.IEXTEN
 	termios.Cc[unix.VMIN] = 1
 	termios.Cc[unix.VTIME] = 0
 
