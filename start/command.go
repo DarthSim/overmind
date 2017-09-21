@@ -12,7 +12,7 @@ import (
 	"github.com/DarthSim/overmind/utils"
 )
 
-var colors = []int{2, 3, 4, 5, 6, 42, 130, 103, 129, 108}
+var defaultColors = []int{2, 3, 4, 5, 6, 42, 130, 103, 129, 108}
 
 type command struct {
 	title     string
@@ -53,6 +53,11 @@ func newCommand(h *Handler) (*command, error) {
 	c.output = newMultiOutput(pf.MaxNameLength())
 
 	procNames := utils.SplitAndTrim(h.ProcNames)
+
+	colors := defaultColors
+	if len(h.Colors) > 0 {
+		colors = h.Colors
+	}
 
 	for i, e := range pf {
 		if len(procNames) == 0 || utils.StringsContain(procNames, e.Name) {

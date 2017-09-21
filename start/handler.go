@@ -1,7 +1,10 @@
 package start
 
 import (
+	"fmt"
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/DarthSim/overmind/utils"
 
@@ -18,6 +21,7 @@ type Handler struct {
 	ProcNames          string
 	SocketPath         string
 	CanDie             string
+	Colors             []int
 }
 
 // AbsRoot returns absolute path to the working directory
@@ -34,7 +38,19 @@ func (h *Handler) AbsRoot() (string, error) {
 }
 
 // Run runs the start command
-func (h *Handler) Run(_ *cli.Context) error {
+func (h *Handler) Run(c *cli.Context) error {
+	colors := strings.Split(c.String("colors"), ",")
+	if len(colors) > 0 {
+		h.Colors = make([]int, len(colors))
+		for i, s := range colors {
+			c, err := strconv.Atoi(strings.TrimSpace(s))
+			if err != nil || c < 0 || c > 255 {
+				return fmt.Errorf("Invalid xterm color code: %s", s)
+			}
+			h.Colors[i] = c
+		}
+	}
+
 	cmd, err := newCommand(h)
 	utils.FatalOnErr(err)
 

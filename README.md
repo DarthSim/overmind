@@ -135,6 +135,17 @@ $ overmind start -c assets,npm_install
 $ OVERMIND_CAN_DIE=assets,npm_install overmind start
 ```
 
+#### Specifying the colors
+
+Overmind colorizes process names with different colors. May happen that these colors don't match well with your color scheme. In this case, you can define your own colors using xterm color codes:
+
+```bash
+$ overmind start -b 123,123,125,126,127
+$ OVERMIND_COLORS=123,123,125,126,127 overmind start
+```
+
+If you want Overmind to always use these colors, you can specify them in the [environment file](https://github.com/DarthSim/overmind#overmind-environment) located in your home directory.
+
 ### Connecting to a process
 
 If you need to gain access to process input, you can connect to its `tmux` window:
