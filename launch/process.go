@@ -9,7 +9,7 @@ import (
 
 	"github.com/DarthSim/overmind/term"
 	"github.com/DarthSim/overmind/utils"
-	"github.com/kr/pty"
+	"github.com/pkg/term/termios"
 )
 
 const runningCheckInterval = 100 * time.Millisecond
@@ -21,7 +21,7 @@ type process struct {
 }
 
 func runProcess(cmdLine string, writer writerHelper, tp term.Params) (*process, error) {
-	pty, tty, err := pty.Open()
+	pty, tty, err := termios.Pty()
 	if err != nil {
 		return nil, err
 	}

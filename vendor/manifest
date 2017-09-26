@@ -10,11 +10,12 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/kr/pty",
-			"repository": "https://github.com/kr/pty",
+			"importpath": "github.com/pkg/term/termios",
+			"repository": "https://github.com/pkg/term",
 			"vcs": "git",
-			"revision": "ce7fa45920dc37a92de8377972e52bc55ffa8d57",
+			"revision": "b1f72af2d63057363398bec5873d16a98b453312",
 			"branch": "master",
+			"path": "/termios",
 			"notests": true
 		},
 		{
