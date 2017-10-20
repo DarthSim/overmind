@@ -11,6 +11,9 @@ Procfile is a simple format to specify types of processes your application provi
 
 There are some good Procfile-based process management tools, including [foreman](https://github.com/ddollar/foreman) by David Dollar, which started it all. The problem with most of those tools is that processes you want to manage start to think they are logging their output into a file, and that can lead to all sorts of problems: severe lagging, losing or breaking colored output. Tools can also add vanity information (unneeded timestamps in logs). Overmind was created to fix those problems once and for all.
 
+See this article for a good intro and all the juicy details! [Introducing
+Overmind and Hivemind](https://evilmartians.com/chronicles/introducing-overmind-and-hivemind)
+
 <a href="https://evilmartians.com/?utm_source=overmind">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54">
 </a>
