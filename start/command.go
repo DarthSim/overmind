@@ -59,13 +59,13 @@ func newCommand(h *Handler) (*command, error) {
 		colors = h.Colors
 	}
 
+	c.canDie = utils.SplitAndTrim(h.CanDie)
+
 	for i, e := range pf {
 		if len(procNames) == 0 || utils.StringsContain(procNames, e.Name) {
-			c.processes[e.Name] = newProcess(e.Name, c.sessionID, colors[i%len(colors)], e.Command, root, e.Port, c.output)
+			c.processes[e.Name] = newProcess(e.Name, c.sessionID, colors[i%len(colors)], e.Command, root, e.Port, c.output, utils.StringsContain(c.canDie, e.Name))
 		}
 	}
-
-	c.canDie = utils.SplitAndTrim(h.CanDie)
 
 	c.cmdCenter, err = newCommandCenter(c.processes, h.SocketPath, c.output)
 	if err != nil {
@@ -128,15 +128,9 @@ func (c *command) runProcesses() {
 
 		go func(p *process, trig chan bool, wg *sync.WaitGroup) {
 			defer wg.Done()
-			defer func() {
-				if !utils.StringsContain(c.canDie, p.Name) {
-					trig <- true
-				}
-			}()
+			defer func() { trig <- true }()
 
 			p.Wait()
-
-			c.output.WriteBoldLine(p, []byte("Exited"))
 		}(p, c.doneTrig, &c.doneWg)
 	}
 }

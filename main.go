@@ -44,7 +44,7 @@ func setupLaunchCmd() cli.Command {
 		Name:      "launch",
 		Usage:     "Launch process, connect to overmind socket, wait for instructions",
 		Action:    launch.Run,
-		ArgsUsage: "[process name] [shell command] [path to overmind socket]",
+		ArgsUsage: "[process name] [shell command] [path to overmind socket] [keep alive]",
 		Hidden:    true,
 	}
 }

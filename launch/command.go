@@ -14,17 +14,19 @@ type command struct {
 	cmdLine     string
 	port        string
 	socketPath  string
+	keep_alive  bool
 	restart     bool
 	writer      writerHelper
 	proc        *process
 }
 
-func newCommand(procName, cmdLine, port, socketPath string) (*command, error) {
+func newCommand(procName, cmdLine, port, socketPath string, keep_alive bool) (*command, error) {
 	return &command{
 		processName: procName,
 		cmdLine:     cmdLine,
 		port:        port,
 		socketPath:  socketPath,
+		keep_alive:  keep_alive,
 	}, nil
 }
 
@@ -35,7 +37,6 @@ func (c *command) Run() error {
 	}
 
 	c.writer = writerHelper{io.MultiWriter(conn, os.Stdout)}
-	// c.writer = writerHelper{os.Stdout}
 
 	tp, err := term.GetParams(os.Stdin)
 	if err != nil {
@@ -50,11 +51,15 @@ func (c *command) Run() error {
 	os.Setenv("PORT", c.port)
 
 	for {
-		if c.proc, err = runProcess(c.cmdLine, c.writer, tp); err != nil {
+		if c.proc, err = runProcess(c.cmdLine, c.writer, tp, c.keep_alive); err != nil {
 			return err
 		}
 
 		c.proc.Wait()
+
+		c.writer.WriteBoldLine("Exited")
+
+		c.proc.WaitKeepAlive()
 
 		if !c.restart {
 			break
