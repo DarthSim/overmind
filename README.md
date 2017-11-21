@@ -181,7 +181,7 @@ $ overmind kill
 
 ### Overmind environment
 
-If you need to set specific environment variables before running a `Procfile`, you can specify them in the `.overmind.env` file in the current working directory and/or your home directory. The file should contain `variable=value` pairs, one per line:
+If you need to set specific environment variables before running a `Procfile`, you can specify them in the `.overmind.env` file in the current working directory, your home directory, or/and in the `.env` file in in the current working directory. The file should contain `variable=value` pairs, one per line:
 
 ```
 PATH=$PATH:/additional/path

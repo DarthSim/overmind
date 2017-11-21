@@ -127,7 +127,12 @@ func main() {
 func loadEnvFiles() {
 	re, _ := regexp.Compile("^(\\w+)=(.+)$")
 
-	for _, path := range []string{"~/.overmind.env", "./.overmind.env"} {
+	envFiles := []string{"~/.overmind.env", "./.overmind.env", "./.env"}
+	if f := os.Getenv("OVERMIND_ENV"); len(f) > 0 {
+		envFiles = append(envFiles, f)
+	}
+
+	for _, path := range envFiles {
 		if f, err := os.Open(path); err == nil {
 			utils.ScanLines(f, func(b []byte) bool {
 				if env := re.FindStringSubmatch(string(b)); len(env) == 3 {
