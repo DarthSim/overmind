@@ -14,19 +14,19 @@ type command struct {
 	cmdLine     string
 	port        string
 	socketPath  string
-	keep_alive  bool
+	keepAlive   bool
 	restart     bool
 	writer      writerHelper
 	proc        *process
 }
 
-func newCommand(procName, cmdLine, port, socketPath string, keep_alive bool) (*command, error) {
+func newCommand(procName, cmdLine, port, socketPath string, keepAlive bool) (*command, error) {
 	return &command{
 		processName: procName,
 		cmdLine:     cmdLine,
 		port:        port,
 		socketPath:  socketPath,
-		keep_alive:  keep_alive,
+		keepAlive:   keepAlive,
 	}, nil
 }
 
@@ -51,7 +51,7 @@ func (c *command) Run() error {
 	os.Setenv("PORT", c.port)
 
 	for {
-		if c.proc, err = runProcess(c.cmdLine, c.writer, tp, c.keep_alive); err != nil {
+		if c.proc, err = runProcess(c.cmdLine, c.writer, tp, c.keepAlive); err != nil {
 			return err
 		}
 

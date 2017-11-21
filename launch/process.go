@@ -18,10 +18,10 @@ type process struct {
 	cmd         *exec.Cmd
 	writer      writerHelper
 	interrupted bool
-	keep_alive  bool
+	keepAlive   bool
 }
 
-func runProcess(cmdLine string, writer writerHelper, tp term.Params, keep_alive bool) (*process, error) {
+func runProcess(cmdLine string, writer writerHelper, tp term.Params, keepAlive bool) (*process, error) {
 	pty, tty, err := termios.Pty()
 	if err != nil {
 		return nil, err
@@ -32,9 +32,9 @@ func runProcess(cmdLine string, writer writerHelper, tp term.Params, keep_alive 
 	}
 
 	proc := process{
-		cmd:        exec.Command("/bin/sh", "-c", cmdLine),
-		writer:     writer,
-		keep_alive: keep_alive,
+		cmd:       exec.Command("/bin/sh", "-c", cmdLine),
+		writer:    writer,
+		keepAlive: keepAlive,
 	}
 
 	go io.Copy(proc.writer, pty)
@@ -72,7 +72,7 @@ func (p *process) Wait() {
 
 func (p *process) WaitKeepAlive() {
 	for _ = range time.Tick(runningCheckInterval) {
-		if !p.keep_alive {
+		if !p.keepAlive {
 			return
 		}
 	}
@@ -83,7 +83,7 @@ func (p *process) Running() bool {
 }
 
 func (p *process) Stop() {
-	p.keep_alive = false
+	p.keepAlive = false
 
 	if !p.Running() {
 		return

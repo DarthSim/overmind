@@ -22,7 +22,7 @@ type process struct {
 	port      int
 	sessionID string
 	output    *multiOutput
-	can_die   bool
+	canDie    bool
 	conn      *processConnection
 	proc      *os.Process
 
@@ -32,14 +32,14 @@ type process struct {
 
 type processesMap map[string]*process
 
-func newProcess(name, sessionID string, color int, command, root string, port int, output *multiOutput, can_die bool) *process {
+func newProcess(name, sessionID string, color int, command, root string, port int, output *multiOutput, canDie bool) *process {
 	return &process{
 		command:   command,
 		root:      root,
 		port:      port,
 		sessionID: sessionID,
 		output:    output,
-		can_die:   can_die,
+		canDie:    canDie,
 		Name:      name,
 		Color:     color,
 	}
@@ -54,14 +54,14 @@ func (p *process) Start(socketPath string, newSession bool) (err error) {
 		return
 	}
 
-	can_die := ""
-	if p.can_die {
-		can_die = "true"
+	canDie := ""
+	if p.canDie {
+		canDie = "true"
 	}
 
 	args := []string{
 		"-n", p.Name, "-P", "-F", "#{pane_pid}",
-		os.Args[0], "launch", p.Name, p.command, strconv.Itoa(p.port), socketPath, can_die,
+		os.Args[0], "launch", p.Name, p.command, strconv.Itoa(p.port), socketPath, canDie,
 		"\\;", "allow-rename", "off",
 	}
 
