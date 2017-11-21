@@ -195,6 +195,7 @@ Overmind receives commands via a Unix socket. Usually, it opens a socket named `
 
 ```bash
 $ overmind start -s path/to/socket
+$ OVERMIND_SOCKET=path/to/socket overmind start
 ```
 
 All other commands support the same flag:
