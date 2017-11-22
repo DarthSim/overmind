@@ -189,6 +189,12 @@ OVERMIND_CAN_DIE=npm_install
 OVERMIND_PORT=3000
 ```
 
+You can specify additional env file to load with `OVERMIND_ENV` variable:
+
+```
+$ OVERMIND_ENV=path/to/env overmind s
+```
+
 ### Specifying a socket
 
 Overmind receives commands via a Unix socket. Usually, it opens a socket named `.overmind.sock` in a working directory, but you can specify the full path:
