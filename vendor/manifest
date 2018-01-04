@@ -10,6 +10,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/joho/godotenv",
+			"repository": "https://github.com/joho/godotenv",
+			"vcs": "git",
+			"revision": "06e67b5ef3bef2e1a8696e1c04b94b44cbc5d9a5",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/pkg/term/termios",
 			"repository": "https://github.com/pkg/term",
 			"vcs": "git",

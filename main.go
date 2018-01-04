@@ -3,13 +3,12 @@ package main
 import (
 	"math/rand"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 
 	"github.com/DarthSim/overmind/launch"
 	"github.com/DarthSim/overmind/start"
-	"github.com/DarthSim/overmind/utils"
+	"github.com/joho/godotenv"
 
 	"gopkg.in/urfave/cli.v1"
 )
@@ -125,21 +124,15 @@ func main() {
 }
 
 func loadEnvFiles() {
-	re, _ := regexp.Compile("^(\\w+)=(.+)$")
-
 	envFiles := []string{"~/.overmind.env", "./.overmind.env", "./.env"}
 	if f := os.Getenv("OVERMIND_ENV"); len(f) > 0 {
 		envFiles = append(envFiles, f)
 	}
 
 	for _, path := range envFiles {
-		if f, err := os.Open(path); err == nil {
-			utils.ScanLines(f, func(b []byte) bool {
-				if env := re.FindStringSubmatch(string(b)); len(env) == 3 {
-					os.Setenv(env[1], env[2])
-				}
-				return true
-			})
-		}
+		// While godotenv.Overload allows multiple env files,
+		// it stops loading on first error ( e.g. `no such file or directory` ).
+		// So load each file individually to ensure all envFiles are loaded.
+		godotenv.Overload(path)
 	}
 }
