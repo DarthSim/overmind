@@ -18,6 +18,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/matoous/go-nanoid",
+			"repository": "https://github.com/matoous/go-nanoid",
+			"vcs": "git",
+			"revision": "958d370425a1ea42a4dd3c67d15bf02554a16b82",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/pkg/term/termios",
 			"repository": "https://github.com/pkg/term",
 			"vcs": "git",

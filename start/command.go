@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/DarthSim/overmind/utils"
+	gonanoid "github.com/matoous/go-nanoid"
 )
 
 var defaultColors = []int{2, 3, 4, 5, 6, 42, 130, 103, 129, 108}
@@ -48,7 +49,12 @@ func newCommand(h *Handler) (*command, error) {
 		c.title = filepath.Base(root)
 	}
 
-	c.sessionID = fmt.Sprintf("overmind-%s-%s", utils.EscapeTitle(c.title), utils.RandomString(32))
+	nanoid, err := gonanoid.Nanoid()
+	if err != nil {
+		return nil, err
+	}
+
+	c.sessionID = fmt.Sprintf("overmind-%s-%s", utils.EscapeTitle(c.title), nanoid)
 
 	c.output = newMultiOutput(pf.MaxNameLength())
 

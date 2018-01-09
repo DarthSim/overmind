@@ -5,14 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math/rand"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
 )
-
-const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 var badTitleCharsRe = regexp.MustCompile(`[^a-zA-Z0-9]`)
 var dashesRe = regexp.MustCompile(`-{2,}`)
@@ -29,16 +26,6 @@ func Fatal(i ...interface{}) {
 	fmt.Fprint(os.Stderr, "overmind: ")
 	fmt.Fprintln(os.Stderr, i...)
 	os.Exit(1)
-}
-
-// RandomString returns random string
-func RandomString(strlen int) string {
-	result := make([]byte, strlen)
-	charsLen := len(chars)
-	for i := 0; i < strlen; i++ {
-		result[i] = chars[rand.Intn(charsLen)]
-	}
-	return string(result)
 }
 
 // EscapeTitle makes title usable for tmux session name
