@@ -16,16 +16,17 @@ import (
 var defaultColors = []int{2, 3, 4, 5, 6, 42, 130, 103, 129, 108}
 
 type command struct {
-	title     string
-	timeout   int
-	output    *multiOutput
-	cmdCenter *commandCenter
-	doneTrig  chan bool
-	doneWg    sync.WaitGroup
-	stopTrig  chan os.Signal
-	processes processesMap
-	sessionID string
-	canDie    []string
+	title       string
+	timeout     int
+	output      *multiOutput
+	cmdCenter   *commandCenter
+	doneTrig    chan bool
+	doneWg      sync.WaitGroup
+	stopTrig    chan os.Signal
+	processes   processesMap
+	tmuxSocket  string
+	tmuxSession string
+	canDie      []string
 }
 
 func newCommand(h *Handler) (*command, error) {
@@ -54,7 +55,8 @@ func newCommand(h *Handler) (*command, error) {
 		return nil, err
 	}
 
-	c.sessionID = fmt.Sprintf("overmind-%s-%s", utils.EscapeTitle(c.title), nanoid)
+	c.tmuxSession = utils.EscapeTitle(c.title)
+	c.tmuxSocket = fmt.Sprintf("overmind-%s-%s", c.tmuxSession, nanoid)
 
 	c.output = newMultiOutput(pf.MaxNameLength())
 
@@ -69,7 +71,7 @@ func newCommand(h *Handler) (*command, error) {
 
 	for i, e := range pf {
 		if len(procNames) == 0 || utils.StringsContain(procNames, e.Name) {
-			c.processes[e.Name] = newProcess(e.Name, c.sessionID, colors[i%len(colors)], e.Command, root, e.Port, c.output, utils.StringsContain(c.canDie, e.Name))
+			c.processes[e.Name] = newProcess(e.Name, c.tmuxSocket, c.tmuxSession, colors[i%len(colors)], e.Command, root, e.Port, c.output, utils.StringsContain(c.canDie, e.Name))
 		}
 	}
 
@@ -116,7 +118,8 @@ func (c *command) stopCommandCenter() {
 }
 
 func (c *command) runProcesses() {
-	c.output.WriteBoldLinef(nil, "Tmux session ID: %v", c.sessionID)
+	c.output.WriteBoldLinef(nil, "Tmux socket name: %v", c.tmuxSocket)
+	c.output.WriteBoldLinef(nil, "Tmux session ID: %v", c.tmuxSession)
 
 	newSession := true
 
@@ -170,5 +173,5 @@ func (c *command) waitForTimeoutOrStop() {
 }
 
 func (c *command) killSession() {
-	utils.RunCmd("tmux", "kill-session", "-t", c.sessionID)
+	utils.RunCmd("tmux", "-L", c.tmuxSocket, "kill-session", "-t", c.tmuxSession)
 }

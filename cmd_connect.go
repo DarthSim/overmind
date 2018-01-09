@@ -30,19 +30,22 @@ func (h *cmdConnectHandler) Run(c *cli.Context) error {
 	conn, err := net.Dial("unix", h.SocketPath)
 	utils.FatalOnErr(err)
 
-	fmt.Fprintf(conn, "get-window %v\n", c.Args().First())
+	fmt.Fprintf(conn, "get-connection %v\n", c.Args().First())
 
-	sid, err := bufio.NewReader(conn).ReadString('\n')
+	response, err := bufio.NewReader(conn).ReadString('\n')
 	utils.FatalOnErr(err)
 
-	sid = strings.TrimSpace(sid)
-
-	if sid == "" {
+	response = strings.TrimSpace(response)
+	if response == "" {
 		utils.Fatal(fmt.Sprintf("Unknown process name: %s", c.Args().First()))
 	}
 
-	// For some reason this doesn't work without sh
-	cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf("tmux attach -t %s", sid))
+	parts := strings.Split(response, " ")
+	if len(parts) < 2 {
+		utils.Fatal("Invalid server response")
+	}
+
+	cmd := exec.Command("tmux", "-L", parts[0], "attach", "-t", parts[1])
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin

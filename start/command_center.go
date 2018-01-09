@@ -82,8 +82,8 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 			c.processRestart(cmd, args)
 		case "kill":
 			c.processKill()
-		case "get-window":
-			c.processGetWindow(cmd, args, conn)
+		case "get-connection":
+			c.processGetConnection(cmd, args, conn)
 		}
 
 		return true
@@ -112,10 +112,10 @@ func (c *commandCenter) processKill() {
 	}
 }
 
-func (c *commandCenter) processGetWindow(cmd string, args []string, conn net.Conn) {
+func (c *commandCenter) processGetConnection(cmd string, args []string, conn net.Conn) {
 	if len(args) > 0 {
 		if proc, ok := c.processes[args[0]]; ok {
-			fmt.Fprintln(conn, proc.WindowID())
+			fmt.Fprintf(conn, "%s %s\n", proc.tmuxSocket, proc.WindowID())
 		} else {
 			fmt.Fprintln(conn, "")
 		}

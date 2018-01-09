@@ -17,14 +17,15 @@ import (
 const runningCheckInterval = 100 * time.Millisecond
 
 type process struct {
-	command   string
-	root      string
-	port      int
-	sessionID string
-	output    *multiOutput
-	canDie    bool
-	conn      *processConnection
-	proc      *os.Process
+	command     string
+	root        string
+	port        int
+	tmuxSocket  string
+	tmuxSession string
+	output      *multiOutput
+	canDie      bool
+	conn        *processConnection
+	proc        *os.Process
 
 	Name  string
 	Color int
@@ -32,21 +33,22 @@ type process struct {
 
 type processesMap map[string]*process
 
-func newProcess(name, sessionID string, color int, command, root string, port int, output *multiOutput, canDie bool) *process {
+func newProcess(name, tmuxSocket, tmuxSession string, color int, command, root string, port int, output *multiOutput, canDie bool) *process {
 	return &process{
-		command:   command,
-		root:      root,
-		port:      port,
-		sessionID: sessionID,
-		output:    output,
-		canDie:    canDie,
-		Name:      name,
-		Color:     color,
+		command:     command,
+		root:        root,
+		port:        port,
+		tmuxSocket:  tmuxSocket,
+		tmuxSession: tmuxSession,
+		output:      output,
+		canDie:      canDie,
+		Name:        name,
+		Color:       color,
 	}
 }
 
 func (p *process) WindowID() string {
-	return fmt.Sprintf("%v:%v", p.sessionID, p.Name)
+	return fmt.Sprintf("%s:%s", p.tmuxSession, p.Name)
 }
 
 func (p *process) Start(socketPath string, newSession bool) (err error) {
@@ -71,10 +73,12 @@ func (p *process) Start(socketPath string, newSession bool) (err error) {
 			return e
 		}
 
-		args = append([]string{"new", "-d", "-s", p.sessionID, "-x", strconv.Itoa(int(ws.Cols)), "-y", strconv.Itoa(int(ws.Rows))}, args...)
+		args = append([]string{"new", "-d", "-s", p.tmuxSession, "-x", strconv.Itoa(int(ws.Cols)), "-y", strconv.Itoa(int(ws.Rows))}, args...)
 	} else {
-		args = append([]string{"neww", "-t", p.sessionID}, args...)
+		args = append([]string{"neww", "-t", p.tmuxSession}, args...)
 	}
+
+	args = append([]string{"-L", p.tmuxSocket}, args...)
 
 	var pid []byte
 	var ipid int
