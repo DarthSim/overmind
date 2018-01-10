@@ -5,6 +5,7 @@ import (
 	"net"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/DarthSim/overmind/utils"
 )
@@ -31,6 +32,9 @@ func newCommandCenter(processes processesMap, socket string, output *multiOutput
 
 func (c *commandCenter) Start() (err error) {
 	if c.listener, err = net.Listen("unix", c.SocketPath); err != nil {
+		if strings.Contains(err.Error(), "address already in use") {
+			err = fmt.Errorf("it looks like Overmind is already running. If it's not, remove %s and try again", c.SocketPath)
+		}
 		return
 	}
 
