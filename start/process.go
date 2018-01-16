@@ -75,7 +75,7 @@ func (p *process) Start(socketPath string, newSession bool) (err error) {
 
 		args = append([]string{"new", "-d", "-s", p.tmuxSession, "-x", strconv.Itoa(int(ws.Cols)), "-y", strconv.Itoa(int(ws.Rows))}, args...)
 	} else {
-		args = append([]string{"neww", "-t", p.tmuxSession}, args...)
+		args = append([]string{"neww", "-a", "-t", p.tmuxSession}, args...)
 	}
 
 	args = append([]string{"-L", p.tmuxSocket}, args...)
