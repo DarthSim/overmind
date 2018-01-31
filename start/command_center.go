@@ -79,9 +79,6 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 		}
 
 		switch cmd {
-		case "attach":
-			c.processAttach(cmd, args, conn)
-			return false
 		case "restart":
 			c.processRestart(cmd, args)
 		case "kill":
@@ -92,14 +89,6 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 
 		return true
 	})
-}
-
-func (c *commandCenter) processAttach(cmd string, args []string, conn net.Conn) {
-	if len(args) > 0 {
-		if proc, ok := c.processes[args[0]]; ok {
-			proc.AttachConnection(conn)
-		}
-	}
 }
 
 func (c *commandCenter) processRestart(cmd string, args []string) {
@@ -119,7 +108,7 @@ func (c *commandCenter) processKill() {
 func (c *commandCenter) processGetConnection(cmd string, args []string, conn net.Conn) {
 	if len(args) > 0 {
 		if proc, ok := c.processes[args[0]]; ok {
-			fmt.Fprintf(conn, "%s %s\n", proc.tmuxSocket, proc.WindowID())
+			fmt.Fprintf(conn, "%s %s\n", proc.tmux.Socket, proc.WindowID())
 		} else {
 			fmt.Fprintln(conn, "")
 		}

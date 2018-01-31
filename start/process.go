@@ -2,108 +2,98 @@ package start
 
 import (
 	"fmt"
-	"net"
+	"io"
 	"os"
-	"os/exec"
-	"strconv"
-	"strings"
+	"path/filepath"
 	"syscall"
 	"time"
 
-	"github.com/DarthSim/overmind/term"
 	"github.com/DarthSim/overmind/utils"
 )
 
 const runningCheckInterval = 100 * time.Millisecond
 
 type process struct {
-	command     string
-	root        string
-	port        int
-	tmuxSocket  string
-	tmuxSession string
-	output      *multiOutput
-	canDie      bool
-	conn        *processConnection
-	proc        *os.Process
+	output *multiOutput
 
-	Name  string
-	Color int
+	proc      *os.Process
+	procGroup *os.Process
+
+	canDie       bool
+	canDieNow    bool
+	keepingAlive bool
+	dead         bool
+	interrupted  bool
+	restart      bool
+
+	tmux     *tmuxClient
+	tmuxPane string
+
+	in  io.Writer
+	out io.Reader
+
+	Name    string
+	Color   int
+	Command string
 }
 
 type processesMap map[string]*process
 
-func newProcess(name, tmuxSocket, tmuxSession string, color int, command, root string, port int, output *multiOutput, canDie bool) *process {
+func newProcess(tmux *tmuxClient, name string, color int, command string, port int, output *multiOutput, canDie bool, scriptDir string) *process {
+	out, in := io.Pipe()
+
+	scriptFile, err := os.Create(filepath.Join(scriptDir, name))
+	utils.FatalOnErr(err)
+
+	fmt.Fprintf(scriptFile, "export PORT=%d\n", port)
+	fmt.Fprintln(scriptFile, command)
+
+	utils.FatalOnErr(scriptFile.Chmod(0744))
+
+	utils.FatalOnErr(scriptFile.Close())
+
 	return &process{
-		command:     command,
-		root:        root,
-		port:        port,
-		tmuxSocket:  tmuxSocket,
-		tmuxSession: tmuxSession,
-		output:      output,
-		canDie:      canDie,
-		Name:        name,
-		Color:       color,
+		output: output,
+		tmux:   tmux,
+
+		canDie:    canDie,
+		canDieNow: canDie,
+
+		in:  in,
+		out: out,
+
+		Name:    name,
+		Color:   color,
+		Command: scriptFile.Name(),
 	}
 }
 
 func (p *process) WindowID() string {
-	return fmt.Sprintf("%s:%s", p.tmuxSession, p.Name)
+	return fmt.Sprintf("%s:%s", p.tmux.Session, p.Name)
 }
 
-func (p *process) Start(socketPath string, newSession bool) (err error) {
-	if p.Running() {
-		return
+func (p *process) Start() {
+	if !p.Running() {
+		p.tmux.AddProcess(p)
+
+		p.waitPid()
+
+		go p.scanOuput()
+		go p.observe()
 	}
-
-	canDie := ""
-	if p.canDie {
-		canDie = "true"
-	}
-
-	args := []string{
-		"-n", p.Name, "-P", "-F", "#{pane_pid}",
-		os.Args[0], "launch", p.Name, p.command, strconv.Itoa(p.port), socketPath, canDie,
-		"\\;", "allow-rename", "off",
-	}
-
-	if newSession {
-		ws, e := term.GetSize(os.Stdout)
-		if e != nil {
-			return e
-		}
-
-		args = append([]string{"new", "-d", "-s", p.tmuxSession, "-x", strconv.Itoa(int(ws.Cols)), "-y", strconv.Itoa(int(ws.Rows))}, args...)
-	} else {
-		args = append([]string{"neww", "-a", "-t", p.tmuxSession}, args...)
-	}
-
-	args = append([]string{"-L", p.tmuxSocket}, args...)
-
-	var pid []byte
-	var ipid int
-
-	cmd := exec.Command("tmux", args...)
-	cmd.Dir = p.root
-
-	if pid, err = cmd.Output(); err == nil {
-		if ipid, err = strconv.Atoi(strings.TrimSpace(string(pid))); err == nil {
-			p.proc, err = os.FindProcess(ipid)
-		}
-	}
-
-	err = utils.ConvertError(err)
-
-	return
 }
 
 func (p *process) Pid() int {
-	return p.proc.Pid
+	if p.proc == nil {
+		return 0
+	}
+
+	return -p.proc.Pid
 }
 
 func (p *process) Wait() {
-	for _ = range time.Tick(runningCheckInterval) {
-		if !p.Running() {
+	for range time.Tick(runningCheckInterval) {
+		if p.dead {
 			return
 		}
 	}
@@ -114,12 +104,25 @@ func (p *process) Running() bool {
 }
 
 func (p *process) Stop() {
-	if p.Running() && p.conn != nil {
-		p.conn.Stop()
+	p.canDieNow = false
+
+	if p.interrupted {
+		// Ok, we have tried once, time to go brutal
+		p.Kill()
+		return
 	}
+
+	if p.Running() {
+		p.output.WriteBoldLine(p, []byte("Interrupting..."))
+		p.proc.Signal(syscall.SIGINT)
+	}
+
+	p.interrupted = true
 }
 
 func (p *process) Kill() {
+	p.canDieNow = false
+
 	if p.Running() {
 		p.output.WriteBoldLine(p, []byte("Killing..."))
 		p.proc.Signal(syscall.SIGKILL)
@@ -127,24 +130,59 @@ func (p *process) Kill() {
 }
 
 func (p *process) Restart() {
-	if p.conn != nil {
-		p.conn.Restart()
+	p.restart = true
+	p.Stop()
+}
+
+func (p *process) waitPid() {
+	for range time.Tick(runningCheckInterval) {
+		if p.Pid() != 0 {
+			break
+		}
 	}
 }
 
-func (p *process) AttachConnection(conn net.Conn) {
-	if p.conn == nil {
-		p.conn = &processConnection{conn}
-		go p.scanConn()
-	}
-}
-
-func (p *process) scanConn() {
-	err := utils.ScanLines(p.conn.Reader(), func(b []byte) bool {
+func (p *process) scanOuput() {
+	err := utils.ScanLines(p.out, func(b []byte) bool {
 		p.output.WriteLine(p, b)
 		return true
 	})
 	if err != nil {
-		p.output.WriteErr(p, fmt.Errorf("Connection error: %v", err))
+		p.output.WriteErr(p, fmt.Errorf("Output error: %v", err))
 	}
+}
+
+func (p *process) observe() {
+	for range time.Tick(runningCheckInterval) {
+		if !p.Running() {
+			if !p.keepingAlive {
+				p.output.WriteBoldLine(p, []byte("Exited"))
+				p.keepingAlive = true
+			}
+
+			if !p.canDieNow {
+				p.keepingAlive = false
+				p.proc = nil
+
+				if p.restart {
+					p.respawn()
+				} else {
+					p.dead = true
+					break
+				}
+			}
+		}
+	}
+}
+
+func (p *process) respawn() {
+	p.output.WriteBoldLine(p, []byte("Restarting..."))
+
+	p.restart = false
+	p.canDieNow = p.canDie
+	p.interrupted = false
+
+	p.tmux.RespawnProcess(p)
+
+	p.waitPid()
 }

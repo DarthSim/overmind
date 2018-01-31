@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/DarthSim/overmind/launch"
 	"github.com/DarthSim/overmind/start"
 	"github.com/joho/godotenv"
 
@@ -37,16 +36,6 @@ func setupStartCmd() cli.Command {
 			cli.StringFlag{Name: "formation, m", EnvVar: "OVERMIND_FORMATION", Usage: "Specify the number of each process type to run. The value passed in should be in the format process=num,process=num"},
 			cli.IntFlag{Name: "formation-port-step", EnvVar: "OVERMIND_FORMATION_PORT_STEP", Usage: "Specify a step to increase port number for the next instance of a process", Value: 10, Destination: &c.FormationPortStep},
 		},
-	}
-}
-
-func setupLaunchCmd() cli.Command {
-	return cli.Command{
-		Name:      "launch",
-		Usage:     "Launch process, connect to overmind socket, wait for instructions",
-		Action:    launch.Run,
-		ArgsUsage: "[process name] [shell command] [path to overmind socket] [keep alive]",
-		Hidden:    true,
 	}
 }
 
@@ -116,7 +105,6 @@ func main() {
 
 	app.Commands = []cli.Command{
 		setupStartCmd(),
-		setupLaunchCmd(),
 		setupRestartCmd(),
 		setupConnectCmd(),
 		setupKillCmd(),
