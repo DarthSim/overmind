@@ -100,6 +100,22 @@ func (p *process) Stop() {
 	}
 }
 
+func (p *process) KillOne() {
+	if !p.Running() {
+		return
+	}
+
+	if p.interrupted {
+		// Ok, we tried this easy way, it's time to kill
+		p.writer.WriteBoldLine("Killing...")
+		p.signal(syscall.SIGKILL)
+	} else {
+		p.writer.WriteBoldLine("Interrupting...")
+		p.signal(syscall.SIGINT)
+		p.interrupted = true
+	}
+}
+
 func (p *process) signal(sig os.Signal) {
 	if !p.Running() {
 		return

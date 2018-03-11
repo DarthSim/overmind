@@ -14,6 +14,10 @@ func (c *processConnection) Reader() io.Reader {
 	return io.Reader(c.conn)
 }
 
+func (c *processConnection) KillOne() {
+	fmt.Fprintln(c.conn, "kill")
+}
+
 func (c *processConnection) Stop() {
 	fmt.Fprintln(c.conn, "stop")
 }

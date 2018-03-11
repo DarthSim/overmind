@@ -25,6 +25,8 @@ func (c *commandCenter) Start() {
 		}
 
 		switch string(b) {
+		case "kill":
+			c.command.KillOne()
 		case "stop":
 			c.command.Stop()
 		case "restart":

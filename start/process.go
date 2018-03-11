@@ -126,6 +126,12 @@ func (p *process) Kill() {
 	}
 }
 
+func (p *process) KillOne() {
+	if p.Running() && p.conn != nil {
+		p.conn.KillOne()
+	}
+}
+
 func (p *process) Restart() {
 	if p.conn != nil {
 		p.conn.Restart()

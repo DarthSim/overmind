@@ -13,11 +13,11 @@ type cmdKillHandler struct {
 	SocketPath string
 }
 
-func (c *cmdKillHandler) Run(_ *cli.Context) error {
-	conn, err := net.Dial("unix", c.SocketPath)
+func (k *cmdKillHandler) Run(c *cli.Context) error {
+	conn, err := net.Dial("unix", k.SocketPath)
 	utils.FatalOnErr(err)
 
-	fmt.Fprintf(conn, "kill")
+	fmt.Fprintf(conn, "kill %v\n", strings.Join(c.Args(), " "))
 
 	return nil
 }
