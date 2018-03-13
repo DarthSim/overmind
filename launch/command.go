@@ -76,6 +76,10 @@ func (c *command) Stop() {
 	c.proc.Stop()
 }
 
+func (c *command) KillOne() {
+	c.proc.KillOne()
+}
+
 func (c *command) Restart() {
 	c.restart = true
 	c.Stop()

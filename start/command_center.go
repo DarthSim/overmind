@@ -85,7 +85,7 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 		case "restart":
 			c.processRestart(cmd, args)
 		case "kill":
-			c.processKill()
+			c.processKill(cmd, args)
 		case "get-connection":
 			c.processGetConnection(cmd, args, conn)
 		}
@@ -110,9 +110,17 @@ func (c *commandCenter) processRestart(cmd string, args []string) {
 	}
 }
 
-func (c *commandCenter) processKill() {
-	for _, p := range c.processes {
-		p.Kill()
+func (c *commandCenter) processKill(cmd string, args []string) {
+	if len(args) > 0 {
+		for _, n := range args {
+			if p, ok := c.processes[n]; ok {
+				p.KillOne()
+			}
+		}
+	} else {
+		for _, p := range c.processes {
+			p.Kill()
+		}
 	}
 }
 
