@@ -30,7 +30,7 @@ type command struct {
 }
 
 func newCommand(h *Handler) (*command, error) {
-	pf := parseProcfile(h.Procfile, h.PortBase, h.PortStep)
+	pf := parseProcfile(h.Procfile, h.PortBase, h.PortStep, h.Formation, h.FormationPortStep)
 
 	c := command{
 		timeout:   h.Timeout,

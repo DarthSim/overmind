@@ -1,6 +1,7 @@
 package start
 
 import (
+	"fmt"
 	"os"
 	"regexp"
 
@@ -15,7 +16,7 @@ type procfileEntry struct {
 
 type procfile []procfileEntry
 
-func parseProcfile(procfile string, portBase, portStep int) (pf procfile) {
+func parseProcfile(procfile string, portBase, portStep int, formation map[string]int, formationPortStep int) (pf procfile) {
 	re, _ := regexp.Compile("^([\\w-]+):\\s+(.+)$")
 
 	f, err := os.Open(procfile)
@@ -36,12 +37,25 @@ func parseProcfile(procfile string, portBase, portStep int) (pf procfile) {
 
 		name, cmd := params[1], params[2]
 
-		if names[name] {
-			utils.Fatal("Process names must be uniq")
+		num := 1
+		if fnum, ok := formation[name]; ok {
+			num = fnum
 		}
-		names[name] = true
 
-		pf = append(pf, procfileEntry{name, cmd, port})
+		for i := 0; i < num; i++ {
+			iname := name
+
+			if num > 1 {
+				iname = fmt.Sprintf("%s#%d", name, i+1)
+			}
+
+			if names[iname] {
+				utils.Fatal("Process names must be uniq")
+			}
+			names[iname] = true
+
+			pf = append(pf, procfileEntry{iname, cmd, port + (i * formationPortStep)})
+		}
 
 		port += portStep
 
