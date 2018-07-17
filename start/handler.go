@@ -42,10 +42,6 @@ func (h *Handler) AbsRoot() (string, error) {
 
 // Run runs the start command
 func (h *Handler) Run(c *cli.Context) error {
-	if strings.ContainsAny(h.Title, ".:") {
-		return errors.New("Due to the tmux restrictions, title can't contain . (dot) and : (colon)")
-	}
-
 	if len(c.String("colors")) > 0 {
 		colors := strings.Split(c.String("colors"), ",")
 		h.Colors = make([]int, len(colors))
