@@ -13,7 +13,7 @@
 			"importpath": "github.com/joho/godotenv",
 			"repository": "https://github.com/joho/godotenv",
 			"vcs": "git",
-			"revision": "06e67b5ef3bef2e1a8696e1c04b94b44cbc5d9a5",
+			"revision": "1709ab122c988931ad53508747b3c061400c2984",
 			"branch": "master",
 			"notests": true
 		},
