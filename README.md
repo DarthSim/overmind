@@ -197,6 +197,8 @@ You can specify additional env file to load with `OVERMIND_ENV` variable:
 $ OVERMIND_ENV=path/to/env overmind s
 ```
 
+You can also opt to SKIP loading the `.env` file entirely (`.overmind.env` will still be read) by setting the variable `OVERMIND_SKIP_ENV` (this can be set inside `.overmind.env`).
+
 ### Specifying a socket
 
 Overmind receives commands via a Unix socket. Usually, it opens a socket named `.overmind.sock` in a working directory, but you can specify the full path:
