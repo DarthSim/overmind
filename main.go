@@ -13,7 +13,7 @@ import (
 	"gopkg.in/urfave/cli.v1"
 )
 
-const version = "1.2.1"
+var version = "1.2.1"
 
 func setupStartCmd() cli.Command {
 	c := start.Handler{}
