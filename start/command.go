@@ -133,18 +133,17 @@ func (c *command) runProcesses() {
 	c.output.WriteBoldLinef(nil, "Tmux session ID: %v", c.tmux.Session)
 
 	for _, p := range c.processes {
-		p.Start()
-
-		c.output.WriteBoldLinef(p, "Started with pid %v...", p.Pid())
 		c.doneWg.Add(1)
 
 		go func(p *process, trig chan bool, wg *sync.WaitGroup) {
 			defer wg.Done()
 			defer func() { trig <- true }()
 
-			p.Wait()
+			p.StartObserving()
 		}(p, c.doneTrig, &c.doneWg)
 	}
+
+	utils.FatalOnErr(c.tmux.Start())
 }
 
 func (c *command) waitForExit() {

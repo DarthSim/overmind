@@ -52,7 +52,7 @@ func newProcess(tmux *tmuxClient, name string, color int, command string, port i
 
 	utils.FatalOnErr(scriptFile.Close())
 
-	return &process{
+	proc := &process{
 		output: output,
 		tmux:   tmux,
 
@@ -66,21 +66,27 @@ func newProcess(tmux *tmuxClient, name string, color int, command string, port i
 		Color:   color,
 		Command: scriptFile.Name(),
 	}
+
+	tmux.AddProcess(proc)
+
+	return proc
 }
 
 func (p *process) WindowID() string {
 	return fmt.Sprintf("%s:%s", p.tmux.Session, p.Name)
 }
 
-func (p *process) Start() {
+func (p *process) StartObserving() {
 	if !p.Running() {
-		p.tmux.AddProcess(p)
-
 		p.waitPid()
+
+		p.output.WriteBoldLinef(p, "Started with pid %v...", p.Pid())
 
 		go p.scanOuput()
 		go p.observe()
 	}
+
+	p.Wait()
 }
 
 func (p *process) Pid() int {
