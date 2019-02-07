@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/DarthSim/overmind/utils"
 
@@ -29,6 +30,8 @@ type tmuxClient struct {
 	processesByName processesMap
 
 	cmdMutex sync.Mutex
+
+	cmd *exec.Cmd
 
 	initKilled bool
 
@@ -60,7 +63,7 @@ func newTmuxClient(session, socket, root string) (*tmuxClient, error) {
 func (t *tmuxClient) Start() error {
 	go t.listen()
 
-	args := []string{"-C", "-L", t.Socket}
+	args := []string{"-CC", "-L", t.Socket}
 
 	first := true
 	for name, p := range t.processesByName {
@@ -73,15 +76,15 @@ func (t *tmuxClient) Start() error {
 		}
 	}
 
-	cmd := exec.Command("tmux", args...)
-	cmd.Stdout = t.tty
-	// cmd.Stdout = io.MultiWriter(t.tty, os.Stdout)
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = t.tty
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setctty: true, Setsid: true}
-	cmd.Dir = t.Root
+	t.cmd = exec.Command("tmux", args...)
+	t.cmd.Stdout = t.tty
+	// t.cmd.Stdout = io.MultiWriter(t.tty, os.Stdout)
+	t.cmd.Stderr = os.Stderr
+	t.cmd.Stdin = t.tty
+	t.cmd.SysProcAttr = &syscall.SysProcAttr{Setctty: true, Setsid: true}
+	t.cmd.Dir = t.Root
 
-	if err := cmd.Start(); err != nil {
+	if err := t.cmd.Start(); err != nil {
 		return err
 	}
 
@@ -151,4 +154,20 @@ func (t *tmuxClient) AddProcess(p *process) {
 
 func (t *tmuxClient) RespawnProcess(p *process) {
 	t.sendCmd("neww -k -t %s -P -F \"%s\" %s", p.Name, tmuxPaneFmt, p.Command)
+}
+
+func (t *tmuxClient) Shutdown() {
+	t.sendCmd("kill-session")
+
+	stopped := make(chan struct{})
+
+	go func() {
+		t.cmd.Process.Wait()
+		close(stopped)
+	}()
+
+	select {
+	case <-stopped:
+	case <-time.After(5 * time.Second):
+	}
 }

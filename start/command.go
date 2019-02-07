@@ -107,8 +107,7 @@ func (c *command) Run() error {
 
 	c.doneWg.Wait()
 
-	// Session should be killed after all windows exit, but just for sure...
-	c.killSession()
+	c.tmux.Shutdown()
 
 	// Cleanup created scripts
 	os.RemoveAll(c.scriptsDir)
@@ -174,8 +173,4 @@ func (c *command) waitForTimeoutOrStop() {
 	case <-time.After(time.Duration(c.timeout) * time.Second):
 	case <-c.stopTrig:
 	}
-}
-
-func (c *command) killSession() {
-	utils.RunCmd("tmux", "-L", c.tmux.Socket, "kill-session", "-t", c.tmux.Session)
 }
