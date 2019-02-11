@@ -101,11 +101,11 @@ func newCommand(h *Handler) (*command, error) {
 	return &c, nil
 }
 
-func (c *command) Run() error {
+func (c *command) Run() (int, error) {
 	fmt.Printf("\033]0;%s | overmind\007", c.title)
 
 	if !c.checkTmux() {
-		return errors.New("Can't find tmux. Did you forget to install it?")
+		return 1, errors.New("Can't find tmux. Did you forget to install it?")
 	}
 
 	c.startCommandCenter()
@@ -117,12 +117,16 @@ func (c *command) Run() error {
 
 	c.doneWg.Wait()
 
+	exitCode := c.tmux.ExitCode()
+
+	time.Sleep(time.Second)
+
 	c.tmux.Shutdown()
 
 	// Cleanup created scripts
 	os.RemoveAll(c.scriptsDir)
 
-	return nil
+	return exitCode, nil
 }
 
 func (c *command) checkTmux() bool {

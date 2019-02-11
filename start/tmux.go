@@ -2,6 +2,7 @@ package start
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -154,6 +155,25 @@ func (t *tmuxClient) AddProcess(p *process) {
 
 func (t *tmuxClient) RespawnProcess(p *process) {
 	t.sendCmd("neww -k -t %s -P -F \"%s\" %s", p.Name, tmuxPaneFmt, p.Command)
+}
+
+func (t *tmuxClient) ExitCode() (status int) {
+	buf := new(bytes.Buffer)
+
+	cmd := exec.Command("tmux", "-L", t.Socket, "list-windows", "-t", t.Session, "-F", "#{pane_dead_status}")
+	cmd.Stdout = buf
+	cmd.Stderr = os.Stderr
+	cmd.Run()
+
+	scanner := bufio.NewScanner(buf)
+
+	for scanner.Scan() {
+		if s, err := strconv.Atoi(scanner.Text()); err == nil && s > status {
+			status = s
+		}
+	}
+
+	return
 }
 
 func (t *tmuxClient) Shutdown() {

@@ -3,6 +3,7 @@ package start
 import (
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -67,7 +68,10 @@ func (h *Handler) Run(c *cli.Context) error {
 	cmd, err := newCommand(h)
 	utils.FatalOnErr(err)
 
-	utils.FatalOnErr(cmd.Run())
+	exitCode, err := cmd.Run()
+	utils.FatalOnErr(err)
+
+	os.Exit(exitCode)
 
 	return nil
 }
