@@ -94,17 +94,33 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 }
 
 func (c *commandCenter) processRestart(cmd string, args []string) {
-	for _, n := range args {
-		if p, ok := c.processes[n]; ok {
+	for name, p := range c.processes {
+		if len(args) == 0 {
 			p.Restart()
+			continue
+		}
+
+		for _, pattern := range args {
+			if utils.WildcardMatch(pattern, name) {
+				p.Restart()
+				break
+			}
 		}
 	}
 }
 
 func (c *commandCenter) processStop(cmd string, args []string) {
-	for _, n := range args {
-		if p, ok := c.processes[n]; ok {
+	for name, p := range c.processes {
+		if len(args) == 0 {
 			p.Stop(true)
+			continue
+		}
+
+		for _, pattern := range args {
+			if utils.WildcardMatch(pattern, name) {
+				p.Stop(true)
+				break
+			}
 		}
 	}
 }

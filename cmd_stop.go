@@ -15,10 +15,6 @@ type cmdStopHandler struct {
 }
 
 func (h *cmdStopHandler) Run(c *cli.Context) error {
-	if !c.Args().Present() {
-		utils.Fatal("Specify names of processes to be stopped")
-	}
-
 	conn, err := net.Dial("unix", h.SocketPath)
 	utils.FatalOnErr(err)
 

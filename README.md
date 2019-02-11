@@ -173,6 +173,14 @@ You can restart multiple processes the same way:
 $ overmind restart sidekiq assets
 ```
 
+It's also possible to use wildcarded process names:
+
+```bash
+$ overmind restart 'sidekiq*'
+```
+
+When the command is called without any arguments, it will restart all the processes.
+
 ### Stopping a process
 
 You can stop a single process without stopping all the other ones:
@@ -186,6 +194,14 @@ You can stop multiple processes the same way:
 ```bash
 $ overmind stop sidekiq assets
 ```
+
+It's also possible to use wildcarded process names:
+
+```bash
+$ overmind stop 'sidekiq*'
+```
+
+When the command is called without any arguments, it will stop all the processes without stopping Overmind itself.
 
 ### Killing processes
 

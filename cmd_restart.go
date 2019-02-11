@@ -15,10 +15,6 @@ type cmdRestartHandler struct {
 }
 
 func (h *cmdRestartHandler) Run(c *cli.Context) error {
-	if !c.Args().Present() {
-		utils.Fatal("Specify names of processes to be restarted")
-	}
-
 	conn, err := net.Dial("unix", h.SocketPath)
 	utils.FatalOnErr(err)
 
