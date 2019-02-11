@@ -6,11 +6,23 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/DarthSim/overmind/utils"
 
 	"gopkg.in/urfave/cli.v1"
 )
+
+var signalMap = map[string]syscall.Signal{
+	"ABRT": syscall.SIGABRT,
+	"INT":  syscall.SIGINT,
+	"KILL": syscall.SIGKILL,
+	"QUIT": syscall.SIGQUIT,
+	"STOP": syscall.SIGSTOP,
+	"TERM": syscall.SIGTERM,
+	"USR1": syscall.SIGUSR1,
+	"USR2": syscall.SIGUSR2,
+}
 
 // Handler handles args and flags for the start command
 type Handler struct {
@@ -25,6 +37,7 @@ type Handler struct {
 	Colors             []int
 	Formation          map[string]int
 	FormationPortStep  int
+	StopSignals        map[string]syscall.Signal
 }
 
 // AbsRoot returns absolute path to the working directory
@@ -42,9 +55,29 @@ func (h *Handler) AbsRoot() (string, error) {
 
 // Run runs the start command
 func (h *Handler) Run(c *cli.Context) error {
-	if len(c.String("colors")) > 0 {
-		colors := strings.Split(c.String("colors"), ",")
+	err := h.parseColors(c.String("colors"))
+	utils.FatalOnErr(err)
+
+	err = h.parseFormation(c.String("formation"))
+	utils.FatalOnErr(err)
+
+	err = h.parseStopSignals(c.String("stop-signals"))
+	utils.FatalOnErr(err)
+
+	cmd, err := newCommand(h)
+	utils.FatalOnErr(err)
+
+	utils.FatalOnErr(cmd.Run())
+
+	return nil
+}
+
+func (h *Handler) parseColors(colorsStr string) error {
+	if len(colorsStr) > 0 {
+		colors := strings.Split(colorsStr, ",")
+
 		h.Colors = make([]int, len(colors))
+
 		for i, s := range colors {
 			color, err := strconv.Atoi(strings.TrimSpace(s))
 			if err != nil || color < 0 || color > 255 {
@@ -54,11 +87,17 @@ func (h *Handler) Run(c *cli.Context) error {
 		}
 	}
 
-	if len(c.String("formation")) > 0 {
+	return nil
+}
+
+func (h *Handler) parseFormation(formation string) error {
+	if len(formation) > 0 {
 		maxProcNum := h.PortStep / h.FormationPortStep
 
-		entries := strings.Split(c.String("formation"), ",")
+		entries := strings.Split(formation, ",")
+
 		h.Formation = make(map[string]int)
+
 		for _, entry := range entries {
 			pair := strings.Split(entry, "=")
 
@@ -83,10 +122,34 @@ func (h *Handler) Run(c *cli.Context) error {
 		}
 	}
 
-	cmd, err := newCommand(h)
-	utils.FatalOnErr(err)
+	return nil
+}
 
-	utils.FatalOnErr(cmd.Run())
+func (h *Handler) parseStopSignals(signals string) error {
+	if len(signals) > 0 {
+		entries := strings.Split(signals, ",")
+
+		h.StopSignals = make(map[string]syscall.Signal)
+
+		for _, entry := range entries {
+			pair := strings.Split(entry, "=")
+
+			if len(pair) != 2 {
+				return errors.New("Invalid stop-signals format")
+			}
+
+			name := strings.TrimSpace(pair[0])
+			if len(name) == 0 {
+				return errors.New("Invalid stop-signals format")
+			}
+
+			if signal, ok := signalMap[pair[1]]; ok {
+				h.StopSignals[name] = signal
+			} else {
+				return fmt.Errorf("Invalid signal: %s", pair[1])
+			}
+		}
+	}
 
 	return nil
 }

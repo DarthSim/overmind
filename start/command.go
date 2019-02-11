@@ -29,7 +29,7 @@ type command struct {
 }
 
 func newCommand(h *Handler) (*command, error) {
-	pf := parseProcfile(h.Procfile, h.PortBase, h.PortStep, h.Formation, h.FormationPortStep)
+	pf := parseProcfile(h.Procfile, h.PortBase, h.PortStep, h.Formation, h.FormationPortStep, h.StopSignals)
 
 	c := command{
 		timeout:   h.Timeout,
@@ -79,7 +79,17 @@ func newCommand(h *Handler) (*command, error) {
 
 	for i, e := range pf {
 		if len(procNames) == 0 || utils.StringsContain(procNames, e.Name) {
-			c.processes[e.Name] = newProcess(c.tmux, e.Name, colors[i%len(colors)], e.Command, e.Port, c.output, utils.StringsContain(canDie, e.Name), c.scriptsDir)
+			c.processes[e.Name] = newProcess(
+				c.tmux,
+				e.Name,
+				colors[i%len(colors)],
+				e.Command,
+				e.Port,
+				c.output,
+				utils.StringsContain(canDie, e.Name),
+				c.scriptsDir,
+				e.StopSignal,
+			)
 		}
 	}
 

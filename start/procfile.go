@@ -4,19 +4,21 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"syscall"
 
 	"github.com/DarthSim/overmind/utils"
 )
 
 type procfileEntry struct {
-	Name    string
-	Command string
-	Port    int
+	Name       string
+	Command    string
+	Port       int
+	StopSignal syscall.Signal
 }
 
 type procfile []procfileEntry
 
-func parseProcfile(procfile string, portBase, portStep int, formation map[string]int, formationPortStep int) (pf procfile) {
+func parseProcfile(procfile string, portBase, portStep int, formation map[string]int, formationPortStep int, stopSignals map[string]syscall.Signal) (pf procfile) {
 	re, _ := regexp.Compile("^([\\w-]+):\\s+(.+)$")
 
 	f, err := os.Open(procfile)
@@ -42,6 +44,11 @@ func parseProcfile(procfile string, portBase, portStep int, formation map[string
 			num = fnum
 		}
 
+		signal := syscall.SIGINT
+		if s, ok := stopSignals[name]; ok {
+			signal = s
+		}
+
 		for i := 0; i < num; i++ {
 			iname := name
 
@@ -54,7 +61,15 @@ func parseProcfile(procfile string, portBase, portStep int, formation map[string
 			}
 			names[iname] = true
 
-			pf = append(pf, procfileEntry{iname, cmd, port + (i * formationPortStep)})
+			pf = append(
+				pf,
+				procfileEntry{
+					Name:       iname,
+					Command:    cmd,
+					Port:       port + (i * formationPortStep),
+					StopSignal: signal,
+				},
+			)
 		}
 
 		port += portStep
