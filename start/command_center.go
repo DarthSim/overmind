@@ -81,6 +81,8 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 		switch cmd {
 		case "restart":
 			c.processRestart(cmd, args)
+		case "stop":
+			c.processStop(cmd, args)
 		case "kill":
 			c.processKill()
 		case "get-connection":
@@ -99,9 +101,17 @@ func (c *commandCenter) processRestart(cmd string, args []string) {
 	}
 }
 
+func (c *commandCenter) processStop(cmd string, args []string) {
+	for _, n := range args {
+		if p, ok := c.processes[n]; ok {
+			p.Stop(true)
+		}
+	}
+}
+
 func (c *commandCenter) processKill() {
 	for _, p := range c.processes {
-		p.Kill()
+		p.Kill(false)
 	}
 }
 

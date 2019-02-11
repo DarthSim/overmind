@@ -151,13 +151,13 @@ func (c *command) waitForExit() {
 	c.waitForDoneOrStop()
 
 	for _, proc := range c.processes {
-		proc.Stop()
+		proc.Stop(false)
 	}
 
 	c.waitForTimeoutOrStop()
 
 	for _, proc := range c.processes {
-		proc.Kill()
+		proc.Kill(false)
 	}
 }
 

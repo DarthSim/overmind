@@ -109,12 +109,12 @@ func (p *process) Running() bool {
 	return p.proc != nil && p.proc.Signal(syscall.Signal(0)) == nil
 }
 
-func (p *process) Stop() {
-	p.canDieNow = false
+func (p *process) Stop(keepAlive bool) {
+	p.canDieNow = keepAlive
 
 	if p.interrupted {
 		// Ok, we have tried once, time to go brutal
-		p.Kill()
+		p.Kill(keepAlive)
 		return
 	}
 
@@ -126,8 +126,8 @@ func (p *process) Stop() {
 	p.interrupted = true
 }
 
-func (p *process) Kill() {
-	p.canDieNow = false
+func (p *process) Kill(keepAlive bool) {
+	p.canDieNow = keepAlive
 
 	if p.Running() {
 		p.output.WriteBoldLine(p, []byte("Killing..."))
@@ -137,7 +137,7 @@ func (p *process) Kill() {
 
 func (p *process) Restart() {
 	p.restart = true
-	p.Stop()
+	p.Stop(false)
 }
 
 func (p *process) waitPid() {

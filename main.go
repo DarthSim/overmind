@@ -54,6 +54,21 @@ func setupRestartCmd() cli.Command {
 	}
 }
 
+func setupStopCmd() cli.Command {
+	c := cmdStopHandler{}
+
+	return cli.Command{
+		Name:      "stop",
+		Aliases:   []string{"interrupt", "i"},
+		Usage:     "Restart specified processes",
+		Action:    c.Run,
+		ArgsUsage: "[process name...]",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "socket, s", EnvVar: "OVERMIND_SOCKET", Usage: "Path to overmind socket", Value: "./.overmind.sock", Destination: &c.SocketPath},
+		},
+	}
+}
+
 func setupConnectCmd() cli.Command {
 	c := cmdConnectHandler{}
 
@@ -106,6 +121,7 @@ func main() {
 	app.Commands = []cli.Command{
 		setupStartCmd(),
 		setupRestartCmd(),
+		setupStopCmd(),
 		setupConnectCmd(),
 		setupKillCmd(),
 	}

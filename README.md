@@ -173,6 +173,20 @@ You can restart multiple processes the same way:
 $ overmind restart sidekiq assets
 ```
 
+### Stopping a process
+
+You can stop a single process without stopping all the other ones:
+
+```bash
+$ overmind stop sidekiq
+```
+
+You can stop multiple processes the same way:
+
+```bash
+$ overmind stop sidekiq assets
+```
+
 ### Killing processes
 
 If something goes wrong, you can kill all running processes:
