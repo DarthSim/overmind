@@ -223,8 +223,16 @@ OVERMIND_PORT=3000
 
 You can specify additional env file to load with `OVERMIND_ENV` variable:
 
-```
+```bash
 $ OVERMIND_ENV=path/to/env overmind s
+```
+
+### Running a command in the Overmind environment
+
+Since you set up an environment with `.env` files, you may want to run a command inside this environment. You can do this using `run` command:
+
+```bash
+$ overmind run yarn install
 ```
 
 ### Specifying a socket

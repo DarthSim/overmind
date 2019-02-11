@@ -99,6 +99,18 @@ func setupKillCmd() cli.Command {
 	}
 }
 
+func setupRunCmd() cli.Command {
+	c := cmdRunHandler{}
+
+	return cli.Command{
+		Name:            "run",
+		Aliases:         []string{"exec", "e"},
+		Usage:           "Runs provided command within the Overmind environment",
+		Action:          c.Run,
+		SkipFlagParsing: true,
+	}
+}
+
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
@@ -125,6 +137,7 @@ func main() {
 		setupStopCmd(),
 		setupConnectCmd(),
 		setupKillCmd(),
+		setupRunCmd(),
 	}
 
 	app.Run(os.Args)
