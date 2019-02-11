@@ -7,7 +7,7 @@ This package is Go implementation of [ai's](https://github.com/ai) [nanoid](http
 
 **Safe.** It uses cryptographically strong random generator.
 
-**Compact.** It uses more symbols than UUID (`A-Za-z0-9_~`)
+**Compact.** It uses more symbols than UUID (`A-Za-z0-9_-`)
 and has the same number of unique options in just 22 symbols instead of 36.
 
 **Fast.** Nanoid is as fast as UUID but can be used in URLs.
@@ -28,10 +28,16 @@ Generate ID
 id, err := gonanoid.Nanoid()
 ```
 
+Generate ID with custom alphabet and length
+
+``` go
+id, err := gonanoid.Generate("abcde", 54)
+```
+
 ## Testing
 
 ``` bash
-$ go test -c -i -o /tmp/TestGenerate_in_gonanoid_test_gogo gonanoid
+$ go test
 ```
 
 ## Notice

@@ -2,40 +2,44 @@
 
 
 [[projects]]
-  digest = "1:d166a4b3543a71d87e34767ace94e8b516e79ba45111730306f07c8d6f797f1f"
+  digest = "1:ecd9aa82687cf31d1585d4ac61d0ba180e42e8a6182b85bd785fcca8dfeefc1b"
   name = "github.com/joho/godotenv"
   packages = ["."]
   pruneopts = "UT"
-  revision = "1709ab122c988931ad53508747b3c061400c2984"
+  revision = "23d116af351c84513e1946b527c88823e476be13"
+  version = "v1.3.0"
 
 [[projects]]
-  digest = "1:7fa2c91c6b85e6dffdba59a2679312025c33578cdef6ee218f3c26c5b1ea817b"
+  branch = "master"
+  digest = "1:7af7e6d4c8334420eb075b54d5eff873e375b32f0740e4e4c819b69e0704c32d"
   name = "github.com/matoous/go-nanoid"
   packages = ["."]
   pruneopts = "UT"
-  revision = "958d370425a1ea42a4dd3c67d15bf02554a16b82"
+  revision = "eab626deece6c9806cfbe2290859eb31a934edb0"
 
 [[projects]]
-  digest = "1:4f43b3c1b7e44980a5f3c593f8bf0e18844dc44f451a071c93e77e28cf990db6"
+  branch = "master"
+  digest = "1:fcb0de0dfbff6314fa0eb3672942d86054a713922b7c1bb0a690f59e6fe1ae3c"
   name = "github.com/pkg/term"
   packages = ["termios"]
   pruneopts = "UT"
-  revision = "b1f72af2d63057363398bec5873d16a98b453312"
+  revision = "aa71e9d9e942418fbb97d80895dcea70efed297c"
 
 [[projects]]
-  digest = "1:36e8440c31079d74414fd18f6b4ec10282f60c4abf3678ae3de48ab73010f532"
+  branch = "master"
+  digest = "1:8b466798e96432c23185ca32826702885299f94eb644c9a8dedb79771dff383a"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "d75a52659825e75fff6158388dddc6a5b04f9ba5"
+  revision = "3b5209105503162ded1863c307ac66fec31120dd"
 
 [[projects]]
-  digest = "1:01d3c3dfb7ef9da24cd00cbd5b9e2c147fa7a3f44a83028bc737da9cac7ed60b"
+  digest = "1:b24d38b282bacf9791408a080f606370efa3d364e4b5fd9ba0f7b87786d3b679"
   name = "gopkg.in/urfave/cli.v1"
   packages = ["."]
   pruneopts = "UT"
-  revision = "0bdeddeeb0f650497d603c4ad7b20cfe685682f6"
-  version = "v1.19.1"
+  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
+  version = "v1.20.0"
 
 [solve-meta]
   analyzer-name = "dep"
