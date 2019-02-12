@@ -61,7 +61,7 @@ func setupStopCmd() cli.Command {
 	return cli.Command{
 		Name:      "stop",
 		Aliases:   []string{"interrupt", "i"},
-		Usage:     "Restart specified processes",
+		Usage:     "Stop specified processes",
 		Action:    c.Run,
 		ArgsUsage: "[process name...]",
 		Flags: []cli.Flag{
