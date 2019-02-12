@@ -14,8 +14,7 @@ import (
 )
 
 type cmdConnectHandler struct {
-	ProcessName string
-	SocketPath  string
+	SocketPath string
 }
 
 func (h *cmdConnectHandler) Run(c *cli.Context) error {
