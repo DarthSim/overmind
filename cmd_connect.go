@@ -14,7 +14,8 @@ import (
 )
 
 type cmdConnectHandler struct {
-	SocketPath string
+	ControlMode bool
+	SocketPath  string
 }
 
 func (h *cmdConnectHandler) Run(c *cli.Context) error {
@@ -44,7 +45,13 @@ func (h *cmdConnectHandler) Run(c *cli.Context) error {
 		utils.Fatal("Invalid server response")
 	}
 
-	cmd := exec.Command("tmux", "-L", parts[0], "attach", "-t", parts[1])
+	args := []string{"-L", parts[0], "attach", "-t", parts[1]}
+
+	if h.ControlMode {
+		args = append([]string{"-CC"}, args...)
+	}
+
+	cmd := exec.Command("tmux", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
