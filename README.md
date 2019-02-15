@@ -234,6 +234,8 @@ The files will be loaded in the following order:
 * `./.env`
 * `$OVERMIND_ENV`
 
+You can also opt to skip loading the `.env` file entirely (`.overmind.env` will still be read) by setting the variable `OVERMIND_SKIP_ENV`.
+
 ### Running a command in the Overmind environment
 
 Since you set up an environment with `.env` files, you may want to run a command inside this environment. You can do this using `run` command:

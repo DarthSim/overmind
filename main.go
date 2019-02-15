@@ -145,15 +145,16 @@ func main() {
 }
 
 func loadEnvFiles() {
-	envFiles := []string{"~/.overmind.env", "./.overmind.env", "./.env"}
-	if f := os.Getenv("OVERMIND_ENV"); len(f) > 0 {
-		envFiles = append(envFiles, f)
+	// First load the specifically named overmind env files
+	godotenv.Overload("~/.overmind.env")
+	godotenv.Overload("./.overmind.env")
+
+	_, skipEnv := os.LookupEnv("OVERMIND_SKIP_ENV")
+	if !skipEnv {
+		godotenv.Overload("./.env")
 	}
 
-	for _, path := range envFiles {
-		// While godotenv.Overload allows multiple env files,
-		// it stops loading on first error ( e.g. `no such file or directory` ).
-		// So load each file individually to ensure all envFiles are loaded.
-		godotenv.Overload(path)
+	if f := os.Getenv("OVERMIND_ENV"); len(f) > 0 {
+		godotenv.Overload(f)
 	}
 }
