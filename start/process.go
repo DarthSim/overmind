@@ -46,6 +46,7 @@ func newProcess(tmux *tmuxClient, name string, color int, command string, port i
 	scriptFile, err := os.Create(filepath.Join(scriptDir, name))
 	utils.FatalOnErr(err)
 
+	fmt.Fprintln(scriptFile, "#!/bin/sh")
 	fmt.Fprintf(scriptFile, "export PORT=%d\n", port)
 	fmt.Fprintln(scriptFile, command)
 
