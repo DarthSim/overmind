@@ -7,7 +7,7 @@
 
 Overmind is a process manager for Procfile-based applications and [tmux](https://tmux.github.io/). With Overmind, you can easily run several processes from your `Procfile` in a single terminal.
 
-Procfile is a simple format to specify types of processes your application provides (such as web application server, background queue process, front-end builder) and commands to run those processes. It can significantly simplify process management for developers and is used by popular hosting platforms, such as Heroku and Deis. You can learn more about the `Procfile` format [here](https://devcenter.heroku.com/articles/procfile) or [here](http://docs.deis.io/en/latest/using_deis/process-types/).
+Procfile is a simple format to specify types of processes your application provides (such as web application server, background queue process, front-end builder) and commands to run those processes. It can significantly simplify process management for developers and is used by popular hosting platforms, such as Heroku and Deis. You can learn more about the `Procfile` format [here](https://devcenter.heroku.com/articles/procfile).
 
 There are some good Procfile-based process management tools, including [foreman](https://github.com/ddollar/foreman) by David Dollar, which started it all. The problem with most of those tools is that processes you want to manage start to think they are logging their output into a file, and that can lead to all sorts of problems: severe lagging, losing or breaking colored output. Tools can also add vanity information (unneeded timestamps in logs). Overmind was created to fix those problems once and for all.
 
@@ -173,6 +173,36 @@ You can restart multiple processes the same way:
 $ overmind restart sidekiq assets
 ```
 
+It's also possible to use wildcarded process names:
+
+```bash
+$ overmind restart 'sidekiq*'
+```
+
+When the command is called without any arguments, it will restart all the processes.
+
+### Stopping a process
+
+You can stop a single process without stopping all the other ones:
+
+```bash
+$ overmind stop sidekiq
+```
+
+You can stop multiple processes the same way:
+
+```bash
+$ overmind stop sidekiq assets
+```
+
+It's also possible to use wildcarded process names:
+
+```bash
+$ overmind stop 'sidekiq*'
+```
+
+When the command is called without any arguments, it will stop all the processes without stopping Overmind itself.
+
 ### Killing processes
 
 If something goes wrong, you can kill all running processes:
@@ -193,11 +223,26 @@ OVERMIND_PORT=3000
 
 You can specify additional env file to load with `OVERMIND_ENV` variable:
 
-```
+```bash
 $ OVERMIND_ENV=path/to/env overmind s
 ```
 
-You can also opt to SKIP loading the `.env` file entirely (`.overmind.env` will still be read) by setting the variable `OVERMIND_SKIP_ENV` (this can be set inside `.overmind.env`).
+The files will be loaded in the following order:
+
+* `~/.overmind.env`
+* `./.overmind.env`
+* `./.env`
+* `$OVERMIND_ENV`
+
+You can also opt to skip loading the `.env` file entirely (`.overmind.env` will still be read) by setting the variable `OVERMIND_SKIP_ENV`.
+
+### Running a command in the Overmind environment
+
+Since you set up an environment with `.env` files, you may want to run a command inside this environment. You can do this using `run` command:
+
+```bash
+$ overmind run yarn install
+```
 
 ### Specifying a socket
 

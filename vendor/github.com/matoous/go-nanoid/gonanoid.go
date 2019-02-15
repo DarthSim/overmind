@@ -5,28 +5,22 @@ import (
 	"math"
 )
 
-// DefaultsType is the type of the default configuration for Nanoid
-type DefaultsType struct {
-	Alphabet string
-	Size     int
-	MaskSize int
-}
+const (
+	defaultAlphabet = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" // len=64
+	defaultSize     = 22
+	defaultMaskSize = 5
+)
 
-// GetDefaults returns the default configuration for Nanoid
-func GetDefaults() *DefaultsType {
-	return &DefaultsType{
-		Alphabet: "_~0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", // len=64
-		Size:     22,
-		MaskSize: 5,
-	}
-}
+// Generator function
+type Generator func([]byte) (int, error)
 
-var defaults = GetDefaults()
+// BytesGenerator is the default bytes generator
+var BytesGenerator Generator = rand.Read
 
 func initMasks(params ...int) []uint {
 	var size int
 	if len(params) == 0 {
-		size = defaults.MaskSize
+		size = defaultMaskSize
 	} else {
 		size = params[0]
 	}
@@ -48,14 +42,6 @@ func getMask(alphabet string, masks []uint) int {
 	return 0
 }
 
-// Random generates cryptographically strong pseudo-random data.
-// The size argument is a number indicating the number of bytes to generate.
-func Random(size int) ([]byte, error) {
-	var randomBytes = make([]byte, size)
-	_, err := rand.Read(randomBytes)
-	return randomBytes, err
-}
-
 // Generate is a low-level function to change alphabet and ID size.
 func Generate(alphabet string, size int) (string, error) {
 	masks := initMasks(size)
@@ -66,7 +52,7 @@ func Generate(alphabet string, size int) (string, error) {
 	id := make([]byte, size)
 	bytes := make([]byte, step)
 	for j := 0; ; {
-		_, err := rand.Read(bytes)
+		_, err := BytesGenerator(bytes)
 		if err != nil {
 			return "", err
 		}
@@ -87,18 +73,18 @@ func Generate(alphabet string, size int) (string, error) {
 func Nanoid(param ...int) (string, error) {
 	var size int
 	if len(param) == 0 {
-		size = defaults.Size
+		size = defaultSize
 	} else {
 		size = param[0]
 	}
 	bytes := make([]byte, size)
-	_, err := rand.Read(bytes)
+	_, err := BytesGenerator(bytes)
 	if err != nil {
 		return "", err
 	}
 	id := make([]byte, size)
 	for i := 0; i < size; i++ {
-		id[i] = defaults.Alphabet[bytes[i]&63]
+		id[i] = defaultAlphabet[bytes[i]&63]
 	}
 	return string(id[:size]), nil
 }

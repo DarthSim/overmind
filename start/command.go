@@ -16,21 +16,20 @@ import (
 var defaultColors = []int{2, 3, 4, 5, 6, 42, 130, 103, 129, 108}
 
 type command struct {
-	title       string
-	timeout     int
-	output      *multiOutput
-	cmdCenter   *commandCenter
-	doneTrig    chan bool
-	doneWg      sync.WaitGroup
-	stopTrig    chan os.Signal
-	processes   processesMap
-	tmuxSocket  string
-	tmuxSession string
-	canDie      []string
+	title      string
+	timeout    int
+	tmux       *tmuxClient
+	output     *multiOutput
+	cmdCenter  *commandCenter
+	doneTrig   chan bool
+	doneWg     sync.WaitGroup
+	stopTrig   chan os.Signal
+	processes  processesMap
+	scriptsDir string
 }
 
 func newCommand(h *Handler) (*command, error) {
-	pf := parseProcfile(h.Procfile, h.PortBase, h.PortStep, h.Formation, h.FormationPortStep)
+	pf := parseProcfile(h.Procfile, h.PortBase, h.PortStep, h.Formation, h.FormationPortStep, h.StopSignals)
 
 	c := command{
 		timeout:   h.Timeout,
@@ -50,13 +49,19 @@ func newCommand(h *Handler) (*command, error) {
 		c.title = filepath.Base(root)
 	}
 
+	session := utils.EscapeTitle(c.title)
 	nanoid, err := gonanoid.Nanoid()
 	if err != nil {
 		return nil, err
 	}
 
-	c.tmuxSession = utils.EscapeTitle(c.title)
-	c.tmuxSocket = fmt.Sprintf("overmind-%s-%s", c.tmuxSession, nanoid)
+	instanceID := fmt.Sprintf("overmind-%s-%s", session, nanoid)
+
+	c.tmux, err = newTmuxClient(session, instanceID, root)
+
+	if err != nil {
+		return nil, err
+	}
 
 	c.output = newMultiOutput(pf.MaxNameLength())
 
@@ -67,11 +72,24 @@ func newCommand(h *Handler) (*command, error) {
 		colors = h.Colors
 	}
 
-	c.canDie = utils.SplitAndTrim(h.CanDie)
+	canDie := utils.SplitAndTrim(h.CanDie)
+
+	c.scriptsDir = filepath.Join(os.TempDir(), instanceID)
+	os.MkdirAll(c.scriptsDir, 0700)
 
 	for i, e := range pf {
 		if len(procNames) == 0 || utils.StringsContain(procNames, e.Name) {
-			c.processes[e.Name] = newProcess(e.Name, c.tmuxSocket, c.tmuxSession, colors[i%len(colors)], e.Command, root, e.Port, c.output, utils.StringsContain(c.canDie, e.Name))
+			c.processes[e.Name] = newProcess(
+				c.tmux,
+				e.Name,
+				colors[i%len(colors)],
+				e.Command,
+				e.Port,
+				c.output,
+				utils.StringsContain(canDie, e.Name),
+				c.scriptsDir,
+				e.StopSignal,
+			)
 		}
 	}
 
@@ -83,11 +101,11 @@ func newCommand(h *Handler) (*command, error) {
 	return &c, nil
 }
 
-func (c *command) Run() error {
+func (c *command) Run() (int, error) {
 	fmt.Printf("\033]0;%s | overmind\007", c.title)
 
 	if !c.checkTmux() {
-		return errors.New("Can't find tmux. Did you forget to install it?")
+		return 1, errors.New("Can't find tmux. Did you forget to install it?")
 	}
 
 	c.startCommandCenter()
@@ -99,10 +117,16 @@ func (c *command) Run() error {
 
 	c.doneWg.Wait()
 
-	// Session should be killed after all windows exit, but just for sure...
-	c.killSession()
+	exitCode := c.tmux.ExitCode()
 
-	return nil
+	time.Sleep(time.Second)
+
+	c.tmux.Shutdown()
+
+	// Cleanup created scripts
+	os.RemoveAll(c.scriptsDir)
+
+	return exitCode, nil
 }
 
 func (c *command) checkTmux() bool {
@@ -118,30 +142,21 @@ func (c *command) stopCommandCenter() {
 }
 
 func (c *command) runProcesses() {
-	c.output.WriteBoldLinef(nil, "Tmux socket name: %v", c.tmuxSocket)
-	c.output.WriteBoldLinef(nil, "Tmux session ID: %v", c.tmuxSession)
-
-	newSession := true
+	c.output.WriteBoldLinef(nil, "Tmux socket name: %v", c.tmux.Socket)
+	c.output.WriteBoldLinef(nil, "Tmux session ID: %v", c.tmux.Session)
 
 	for _, p := range c.processes {
-		if err := p.Start(c.cmdCenter.SocketPath, newSession); err != nil {
-			c.output.WriteErr(p, err)
-			c.doneTrig <- true
-			break
-		}
-
-		newSession = false
-
-		c.output.WriteBoldLinef(p, "Started with pid %v...", p.Pid())
 		c.doneWg.Add(1)
 
 		go func(p *process, trig chan bool, wg *sync.WaitGroup) {
 			defer wg.Done()
 			defer func() { trig <- true }()
 
-			p.Wait()
+			p.StartObserving()
 		}(p, c.doneTrig, &c.doneWg)
 	}
+
+	utils.FatalOnErr(c.tmux.Start())
 }
 
 func (c *command) waitForExit() {
@@ -149,12 +164,14 @@ func (c *command) waitForExit() {
 
 	c.waitForDoneOrStop()
 
-	for {
-		for _, proc := range c.processes {
-			proc.Stop()
-		}
+	for _, proc := range c.processes {
+		proc.Stop(false)
+	}
 
-		c.waitForTimeoutOrStop()
+	c.waitForTimeoutOrStop()
+
+	for _, proc := range c.processes {
+		proc.Kill(false)
 	}
 }
 
@@ -170,8 +187,4 @@ func (c *command) waitForTimeoutOrStop() {
 	case <-time.After(time.Duration(c.timeout) * time.Second):
 	case <-c.stopTrig:
 	}
-}
-
-func (c *command) killSession() {
-	utils.RunCmd("tmux", "-L", c.tmuxSocket, "kill-session", "-t", c.tmuxSession)
 }

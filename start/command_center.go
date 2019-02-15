@@ -79,11 +79,10 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 		}
 
 		switch cmd {
-		case "attach":
-			c.processAttach(cmd, args, conn)
-			return false
 		case "restart":
 			c.processRestart(cmd, args)
+		case "stop":
+			c.processStop(cmd, args)
 		case "kill":
 			c.processKill()
 		case "get-connection":
@@ -94,32 +93,48 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 	})
 }
 
-func (c *commandCenter) processAttach(cmd string, args []string, conn net.Conn) {
-	if len(args) > 0 {
-		if proc, ok := c.processes[args[0]]; ok {
-			proc.AttachConnection(conn)
+func (c *commandCenter) processRestart(cmd string, args []string) {
+	for name, p := range c.processes {
+		if len(args) == 0 {
+			p.Restart()
+			continue
+		}
+
+		for _, pattern := range args {
+			if utils.WildcardMatch(pattern, name) {
+				p.Restart()
+				break
+			}
 		}
 	}
 }
 
-func (c *commandCenter) processRestart(cmd string, args []string) {
-	for _, n := range args {
-		if p, ok := c.processes[n]; ok {
-			p.Restart()
+func (c *commandCenter) processStop(cmd string, args []string) {
+	for name, p := range c.processes {
+		if len(args) == 0 {
+			p.Stop(true)
+			continue
+		}
+
+		for _, pattern := range args {
+			if utils.WildcardMatch(pattern, name) {
+				p.Stop(true)
+				break
+			}
 		}
 	}
 }
 
 func (c *commandCenter) processKill() {
 	for _, p := range c.processes {
-		p.Kill()
+		p.Kill(false)
 	}
 }
 
 func (c *commandCenter) processGetConnection(cmd string, args []string, conn net.Conn) {
 	if len(args) > 0 {
 		if proc, ok := c.processes[args[0]]; ok {
-			fmt.Fprintf(conn, "%s %s\n", proc.tmuxSocket, proc.WindowID())
+			fmt.Fprintf(conn, "%s %s\n", proc.tmux.Socket, proc.WindowID())
 		} else {
 			fmt.Fprintln(conn, "")
 		}

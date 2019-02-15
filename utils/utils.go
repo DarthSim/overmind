@@ -62,6 +62,18 @@ func StringsContain(strs []string, str string) bool {
 	return false
 }
 
+// WildcardMatch returns true if provided string matches provided wildcard
+func WildcardMatch(pattern, str string) bool {
+	re := regexp.MustCompile(
+		fmt.Sprintf(
+			"^%s$",
+			strings.Replace(regexp.QuoteMeta(pattern), "\\*", ".*", -1),
+		),
+	)
+
+	return re.MatchString(str)
+}
+
 // Max finds max integer
 func Max(a, b int) int {
 	if b > a {
