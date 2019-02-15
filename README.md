@@ -3,7 +3,7 @@
 <img align="right" width="224" height="74" title="Overmind logo"
      src="https://cdn.rawgit.com/DarthSim/overmind/master/logo.svg">
 
-[![Build Status](https://travis-ci.org/DarthSim/overmind.svg?branch=master)](https://travis-ci.org/DarthSim/overmind)
+[![Release](https://img.shields.io/github/release/DarthSim/overmind.svg?style=for-the-badge)](https://github.com/DarthSim/overmind/releases/latest) [![Build Status](https://img.shields.io/travis/DarthSim/overmind.svg?style=for-the-badge)](https://travis-ci.org/DarthSim/overmind)
 
 Overmind is a process manager for Procfile-based applications and [tmux](https://tmux.github.io/). With Overmind, you can easily run several processes from your `Procfile` in a single terminal.
 
