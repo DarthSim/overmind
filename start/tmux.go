@@ -86,11 +86,7 @@ func (t *tmuxClient) Start() error {
 	t.cmd.SysProcAttr = &syscall.SysProcAttr{Setctty: true, Setsid: true}
 	t.cmd.Dir = t.Root
 
-	if err := t.cmd.Start(); err != nil {
-		return err
-	}
-
-	return nil
+	return t.cmd.Start()
 }
 
 func (t *tmuxClient) sendCmd(cmd string, arg ...interface{}) {
