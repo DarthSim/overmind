@@ -61,7 +61,7 @@ func (c *commandCenter) Stop() {
 }
 
 func (c *commandCenter) handleConnection(conn net.Conn) {
-	re := regexp.MustCompile("\\S+")
+	re := regexp.MustCompile(`\S+`)
 
 	utils.ScanLines(conn, func(b []byte) bool {
 		args := re.FindAllString(string(b), -1)

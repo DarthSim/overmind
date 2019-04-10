@@ -13,4 +13,5 @@ Procfile.*
 .overmind.sock
 
 tmp/
+.tmp/
 dist/

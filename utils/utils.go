@@ -100,7 +100,7 @@ func ScanLines(r io.Reader, callback func([]byte) bool) error {
 			return nil
 		}
 	}
-	if err != nil && err != io.EOF {
+	if err != io.EOF {
 		return err
 	}
 	return nil

@@ -16,8 +16,7 @@ const runningCheckInterval = 100 * time.Millisecond
 type process struct {
 	output *multiOutput
 
-	proc      *os.Process
-	procGroup *os.Process
+	proc *os.Process
 
 	stopSignal   syscall.Signal
 	canDie       bool

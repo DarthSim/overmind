@@ -18,9 +18,9 @@ import (
 )
 
 var tmuxUnescapeRe = regexp.MustCompile(`\\(\d{3})`)
-var tmuxOutputRe = regexp.MustCompile("%(\\S+) (.+)")
-var tmuxProcessRe = regexp.MustCompile("%(\\d+) (.+) (\\d+)")
-var outputRe = regexp.MustCompile("%(\\d+) (.+)")
+var tmuxOutputRe = regexp.MustCompile(`%(\S+) (.+)`)
+var tmuxProcessRe = regexp.MustCompile(`%(\d+) (.+) (\d+)`)
+var outputRe = regexp.MustCompile(`%(\d+) (.+)`)
 
 const tmuxPaneFmt = "%overmind-process #{pane_id} #{window_name} #{pane_pid}"
 
@@ -33,8 +33,6 @@ type tmuxClient struct {
 	cmdMutex sync.Mutex
 
 	cmd *exec.Cmd
-
-	initKilled bool
 
 	Root    string
 	Socket  string

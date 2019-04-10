@@ -19,7 +19,7 @@ type procfileEntry struct {
 type procfile []procfileEntry
 
 func parseProcfile(procfile string, portBase, portStep int, formation map[string]int, formationPortStep int, stopSignals map[string]syscall.Signal) (pf procfile) {
-	re, _ := regexp.Compile("^([\\w-]+):\\s+(.+)$")
+	re, _ := regexp.Compile(`^([\w-]+):\s+(.+)$`)
 
 	f, err := os.Open(procfile)
 	utils.FatalOnErr(err)

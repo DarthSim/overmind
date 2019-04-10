@@ -1,0 +1,11 @@
+linters:
+  fast: true
+  enable:
+    - golint
+    - govet
+    - gosimple
+    - goconst
+    - goimports
+  disable:
+    - errcheck
+
