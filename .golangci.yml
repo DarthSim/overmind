@@ -6,6 +6,7 @@ linters:
     - gosimple
     - goconst
     - goimports
+    - staticcheck
   disable:
     - errcheck
 

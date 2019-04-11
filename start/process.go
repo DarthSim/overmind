@@ -100,7 +100,10 @@ func (p *process) Pid() int {
 }
 
 func (p *process) Wait() {
-	for range time.Tick(runningCheckInterval) {
+	ticker := time.NewTicker(runningCheckInterval)
+	defer ticker.Stop()
+
+	for range ticker.C {
 		if p.dead {
 			return
 		}
@@ -143,7 +146,10 @@ func (p *process) Restart() {
 }
 
 func (p *process) waitPid() {
-	for range time.Tick(runningCheckInterval) {
+	ticker := time.NewTicker(runningCheckInterval)
+	defer ticker.Stop()
+
+	for range ticker.C {
 		if p.Pid() != 0 {
 			break
 		}
@@ -161,7 +167,10 @@ func (p *process) scanOuput() {
 }
 
 func (p *process) observe() {
-	for range time.Tick(runningCheckInterval) {
+	ticker := time.NewTicker(runningCheckInterval)
+	defer ticker.Stop()
+
+	for range ticker.C {
 		if !p.Running() {
 			if !p.keepingAlive {
 				p.output.WriteBoldLine(p, []byte("Exited"))

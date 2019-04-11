@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/DarthSim/overmind/utils"
@@ -160,7 +161,7 @@ func (c *command) runProcesses() {
 }
 
 func (c *command) waitForExit() {
-	signal.Notify(c.stopTrig, os.Interrupt, os.Kill)
+	signal.Notify(c.stopTrig, syscall.SIGINT, syscall.SIGTERM)
 
 	c.waitForDoneOrStop()
 
