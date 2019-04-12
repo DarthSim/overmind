@@ -79,7 +79,7 @@ func newCommand(h *Handler) (*command, error) {
 	os.MkdirAll(c.scriptsDir, 0700)
 
 	for i, e := range pf {
-		if len(procNames) == 0 || utils.StringsContain(procNames, e.Name) {
+		if len(procNames) == 0 || utils.StringsContain(procNames, e.OrigName) {
 			c.processes[e.Name] = newProcess(
 				c.tmux,
 				e.Name,
@@ -87,7 +87,7 @@ func newCommand(h *Handler) (*command, error) {
 				e.Command,
 				e.Port,
 				c.output,
-				utils.StringsContain(canDie, e.Name),
+				utils.StringsContain(canDie, e.OrigName),
 				c.scriptsDir,
 				e.StopSignal,
 			)

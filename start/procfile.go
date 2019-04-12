@@ -11,6 +11,7 @@ import (
 
 type procfileEntry struct {
 	Name       string
+	OrigName   string
 	Command    string
 	Port       int
 	StopSignal syscall.Signal
@@ -67,6 +68,7 @@ func parseProcfile(procfile string, portBase, portStep int, formation map[string
 				pf,
 				procfileEntry{
 					Name:       iname,
+					OrigName:   name,
 					Command:    cmd,
 					Port:       port + (i * formationPortStep),
 					StopSignal: signal,
