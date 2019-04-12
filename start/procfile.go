@@ -42,6 +42,8 @@ func parseProcfile(procfile string, portBase, portStep int, formation map[string
 		num := 1
 		if fnum, ok := formation[name]; ok {
 			num = fnum
+		} else if fnum, ok := formation["all"]; ok {
+			num = fnum
 		}
 
 		signal := syscall.SIGINT
