@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"regexp"
@@ -93,7 +92,6 @@ func (t *tmuxClient) Start() error {
 
 			if major, minor := tmuxVersion(); major < 2 || (major == 2 && minor < 6) {
 				if w, h, err := terminal.GetSize(int(os.Stdin.Fd())); err == nil {
-					log.Printf("Resizing client to %dx%d", w, h)
 					args = append(args, "refresh", "-C", fmt.Sprintf("%d,%d", w, h), ";")
 				}
 			}
