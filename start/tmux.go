@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"regexp"
@@ -15,8 +16,10 @@ import (
 	"github.com/DarthSim/overmind/utils"
 
 	"github.com/pkg/term/termios"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
+var tmuxVersionRe = regexp.MustCompile(`(\d+)\.(\d+)`)
 var tmuxUnescapeRe = regexp.MustCompile(`\\(\d{3})`)
 var tmuxOutputRe = regexp.MustCompile(`%(\S+) (.+)`)
 var tmuxProcessRe = regexp.MustCompile(`%(\d+) (.+) (\d+)`)
@@ -37,6 +40,23 @@ type tmuxClient struct {
 	Root    string
 	Socket  string
 	Session string
+}
+
+func tmuxVersion() (int, int) {
+	output, err := exec.Command("tmux", "-V").Output()
+	if err != nil {
+		return 0, 0
+	}
+
+	version := tmuxVersionRe.FindStringSubmatch(string(output))
+	if len(version) < 3 {
+		return 0, 0
+	}
+
+	major, _ := strconv.Atoi(version[1])
+	minor, _ := strconv.Atoi(version[2])
+
+	return major, minor
 }
 
 func newTmuxClient(session, socket, root string) (*tmuxClient, error) {
@@ -68,7 +88,16 @@ func (t *tmuxClient) Start() error {
 	for name, p := range t.processesByName {
 		if first {
 			first = false
+
 			args = append(args, "new", "-n", name, "-s", t.Session, "-P", "-F", tmuxPaneFmt, p.Command, ";")
+
+			if major, minor := tmuxVersion(); major < 2 || (major == 2 && minor < 6) {
+				if w, h, err := terminal.GetSize(int(os.Stdin.Fd())); err == nil {
+					log.Printf("Resizing client to %dx%d", w, h)
+					args = append(args, "refresh", "-C", fmt.Sprintf("%d,%d", w, h), ";")
+				}
+			}
+
 			args = append(args, "setw", "-g", "remain-on-exit", "on", ";")
 			args = append(args, "setw", "-g", "allow-rename", "off", ";")
 		} else {
