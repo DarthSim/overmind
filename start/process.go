@@ -21,6 +21,7 @@ type process struct {
 	stopSignal   syscall.Signal
 	canDie       bool
 	canDieNow    bool
+	autoRestart  bool
 	keepingAlive bool
 	dead         bool
 	interrupted  bool
@@ -39,7 +40,7 @@ type process struct {
 
 type processesMap map[string]*process
 
-func newProcess(tmux *tmuxClient, name string, color int, command string, port int, output *multiOutput, canDie bool, scriptDir string, stopSignal syscall.Signal) *process {
+func newProcess(tmux *tmuxClient, name string, color int, command string, port int, output *multiOutput, canDie bool, autoRestart bool, scriptDir string, stopSignal syscall.Signal) *process {
 	out, in := io.Pipe()
 
 	scriptFile, err := os.Create(filepath.Join(scriptDir, name))
@@ -57,9 +58,10 @@ func newProcess(tmux *tmuxClient, name string, color int, command string, port i
 		output: output,
 		tmux:   tmux,
 
-		stopSignal: stopSignal,
-		canDie:     canDie,
-		canDieNow:  canDie,
+		stopSignal:  stopSignal,
+		canDie:      autoRestart || canDie,
+		canDieNow:   autoRestart || canDie,
+		autoRestart: autoRestart,
 
 		in:  in,
 		out: out,
@@ -177,7 +179,10 @@ func (p *process) observe() {
 				p.keepingAlive = true
 			}
 
-			if !p.canDieNow {
+			if !p.interrupted && p.autoRestart {
+				p.keepingAlive = true
+				p.respawn()
+			} else if !p.canDieNow {
 				p.keepingAlive = false
 				p.proc = nil
 

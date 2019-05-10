@@ -35,6 +35,7 @@ type Handler struct {
 	ProcNames          string
 	SocketPath         string
 	CanDie             string
+	AutoRestart        string
 	Colors             []int
 	Formation          map[string]int
 	FormationPortStep  int
