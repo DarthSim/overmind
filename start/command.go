@@ -74,6 +74,7 @@ func newCommand(h *Handler) (*command, error) {
 	}
 
 	canDie := utils.SplitAndTrim(h.CanDie)
+	autoRestart := utils.SplitAndTrim(h.AutoRestart)
 
 	c.scriptsDir = filepath.Join(os.TempDir(), instanceID)
 	os.MkdirAll(c.scriptsDir, 0700)
@@ -88,6 +89,7 @@ func newCommand(h *Handler) (*command, error) {
 				e.Port,
 				c.output,
 				utils.StringsContain(canDie, e.OrigName),
+				utils.StringsContain(autoRestart, e.OrigName),
 				c.scriptsDir,
 				e.StopSignal,
 			)
