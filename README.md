@@ -236,6 +236,11 @@ The files will be loaded in the following order:
 
 You can also opt to skip loading the `.env` file entirely (`.overmind.env` will still be read) by setting the variable `OVERMIND_SKIP_ENV`.
 
+An example if you want to use a separate `Procfile.dev` by default on a local environment:
+> create .overmind.env file (ignored by git) with OVERMIND_PROCFILE=Procfile.dev
+
+Now Overmind uses Procfile.dev by default.
+
 ### Running a command in the Overmind environment
 
 Since you set up an environment with `.env` files, you may want to run a command inside this environment. You can do this using `run` command:
