@@ -221,6 +221,8 @@ OVERMIND_CAN_DIE=npm_install
 OVERMIND_PORT=3000
 ```
 
+For example, if you want to use a separate `Procfile.dev` by default on a local environment, create `.overmind.env` file with `OVERMIND_PROCFILE=Procfile.dev`. Now, Overmind uses `Procfile.dev` by default.
+
 You can specify additional env file to load with `OVERMIND_ENV` variable:
 
 ```bash
@@ -235,11 +237,6 @@ The files will be loaded in the following order:
 * `$OVERMIND_ENV`
 
 You can also opt to skip loading the `.env` file entirely (`.overmind.env` will still be read) by setting the variable `OVERMIND_SKIP_ENV`.
-
-An example if you want to use a separate `Procfile.dev` by default on a local environment:
-> create .overmind.env file (ignored by git) with OVERMIND_PROCFILE=Procfile.dev
-
-Now Overmind uses `Procfile.dev` by default.
 
 ### Running a command in the Overmind environment
 
