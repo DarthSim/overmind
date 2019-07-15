@@ -87,6 +87,8 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 			c.processKill()
 		case "get-connection":
 			c.processGetConnection(cmd, args, conn)
+		case "echo":
+			c.processEcho(conn)
 		}
 
 		return true
@@ -139,4 +141,8 @@ func (c *commandCenter) processGetConnection(cmd string, args []string, conn net
 			fmt.Fprintln(conn, "")
 		}
 	}
+}
+
+func (c *commandCenter) processEcho(conn net.Conn) {
+	c.output.Echo(conn)
 }

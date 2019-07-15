@@ -3,6 +3,7 @@ package start
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"sync"
@@ -12,13 +13,56 @@ import (
 
 type multiOutput struct {
 	maxNameLength int
-	mutex         sync.Mutex
+
+	ch chan []byte
+
+	echoes    map[int64]io.Writer
+	echoInd   int64
+	echoMutex sync.Mutex
 }
 
 func newMultiOutput(maxNameLength int) *multiOutput {
-	return &multiOutput{
+	o := multiOutput{
 		maxNameLength: utils.Max(maxNameLength, 6),
+		ch:            make(chan []byte, 128),
+		echoes:        make(map[int64]io.Writer),
 	}
+
+	go o.listen()
+
+	return &o
+}
+
+func (o *multiOutput) listen() {
+	for b := range o.ch {
+		os.Stdout.Write(b)
+
+		if len(o.echoes) > 0 {
+			o.writeToEchoes(b)
+		}
+	}
+}
+
+func (o *multiOutput) writeToEchoes(b []byte) {
+	o.echoMutex.Lock()
+	defer o.echoMutex.Unlock()
+
+	for i, e := range o.echoes {
+		if _, err := e.Write(b); err != nil {
+			delete(o.echoes, i)
+			o.WriteBoldLinef(nil, "Echo #%d closed", i)
+		}
+	}
+}
+
+func (o *multiOutput) Echo(w io.Writer) {
+	o.echoMutex.Lock()
+	defer o.echoMutex.Unlock()
+
+	o.echoInd++
+	o.echoes[o.echoInd] = w
+
+	o.WriteBoldLinef(nil, "Echo #%d opened", o.echoInd)
 }
 
 func (o *multiOutput) WriteLine(proc *process, p []byte) {
@@ -49,10 +93,7 @@ func (o *multiOutput) WriteLine(proc *process, p []byte) {
 	buf.Write(p)
 	buf.WriteByte('\n')
 
-	o.mutex.Lock()
-	defer o.mutex.Unlock()
-
-	buf.WriteTo(os.Stdout)
+	o.ch <- buf.Bytes()
 }
 
 func (o *multiOutput) WriteBoldLine(proc *process, p []byte) {

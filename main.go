@@ -112,6 +112,19 @@ func setupRunCmd() cli.Command {
 	}
 }
 
+func setupEchoCmd() cli.Command {
+	c := cmdEchoHandler{}
+
+	return cli.Command{
+		Name:   "echo",
+		Usage:  "Echoes output from master Overmind instance",
+		Action: c.Run,
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "socket, s", EnvVar: "OVERMIND_SOCKET", Usage: "Path to overmind socket", Value: "./.overmind.sock", Destination: &c.SocketPath},
+		},
+	}
+}
+
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
@@ -139,6 +152,7 @@ func main() {
 		setupConnectCmd(),
 		setupKillCmd(),
 		setupRunCmd(),
+		setupEchoCmd(),
 	}
 
 	app.Run(os.Args)
