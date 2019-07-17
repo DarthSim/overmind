@@ -39,6 +39,7 @@ type Handler struct {
 	Formation          map[string]int
 	FormationPortStep  int
 	StopSignals        map[string]syscall.Signal
+	Daemonize          bool
 }
 
 // AbsRoot returns absolute path to the working directory

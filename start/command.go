@@ -12,6 +12,7 @@ import (
 
 	"github.com/DarthSim/overmind/utils"
 	gonanoid "github.com/matoous/go-nanoid"
+	"github.com/sevlyar/go-daemon"
 )
 
 var defaultColors = []int{2, 3, 4, 5, 6, 42, 130, 103, 129, 108}
@@ -27,6 +28,7 @@ type command struct {
 	stopTrig   chan os.Signal
 	processes  processesMap
 	scriptsDir string
+	daemonize  bool
 }
 
 func newCommand(h *Handler) (*command, error) {
@@ -37,6 +39,7 @@ func newCommand(h *Handler) (*command, error) {
 		doneTrig:  make(chan bool, len(pf)),
 		stopTrig:  make(chan os.Signal),
 		processes: make(processesMap),
+		daemonize: h.Daemonize,
 	}
 
 	root, err := h.AbsRoot()
@@ -94,7 +97,7 @@ func newCommand(h *Handler) (*command, error) {
 		}
 	}
 
-	c.cmdCenter, err = newCommandCenter(c.processes, h.SocketPath, c.output)
+	c.cmdCenter, err = newCommandCenter(&c, h.SocketPath)
 	if err != nil {
 		return nil, err
 	}
@@ -107,6 +110,22 @@ func (c *command) Run() (int, error) {
 
 	if !c.checkTmux() {
 		return 1, errors.New("Can't find tmux. Did you forget to install it?")
+	}
+
+	c.output.WriteBoldLinef(nil, "Tmux socket name: %v", c.tmux.Socket)
+	c.output.WriteBoldLinef(nil, "Tmux session ID: %v", c.tmux.Session)
+	c.output.WriteBoldLinef(nil, "Listening at %v", c.cmdCenter.SocketPath)
+
+	if c.daemonize {
+		ctx := new(daemon.Context)
+		child, err := ctx.Reborn()
+
+		if child != nil {
+			c.output.WriteBoldLinef(nil, "Daemonized. Use `overmind echo` to view logs and `overmind quit` to gracefully quit daemonized instance")
+			return 0, err
+		}
+
+		defer ctx.Release()
 	}
 
 	c.startCommandCenter()
@@ -130,6 +149,10 @@ func (c *command) Run() (int, error) {
 	return exitCode, nil
 }
 
+func (c *command) Quit() {
+	c.stopTrig <- syscall.SIGINT
+}
+
 func (c *command) checkTmux() bool {
 	return utils.RunCmd("which", "tmux") == nil
 }
@@ -143,9 +166,6 @@ func (c *command) stopCommandCenter() {
 }
 
 func (c *command) runProcesses() {
-	c.output.WriteBoldLinef(nil, "Tmux socket name: %v", c.tmux.Socket)
-	c.output.WriteBoldLinef(nil, "Tmux session ID: %v", c.tmux.Session)
-
 	for _, p := range c.processes {
 		c.doneWg.Add(1)
 

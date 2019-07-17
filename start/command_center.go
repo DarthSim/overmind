@@ -11,21 +11,18 @@ import (
 )
 
 type commandCenter struct {
-	processes processesMap
-	output    *multiOutput
-	listener  net.Listener
-	stop      bool
+	cmd      *command
+	listener net.Listener
+	stop     bool
 
 	SocketPath string
 }
 
-func newCommandCenter(processes processesMap, socket string, output *multiOutput) (*commandCenter, error) {
+func newCommandCenter(cmd *command, socket string) (*commandCenter, error) {
 	s, err := filepath.Abs(socket)
 
 	return &commandCenter{
-		processes: processes,
-		output:    output,
-
+		cmd:        cmd,
 		SocketPath: s,
 	}, err
 }
@@ -37,8 +34,6 @@ func (c *commandCenter) Start() (err error) {
 		}
 		return
 	}
-
-	c.output.WriteBoldLinef(nil, "Listening at %v", c.SocketPath)
 
 	go func(c *commandCenter) {
 		for {
@@ -83,6 +78,8 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 			c.processRestart(cmd, args)
 		case "stop":
 			c.processStop(cmd, args)
+		case "quit":
+			c.processQuit()
 		case "kill":
 			c.processKill()
 		case "get-connection":
@@ -96,7 +93,7 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 }
 
 func (c *commandCenter) processRestart(cmd string, args []string) {
-	for name, p := range c.processes {
+	for name, p := range c.cmd.processes {
 		if len(args) == 0 {
 			p.Restart()
 			continue
@@ -112,7 +109,7 @@ func (c *commandCenter) processRestart(cmd string, args []string) {
 }
 
 func (c *commandCenter) processStop(cmd string, args []string) {
-	for name, p := range c.processes {
+	for name, p := range c.cmd.processes {
 		if len(args) == 0 {
 			p.Stop(true)
 			continue
@@ -128,14 +125,18 @@ func (c *commandCenter) processStop(cmd string, args []string) {
 }
 
 func (c *commandCenter) processKill() {
-	for _, p := range c.processes {
+	for _, p := range c.cmd.processes {
 		p.Kill(false)
 	}
 }
 
+func (c *commandCenter) processQuit() {
+	c.cmd.Quit()
+}
+
 func (c *commandCenter) processGetConnection(cmd string, args []string, conn net.Conn) {
 	if len(args) > 0 {
-		if proc, ok := c.processes[args[0]]; ok {
+		if proc, ok := c.cmd.processes[args[0]]; ok {
 			fmt.Fprintf(conn, "%s %s\n", proc.tmux.Socket, proc.WindowID())
 		} else {
 			fmt.Fprintln(conn, "")
@@ -144,5 +145,5 @@ func (c *commandCenter) processGetConnection(cmd string, args []string, conn net
 }
 
 func (c *commandCenter) processEcho(conn net.Conn) {
-	c.output.Echo(conn)
+	c.cmd.output.Echo(conn)
 }
