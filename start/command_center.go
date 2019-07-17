@@ -75,15 +75,15 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 
 		switch cmd {
 		case "restart":
-			c.processRestart(cmd, args)
+			c.processRestart(args)
 		case "stop":
-			c.processStop(cmd, args)
+			c.processStop(args)
 		case "quit":
 			c.processQuit()
 		case "kill":
 			c.processKill()
 		case "get-connection":
-			c.processGetConnection(cmd, args, conn)
+			c.processGetConnection(args, conn)
 		case "echo":
 			c.processEcho(conn)
 		}
@@ -92,7 +92,7 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 	})
 }
 
-func (c *commandCenter) processRestart(cmd string, args []string) {
+func (c *commandCenter) processRestart(args []string) {
 	for name, p := range c.cmd.processes {
 		if len(args) == 0 {
 			p.Restart()
@@ -108,7 +108,7 @@ func (c *commandCenter) processRestart(cmd string, args []string) {
 	}
 }
 
-func (c *commandCenter) processStop(cmd string, args []string) {
+func (c *commandCenter) processStop(args []string) {
 	for name, p := range c.cmd.processes {
 		if len(args) == 0 {
 			p.Stop(true)
@@ -134,7 +134,7 @@ func (c *commandCenter) processQuit() {
 	c.cmd.Quit()
 }
 
-func (c *commandCenter) processGetConnection(cmd string, args []string, conn net.Conn) {
+func (c *commandCenter) processGetConnection(args []string, conn net.Conn) {
 	if len(args) > 0 {
 		if proc, ok := c.cmd.processes[args[0]]; ok {
 			fmt.Fprintf(conn, "%s %s\n", proc.tmux.Socket, proc.WindowID())
