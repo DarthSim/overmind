@@ -25,6 +25,7 @@ You may know several Procfile process management tools, but Overmind has some un
 * Overmind starts processes in a tmux session, so you can easily connect to any process and gain control over it;
 * Overmind can restart a single process on the fly — you don't need to restart the whole stack;
 * Overmind allows a specified process to die without interrupting all of the other ones;
+* Overmind can restart a specified processes automatically when they die;
 * Overmind uses `pty` to capture process output — so it won't be clipped, delayed, and it won't break colored output;
 * Overmind can read environment variables from a file and use them as parameters so that you can configure Overmind behavior globally and/or per directory.
 
@@ -138,6 +139,15 @@ $ overmind start -c assets,npm_install
 $ OVERMIND_CAN_DIE=assets,npm_install overmind start
 ```
 
+#### Auto-restarting processes
+
+If some of your processes tend to randomly crash, you can tell Overmind to restart them automatically when they die:
+
+```bash
+$ overmind start -r rails,webpack
+$ OVERMIND_AUTO_RESTART=rails,webpack overmind start
+```
+
 #### Specifying the colors
 
 Overmind colorizes process names with different colors. May happen that these colors don't match well with your color scheme. In this case, you can define your own colors using xterm color codes:
@@ -238,12 +248,33 @@ The files will be loaded in the following order:
 
 You can also opt to skip loading the `.env` file entirely (`.overmind.env` will still be read) by setting the variable `OVERMIND_SKIP_ENV`.
 
-### Running a command in the Overmind environment
+#### Running a command in the Overmind environment
 
 Since you set up an environment with `.env` files, you may want to run a command inside this environment. You can do this using `run` command:
 
 ```bash
 $ overmind run yarn install
+```
+
+### Run as a daemon
+
+Overmind can be run as a daemon:
+
+```bash
+$ overmind start -D
+$ OVERMIND_DAEMONIZE=1 overmind start
+```
+
+Use `echo` command for the logs:
+
+```bash
+$ overmind echo
+```
+
+You can quit daemonized Overmind with `quit`:
+
+```bash
+$ overmind quit
 ```
 
 ### Specifying a socket
