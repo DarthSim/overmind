@@ -59,8 +59,8 @@ func newProcess(tmux *tmuxClient, name string, color int, command string, port i
 		tmux:   tmux,
 
 		stopSignal:  stopSignal,
-		canDie:      autoRestart || canDie,
-		canDieNow:   autoRestart || canDie,
+		canDie:      canDie,
+		canDieNow:   canDie,
 		autoRestart: autoRestart,
 
 		in:  in,
@@ -179,14 +179,11 @@ func (p *process) observe() {
 				p.keepingAlive = true
 			}
 
-			if !p.interrupted && p.autoRestart {
-				p.keepingAlive = true
-				p.respawn()
-			} else if !p.canDieNow {
+			if !p.canDieNow {
 				p.keepingAlive = false
 				p.proc = nil
 
-				if p.restart {
+				if p.restart || (!p.interrupted && p.autoRestart) {
 					p.respawn()
 				} else {
 					p.dead = true
