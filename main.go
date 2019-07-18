@@ -12,7 +12,7 @@ import (
 	"gopkg.in/urfave/cli.v1"
 )
 
-const version = "2.0.2"
+const version = "2.0.3"
 
 func socketFlag(s *string) cli.Flag {
 	return cli.StringFlag{
