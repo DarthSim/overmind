@@ -37,6 +37,7 @@ func setupStartCmd() cli.Command {
 			cli.IntFlag{Name: "formation-port-step", EnvVar: "OVERMIND_FORMATION_PORT_STEP", Usage: "Specify a step to increase port number for the next instance of a process", Value: 10, Destination: &c.FormationPortStep},
 			cli.StringFlag{Name: "stop-signals, i", EnvVar: "OVERMIND_STOP_SIGNALS", Usage: "Specify a signal that will be sent to each process when Overmind will try to stop them. The value passed in should be in the format process=signal,process=signal. Supported signals are: ABRT, INT, KILL, QUIT, STOP, TERM, USR1, USR2"},
 			cli.BoolFlag{Name: "daemonize, D", EnvVar: "OVERMIND_DAEMONIZE", Usage: "Launch Overmind as a daemon. Use `overmind echo` to view logs and `overmind quit` to gracefully quit daemonized instance", Destination: &c.Daemonize},
+			cli.StringFlag{Name: "tmux-config, F", EnvVar: "OVERMIND_TMUX_CONFIG", Usage: "Specify an alternative tmux config path to be used by Overmind", Destination: &c.TmuxConfigPath},
 		},
 	}
 }

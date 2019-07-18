@@ -40,6 +40,7 @@ type Handler struct {
 	FormationPortStep  int
 	StopSignals        map[string]syscall.Signal
 	Daemonize          bool
+	TmuxConfigPath     string
 }
 
 // AbsRoot returns absolute path to the working directory

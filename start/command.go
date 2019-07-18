@@ -61,7 +61,7 @@ func newCommand(h *Handler) (*command, error) {
 
 	instanceID := fmt.Sprintf("overmind-%s-%s", session, nanoid)
 
-	c.tmux, err = newTmuxClient(session, instanceID, root)
+	c.tmux, err = newTmuxClient(session, instanceID, root, h.TmuxConfigPath)
 
 	if err != nil {
 		return nil, err

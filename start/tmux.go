@@ -36,6 +36,8 @@ type tmuxClient struct {
 
 	cmd *exec.Cmd
 
+	configPath string
+
 	Root    string
 	Socket  string
 	Session string
@@ -58,10 +60,12 @@ func tmuxVersion() (int, int) {
 	return major, minor
 }
 
-func newTmuxClient(session, socket, root string) (*tmuxClient, error) {
+func newTmuxClient(session, socket, root, configPath string) (*tmuxClient, error) {
 	t := tmuxClient{
 		processesByName: make(processesMap),
 		processesByPane: make(processesMap),
+
+		configPath: configPath,
 
 		Root:    root,
 		Session: session,
@@ -82,6 +86,10 @@ func (t *tmuxClient) Start() error {
 	go t.listen()
 
 	args := []string{"-CC", "-L", t.Socket}
+
+	if len(t.configPath) != 0 {
+		args = append(args, "-f", t.configPath)
+	}
 
 	first := true
 	for name, p := range t.processesByName {
