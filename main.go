@@ -14,6 +14,16 @@ import (
 
 const version = "2.0.2"
 
+func socketFlag(s *string) cli.Flag {
+	return cli.StringFlag{
+		Name:        "socket, s",
+		EnvVar:      "OVERMIND_SOCKET",
+		Usage:       "Path to overmind socket",
+		Value:       "./.overmind.sock",
+		Destination: s,
+	}
+}
+
 func setupStartCmd() cli.Command {
 	c := start.Handler{}
 
@@ -30,7 +40,6 @@ func setupStartCmd() cli.Command {
 			cli.IntFlag{Name: "timeout, t", EnvVar: "OVERMIND_TIMEOUT", Usage: "Specify the amount of time (in seconds) processes have to shut down gracefully before being brutally killed", Value: 5, Destination: &c.Timeout},
 			cli.IntFlag{Name: "port, p", EnvVar: "OVERMIND_PORT,PORT", Usage: "Specify a port to use as the base", Value: 5000, Destination: &c.PortBase},
 			cli.IntFlag{Name: "port-step, P", EnvVar: "OVERMIND_PORT_STEP", Usage: "Specify a step to increase port number", Value: 100, Destination: &c.PortStep},
-			cli.StringFlag{Name: "socket, s", EnvVar: "OVERMIND_SOCKET", Usage: "Specify a path to the command center socket", Value: "./.overmind.sock", Destination: &c.SocketPath},
 			cli.StringFlag{Name: "can-die, c", EnvVar: "OVERMIND_CAN_DIE", Usage: "Specify names of process which can die without interrupting the other processes. Divide names with comma", Destination: &c.CanDie},
 			cli.StringFlag{Name: "auto-restart, r", EnvVar: "OVERMIND_AUTO_RESTART", Usage: "Specify names of process which will be auto restarted on death. Divide names with comma", Destination: &c.AutoRestart},
 			cli.StringFlag{Name: "colors, b", EnvVar: "OVERMIND_COLORS", Usage: "Specify the xterm color codes that will be used to colorize process names. Divide codes with comma"},
@@ -39,6 +48,7 @@ func setupStartCmd() cli.Command {
 			cli.StringFlag{Name: "stop-signals, i", EnvVar: "OVERMIND_STOP_SIGNALS", Usage: "Specify a signal that will be sent to each process when Overmind will try to stop them. The value passed in should be in the format process=signal,process=signal. Supported signals are: ABRT, INT, KILL, QUIT, STOP, TERM, USR1, USR2"},
 			cli.BoolFlag{Name: "daemonize, D", EnvVar: "OVERMIND_DAEMONIZE", Usage: "Launch Overmind as a daemon. Use `overmind echo` to view logs and `overmind quit` to gracefully quit daemonized instance", Destination: &c.Daemonize},
 			cli.StringFlag{Name: "tmux-config, F", EnvVar: "OVERMIND_TMUX_CONFIG", Usage: "Specify an alternative tmux config path to be used by Overmind", Destination: &c.TmuxConfigPath},
+			socketFlag(&c.SocketPath),
 		},
 	}
 }
@@ -52,9 +62,7 @@ func setupRestartCmd() cli.Command {
 		Usage:     "Restart specified processes",
 		Action:    c.Run,
 		ArgsUsage: "[process name...]",
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "socket, s", EnvVar: "OVERMIND_SOCKET", Usage: "Path to overmind socket", Value: "./.overmind.sock", Destination: &c.SocketPath},
-		},
+		Flags:     []cli.Flag{socketFlag(&c.SocketPath)},
 	}
 }
 
@@ -67,9 +75,7 @@ func setupStopCmd() cli.Command {
 		Usage:     "Stop specified processes without quitting Overmind itself",
 		Action:    c.Run,
 		ArgsUsage: "[process name...]",
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "socket, s", EnvVar: "OVERMIND_SOCKET", Usage: "Path to overmind socket", Value: "./.overmind.sock", Destination: &c.SocketPath},
-		},
+		Flags:     []cli.Flag{socketFlag(&c.SocketPath)},
 	}
 }
 
@@ -84,7 +90,7 @@ func setupConnectCmd() cli.Command {
 		ArgsUsage: "[process name]",
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "control-mode, c", EnvVar: "OVERMIND_CONTROL_MODE", Usage: "Connect to the tmux session in control mode", Destination: &c.ControlMode},
-			cli.StringFlag{Name: "socket, s", EnvVar: "OVERMIND_SOCKET", Usage: "Path to overmind socket", Value: "./.overmind.sock", Destination: &c.SocketPath},
+			socketFlag(&c.SocketPath),
 		},
 	}
 }
@@ -97,9 +103,7 @@ func setupQuitCmd() cli.Command {
 		Aliases: []string{"q"},
 		Usage:   "Gracefully quits Overmind. Same as sending SIGINT",
 		Action:  c.Run,
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "socket, s", EnvVar: "OVERMIND_SOCKET", Usage: "Path to overmind socket", Value: "./.overmind.sock", Destination: &c.SocketPath},
-		},
+		Flags:   []cli.Flag{socketFlag(&c.SocketPath)},
 	}
 }
 
@@ -111,9 +115,7 @@ func setupKillCmd() cli.Command {
 		Aliases: []string{"k"},
 		Usage:   "Kills all processes",
 		Action:  c.Run,
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "socket, s", EnvVar: "OVERMIND_SOCKET", Usage: "Path to overmind socket", Value: "./.overmind.sock", Destination: &c.SocketPath},
-		},
+		Flags:   []cli.Flag{socketFlag(&c.SocketPath)},
 	}
 }
 
@@ -136,9 +138,7 @@ func setupEchoCmd() cli.Command {
 		Name:   "echo",
 		Usage:  "Echoes output from master Overmind instance",
 		Action: c.Run,
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "socket, s", EnvVar: "OVERMIND_SOCKET", Usage: "Path to overmind socket", Value: "./.overmind.sock", Destination: &c.SocketPath},
-		},
+		Flags:  []cli.Flag{socketFlag(&c.SocketPath)},
 	}
 }
 
