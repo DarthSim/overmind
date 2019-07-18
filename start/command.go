@@ -108,6 +108,8 @@ func newCommand(h *Handler) (*command, error) {
 }
 
 func (c *command) Run() (int, error) {
+	defer c.output.Stop()
+
 	fmt.Printf("\033]0;%s | overmind\007", c.title)
 
 	if !c.checkTmux() {

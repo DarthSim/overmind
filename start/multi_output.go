@@ -14,7 +14,8 @@ import (
 type multiOutput struct {
 	maxNameLength int
 
-	ch chan []byte
+	ch   chan []byte
+	done chan struct{}
 
 	echoes    map[int64]io.Writer
 	echoInd   int64
@@ -25,6 +26,7 @@ func newMultiOutput(maxNameLength int) *multiOutput {
 	o := multiOutput{
 		maxNameLength: utils.Max(maxNameLength, 6),
 		ch:            make(chan []byte, 128),
+		done:          make(chan struct{}),
 		echoes:        make(map[int64]io.Writer),
 	}
 
@@ -41,6 +43,12 @@ func (o *multiOutput) listen() {
 			o.writeToEchoes(b)
 		}
 	}
+	close(o.done)
+}
+
+func (o *multiOutput) Stop() {
+	close(o.ch)
+	<-o.done
 }
 
 func (o *multiOutput) writeToEchoes(b []byte) {
