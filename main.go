@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/DarthSim/godotenv"
 	"github.com/DarthSim/overmind/start"
-	"github.com/joho/godotenv"
 
 	"gopkg.in/urfave/cli.v1"
 )

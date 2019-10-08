@@ -1,5 +1,5 @@
-# github.com/joho/godotenv v1.3.0
-github.com/joho/godotenv
+# github.com/DarthSim/godotenv v1.3.1-0.20191008130212-4558b6d096de
+github.com/DarthSim/godotenv
 # github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 github.com/kardianos/osext
 # github.com/matoous/go-nanoid v0.0.0-20181114085210-eab626deece6

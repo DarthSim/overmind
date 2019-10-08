@@ -1,5 +1,5 @@
-github.com/joho/godotenv v1.3.0 h1:Zjp+RcGpHhGlrMbJzXTrZZPrWj+1vfm90La1wgB6Bhc=
-github.com/joho/godotenv v1.3.0/go.mod h1:7hK45KPybAkOC6peb+G5yklZfMxEjkZhHbwpqxOKXbg=
+github.com/DarthSim/godotenv v1.3.1-0.20191008130212-4558b6d096de h1:OCpGbfe3nTyCCT1QCeBVha0BnnXeB/W5cZ6IXuGkeXs=
+github.com/DarthSim/godotenv v1.3.1-0.20191008130212-4558b6d096de/go.mod h1:B3ySe1HYTUFFR6+TPyHyxPWjUdh48il0Blebg9p1cCc=
 github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 h1:iQTw/8FWTuc7uiaSepXwyf3o52HaUYcV+Tu66S3F5GA=
 github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0/go.mod h1:1NbS8ALrpOvjt0rHPNLyCIeMtbizbir8U//inJ+zuB8=
 github.com/matoous/go-nanoid v0.0.0-20181114085210-eab626deece6 h1:elv0VC5n2owefO3RvtKvS3i3/rw9LCrs0+tVFLbBlmQ=
