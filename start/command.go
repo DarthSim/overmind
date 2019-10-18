@@ -121,6 +121,10 @@ func (c *command) Run() (int, error) {
 	c.output.WriteBoldLinef(nil, "Listening at %v", c.cmdCenter.SocketPath)
 
 	if c.daemonize {
+    if socketFileExists(c.cmdCenter.SocketPath) {
+      c.output.WriteBoldLinef(nil, "It looks like Overmind is already running. If it's not, remove %s and try again", c.cmdCenter.SocketPath)
+      return 0, nil
+    }
 		ctx := new(daemon.Context)
 		child, err := ctx.Reborn()
 
@@ -213,3 +217,11 @@ func (c *command) waitForTimeoutOrStop() {
 	case <-c.stopTrig:
 	}
 }
+
+func socketFileExists(filename string) bool {
+    info, err := os.Stat(filename)
+    if os.IsNotExist(err) {
+        return false
+    }
+    return !info.IsDir()
+  }

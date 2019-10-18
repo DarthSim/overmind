@@ -30,7 +30,7 @@ func newCommandCenter(cmd *command, socket string) (*commandCenter, error) {
 func (c *commandCenter) Start() (err error) {
 	if c.listener, err = net.Listen("unix", c.SocketPath); err != nil {
 		if strings.Contains(err.Error(), "address already in use") {
-			err = fmt.Errorf("it looks like Overmind is already running. If it's not, remove %s and try again", c.SocketPath)
+			err = fmt.Errorf("It looks like Overmind is already running. If it's not, remove %s and try again", c.SocketPath)
 		}
 		return
 	}
