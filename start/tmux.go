@@ -4,17 +4,16 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"regexp"
 	"strconv"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/DarthSim/overmind/utils"
 
-	"github.com/pkg/term/termios"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -27,7 +26,8 @@ var outputRe = regexp.MustCompile(`%(\d+) (.+)`)
 const tmuxPaneFmt = "%overmind-process #{pane_id} #{window_name} #{pane_pid}"
 
 type tmuxClient struct {
-	pty, tty *os.File
+	inReader, outReader io.Reader
+	inWriter, outWriter io.Writer
 
 	processesByPane processesMap
 	processesByName processesMap
@@ -60,7 +60,7 @@ func tmuxVersion() (int, int) {
 	return major, minor
 }
 
-func newTmuxClient(session, socket, root, configPath string) (*tmuxClient, error) {
+func newTmuxClient(session, socket, root, configPath string) *tmuxClient {
 	t := tmuxClient{
 		processesByName: make(processesMap),
 		processesByPane: make(processesMap),
@@ -72,20 +72,16 @@ func newTmuxClient(session, socket, root, configPath string) (*tmuxClient, error
 		Socket:  socket,
 	}
 
-	var err error
+	t.inReader, t.inWriter = io.Pipe()
+	t.outReader, t.outWriter = io.Pipe()
 
-	t.pty, t.tty, err = termios.Pty()
-	if err != nil {
-		return nil, err
-	}
-
-	return &t, nil
+	return &t
 }
 
 func (t *tmuxClient) Start() error {
 	go t.listen()
 
-	args := []string{"-CC", "-L", t.Socket}
+	args := []string{"-C", "-L", t.Socket}
 
 	if len(t.configPath) != 0 {
 		args = append(args, "-f", t.configPath)
@@ -112,11 +108,9 @@ func (t *tmuxClient) Start() error {
 	}
 
 	t.cmd = exec.Command("tmux", args...)
-	t.cmd.Stdout = t.tty
-	// t.cmd.Stdout = io.MultiWriter(t.tty, os.Stdout)
+	t.cmd.Stdout = t.outWriter
 	t.cmd.Stderr = os.Stderr
-	t.cmd.Stdin = t.tty
-	t.cmd.SysProcAttr = &syscall.SysProcAttr{Setctty: true, Setsid: true}
+	t.cmd.Stdin = t.inReader
 	t.cmd.Dir = t.Root
 
 	return t.cmd.Start()
@@ -126,11 +120,11 @@ func (t *tmuxClient) sendCmd(cmd string, arg ...interface{}) {
 	t.cmdMutex.Lock()
 	defer t.cmdMutex.Unlock()
 
-	fmt.Fprintln(t.pty, fmt.Sprintf(cmd, arg...))
+	fmt.Fprintln(t.inWriter, fmt.Sprintf(cmd, arg...))
 }
 
 func (t *tmuxClient) listen() {
-	scanner := bufio.NewScanner(t.pty)
+	scanner := bufio.NewScanner(t.outReader)
 
 	for scanner.Scan() {
 		// fmt.Println(scanner.Text())

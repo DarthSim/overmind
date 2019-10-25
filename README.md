@@ -26,7 +26,7 @@ You may know several Procfile process management tools, but Overmind has some un
 * Overmind can restart a single process on the fly — you don't need to restart the whole stack;
 * Overmind allows a specified process to die without interrupting all of the other ones;
 * Overmind can restart a specified processes automatically when they die;
-* Overmind uses `pty` to capture process output — so it won't be clipped, delayed, and it won't break colored output;
+* Overmind uses tmux's control mode to capture process output — so it won't be clipped, delayed, and it won't break colored output;
 * Overmind can read environment variables from a file and use them as parameters so that you can configure Overmind behavior globally and/or per directory.
 
 **If a lot of those features seem like overkill for you, especially the tmux integration, you should take a look at Overmind's little sister — [Hivemind](https://github.com/DarthSim/hivemind)!**

@@ -61,12 +61,7 @@ func newCommand(h *Handler) (*command, error) {
 
 	instanceID := fmt.Sprintf("overmind-%s-%s", session, nanoid)
 
-	c.tmux, err = newTmuxClient(session, instanceID, root, h.TmuxConfigPath)
-
-	if err != nil {
-		return nil, err
-	}
-
+	c.tmux = newTmuxClient(session, instanceID, root, h.TmuxConfigPath)
 	c.output = newMultiOutput(pf.MaxNameLength())
 
 	procNames := utils.SplitAndTrim(h.ProcNames)
