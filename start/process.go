@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"syscall"
 	"time"
 
@@ -40,19 +39,8 @@ type process struct {
 
 type processesMap map[string]*process
 
-func newProcess(tmux *tmuxClient, name string, color int, command string, port int, output *multiOutput, canDie bool, autoRestart bool, scriptDir string, stopSignal syscall.Signal) *process {
+func newProcess(tmux *tmuxClient, name string, color int, command string, port int, output *multiOutput, canDie bool, autoRestart bool, stopSignal syscall.Signal) *process {
 	out, in := io.Pipe()
-
-	scriptFile, err := os.Create(filepath.Join(scriptDir, name))
-	utils.FatalOnErr(err)
-
-	fmt.Fprintln(scriptFile, "#!/bin/sh")
-	fmt.Fprintf(scriptFile, "export PORT=%d\n", port)
-	fmt.Fprintln(scriptFile, command)
-
-	utils.FatalOnErr(scriptFile.Chmod(0744))
-
-	utils.FatalOnErr(scriptFile.Close())
 
 	proc := &process{
 		output: output,
@@ -68,7 +56,7 @@ func newProcess(tmux *tmuxClient, name string, color int, command string, port i
 
 		Name:    name,
 		Color:   color,
-		Command: scriptFile.Name(),
+		Command: fmt.Sprintf("export PORT=%d; %s", port, command),
 	}
 
 	tmux.AddProcess(proc)

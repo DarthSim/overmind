@@ -18,17 +18,16 @@ import (
 var defaultColors = []int{2, 3, 4, 5, 6, 42, 130, 103, 129, 108}
 
 type command struct {
-	title      string
-	timeout    int
-	tmux       *tmuxClient
-	output     *multiOutput
-	cmdCenter  *commandCenter
-	doneTrig   chan bool
-	doneWg     sync.WaitGroup
-	stopTrig   chan os.Signal
-	processes  processesMap
-	scriptsDir string
-	daemonize  bool
+	title     string
+	timeout   int
+	tmux      *tmuxClient
+	output    *multiOutput
+	cmdCenter *commandCenter
+	doneTrig  chan bool
+	doneWg    sync.WaitGroup
+	stopTrig  chan os.Signal
+	processes processesMap
+	daemonize bool
 }
 
 func newCommand(h *Handler) (*command, error) {
@@ -74,9 +73,6 @@ func newCommand(h *Handler) (*command, error) {
 	canDie := utils.SplitAndTrim(h.CanDie)
 	autoRestart := utils.SplitAndTrim(h.AutoRestart)
 
-	c.scriptsDir = filepath.Join(os.TempDir(), instanceID)
-	os.MkdirAll(c.scriptsDir, 0700)
-
 	for i, e := range pf {
 		if len(procNames) == 0 || utils.StringsContain(procNames, e.OrigName) {
 			c.processes[e.Name] = newProcess(
@@ -88,7 +84,6 @@ func newCommand(h *Handler) (*command, error) {
 				c.output,
 				utils.StringsContain(canDie, e.OrigName),
 				utils.StringsContain(autoRestart, e.OrigName),
-				c.scriptsDir,
 				e.StopSignal,
 			)
 		}
@@ -141,9 +136,6 @@ func (c *command) Run() (int, error) {
 	time.Sleep(time.Second)
 
 	c.tmux.Shutdown()
-
-	// Cleanup created scripts
-	os.RemoveAll(c.scriptsDir)
 
 	return exitCode, nil
 }

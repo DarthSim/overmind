@@ -178,7 +178,7 @@ func (t *tmuxClient) AddProcess(p *process) {
 }
 
 func (t *tmuxClient) RespawnProcess(p *process) {
-	t.sendCmd("neww -d -k -t %s -n %s -P -F \"%s\" %s", p.Name, p.Name, tmuxPaneFmt, p.Command)
+	t.sendCmd("neww -d -k -t %s -n %s -P -F %q %q", p.Name, p.Name, tmuxPaneFmt, p.Command)
 }
 
 func (t *tmuxClient) ExitCode() (status int) {
