@@ -38,6 +38,8 @@ type tmuxClient struct {
 
 	configPath string
 
+	shutdown bool
+
 	Root    string
 	Socket  string
 	Session string
@@ -113,7 +115,14 @@ func (t *tmuxClient) Start() error {
 	t.cmd.Stdin = t.inReader
 	t.cmd.Dir = t.Root
 
-	return t.cmd.Start()
+	err := t.cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	go t.observe()
+
+	return nil
 }
 
 func (t *tmuxClient) sendCmd(cmd string, arg ...interface{}) {
@@ -149,6 +158,18 @@ func (t *tmuxClient) listen() {
 	}
 
 	utils.FatalOnErr(scanner.Err())
+}
+
+func (t *tmuxClient) observe() {
+	t.cmd.Process.Wait()
+
+	if t.shutdown {
+		return
+	}
+
+	exec.Command("tmux", "-L", t.Socket, "kill-session", "-t", t.Session).Run()
+
+	utils.Fatal("Tmux client unexpectidly exited with", t.cmd.ProcessState.ExitCode())
 }
 
 func (t *tmuxClient) mapProcess(pane, name, pid string) {
@@ -201,6 +222,8 @@ func (t *tmuxClient) ExitCode() (status int) {
 }
 
 func (t *tmuxClient) Shutdown() {
+	t.shutdown = true
+
 	t.sendCmd("kill-session")
 
 	stopped := make(chan struct{})
