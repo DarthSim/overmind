@@ -92,7 +92,7 @@ func ScanLines(r io.Reader, callback func([]byte) bool) error {
 	reader := bufio.NewReader(r)
 
 	for {
-		line, _, err = reader.ReadLine()
+		line, _, err = reader.ReadBytes('\n')
 		if err != nil {
 			break
 		}
