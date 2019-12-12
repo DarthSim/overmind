@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -85,19 +86,27 @@ func Max(a, b int) int {
 // ScanLines reads line by line from reader. Doesn't throw "token too long" error like bufio.Scanner
 func ScanLines(r io.Reader, callback func([]byte) bool) error {
 	var (
-		err  error
-		line []byte
+		err      error
+		line     []byte
+		isPrefix bool
 	)
 
 	reader := bufio.NewReader(r)
+	buf := new(bytes.Buffer)
 
 	for {
-		line, _, err = reader.ReadLine()
+		line, isPrefix, err = reader.ReadLine()
 		if err != nil {
 			break
 		}
-		if !callback(line) {
-			return nil
+
+		buf.Write(line)
+
+		if !isPrefix {
+			if !callback(buf.Bytes()) {
+				return nil
+			}
+			buf.Reset()
 		}
 	}
 	if err != io.EOF {
