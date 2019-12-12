@@ -89,10 +89,7 @@ func newCommand(h *Handler) (*command, error) {
 		}
 	}
 
-	c.cmdCenter, err = newCommandCenter(&c, h.SocketPath)
-	if err != nil {
-		return nil, err
-	}
+	c.cmdCenter = newCommandCenter(&c, h.SocketPath)
 
 	return &c, nil
 }

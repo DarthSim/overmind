@@ -3,7 +3,6 @@ package start
 import (
 	"fmt"
 	"net"
-	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -18,13 +17,11 @@ type commandCenter struct {
 	SocketPath string
 }
 
-func newCommandCenter(cmd *command, socket string) (*commandCenter, error) {
-	s, err := filepath.Abs(socket)
-
+func newCommandCenter(cmd *command, socket string) *commandCenter {
 	return &commandCenter{
 		cmd:        cmd,
-		SocketPath: s,
-	}, err
+		SocketPath: socket,
+	}
 }
 
 func (c *commandCenter) Start() (err error) {
