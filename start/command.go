@@ -107,7 +107,14 @@ func (c *command) Run() (int, error) {
 	c.output.WriteBoldLinef(nil, "Tmux session ID: %v", c.tmux.Session)
 	c.output.WriteBoldLinef(nil, "Listening at %v", c.cmdCenter.SocketPath)
 
+	c.startCommandCenter()
+	defer c.stopCommandCenter()
+
 	if c.daemonize {
+		if !daemon.WasReborn() {
+			c.stopCommandCenter()
+		}
+
 		ctx := new(daemon.Context)
 		child, err := ctx.Reborn()
 
@@ -118,9 +125,6 @@ func (c *command) Run() (int, error) {
 
 		defer ctx.Release()
 	}
-
-	c.startCommandCenter()
-	defer c.stopCommandCenter()
 
 	c.runProcesses()
 
