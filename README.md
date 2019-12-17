@@ -294,6 +294,28 @@ $ overmind restart -s path/to/socket sidekiq
 $ overmind kill -s path/to/socket
 ```
 
+## Known issues
+
+### Overmind uses system Ruby/Node/etc instead of custom-defined one
+
+This may happen if your Ruby/Node/etc version manager isn't configured properly. Make sure that the path to your custom binaries is included in your `PATH` before the system binaries path.
+
+### Overmind does not stop Docker process properly
+
+Unfortunately, this is how Docker works. When you send `SIGINT` to a `docker run ...` process, it just detaches container and exits. You can solve this by using named containers and signal traps:
+
+```procfile
+mydocker: trap 'docker stop mydocker' EXIT > /dev/null; docker run --name mydocker ...
+```
+
+### Overmind can't start because of `bind: invalid argument` error
+
+All operating systems have limitations on Unix socket path length. Try to use a shorter socket path.
+
+### Overmind exits after `pg_ctl --wait start` and keeps PostgreSQL server running
+
+Since version 12.0 `pg_ctl --wait start` exits right after starting the server. Just use `postres` command directly.
+
 ## Author
 
 Sergey "DarthSim" Aleksandrovich
