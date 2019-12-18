@@ -9,7 +9,7 @@ import (
 	"github.com/DarthSim/godotenv"
 	"github.com/DarthSim/overmind/start"
 
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli"
 )
 
 const version = "2.1.0"

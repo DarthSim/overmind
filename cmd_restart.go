@@ -7,7 +7,7 @@ import (
 
 	"github.com/DarthSim/overmind/utils"
 
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli"
 )
 
 type cmdRestartHandler struct {

@@ -11,7 +11,7 @@ import (
 
 	"github.com/DarthSim/overmind/utils"
 
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli"
 )
 
 var signalMap = map[string]syscall.Signal{
