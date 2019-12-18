@@ -1,6 +1,6 @@
 module github.com/DarthSim/overmind
 
-go 1.12
+go 1.11
 
 require (
 	github.com/DarthSim/godotenv v1.3.1
