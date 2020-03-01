@@ -10,16 +10,17 @@ import (
 )
 
 type procfileEntry struct {
-	Name       string
-	OrigName   string
-	Command    string
-	Port       int
-	StopSignal syscall.Signal
+	Name          string
+	OrigName      string
+	Command       string
+	Port          int
+	StopSignal    syscall.Signal
+	RestartSignal syscall.Signal
 }
 
 type procfile []procfileEntry
 
-func parseProcfile(procfile string, portBase, portStep int, formation map[string]int, formationPortStep int, stopSignals map[string]syscall.Signal) (pf procfile) {
+func parseProcfile(procfile string, portBase, portStep int, formation map[string]int, formationPortStep int, stopSignals map[string]syscall.Signal, restartSignals map[string]syscall.Signal) (pf procfile) {
 	re, _ := regexp.Compile(`^([\w-]+):\s+(.+)$`)
 
 	f, err := os.Open(procfile)
@@ -47,9 +48,14 @@ func parseProcfile(procfile string, portBase, portStep int, formation map[string
 			num = fnum
 		}
 
-		signal := syscall.SIGINT
+		stopSignal := syscall.SIGINT
 		if s, ok := stopSignals[name]; ok {
-			signal = s
+			stopSignal = s
+		}
+
+		restartSignal := syscall.SIGTERM
+		if s, ok := restartSignals[name]; ok {
+			restartSignal = s
 		}
 
 		for i := 0; i < num; i++ {
@@ -67,11 +73,12 @@ func parseProcfile(procfile string, portBase, portStep int, formation map[string
 			pf = append(
 				pf,
 				procfileEntry{
-					Name:       iname,
-					OrigName:   name,
-					Command:    cmd,
-					Port:       port + (i * formationPortStep),
-					StopSignal: signal,
+					Name:          iname,
+					OrigName:      name,
+					Command:       cmd,
+					Port:          port + (i * formationPortStep),
+					StopSignal:    stopSignal,
+					RestartSignal: restartSignal,
 				},
 			)
 		}

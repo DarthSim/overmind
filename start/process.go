@@ -17,14 +17,15 @@ type process struct {
 
 	proc *os.Process
 
-	stopSignal   syscall.Signal
-	canDie       bool
-	canDieNow    bool
-	autoRestart  bool
-	keepingAlive bool
-	dead         bool
-	interrupted  bool
-	restart      bool
+	stopSignal    syscall.Signal
+	restartSignal syscall.Signal
+	canDie        bool
+	canDieNow     bool
+	autoRestart   bool
+	keepingAlive  bool
+	dead          bool
+	interrupted   bool
+	restart       bool
 
 	tmux     *tmuxClient
 	tmuxPane string
@@ -39,17 +40,18 @@ type process struct {
 
 type processesMap map[string]*process
 
-func newProcess(tmux *tmuxClient, name string, color int, command string, port int, output *multiOutput, canDie bool, autoRestart bool, stopSignal syscall.Signal) *process {
+func newProcess(tmux *tmuxClient, name string, color int, command string, port int, output *multiOutput, canDie bool, autoRestart bool, stopSignal syscall.Signal, restartSignal syscall.Signal) *process {
 	out, in := io.Pipe()
 
 	proc := &process{
 		output: output,
 		tmux:   tmux,
 
-		stopSignal:  stopSignal,
-		canDie:      canDie,
-		canDieNow:   canDie,
-		autoRestart: autoRestart,
+		stopSignal:    stopSignal,
+		restartSignal: restartSignal,
+		canDie:        canDie,
+		canDieNow:     canDie,
+		autoRestart:   autoRestart,
 
 		in:  in,
 		out: out,
@@ -132,7 +134,10 @@ func (p *process) Kill(keepAlive bool) {
 
 func (p *process) Restart() {
 	p.restart = true
-	p.Stop(false)
+	if p.Running() {
+		p.output.WriteBoldLine(p, []byte("Restarting..."))
+		p.proc.Signal(p.restartSignal)
+	}
 }
 
 func (p *process) waitPid() {

@@ -31,7 +31,7 @@ type command struct {
 }
 
 func newCommand(h *Handler) (*command, error) {
-	pf := parseProcfile(h.Procfile, h.PortBase, h.PortStep, h.Formation, h.FormationPortStep, h.StopSignals)
+	pf := parseProcfile(h.Procfile, h.PortBase, h.PortStep, h.Formation, h.FormationPortStep, h.StopSignals, h.RestartSignals)
 
 	c := command{
 		timeout:   h.Timeout,
@@ -85,6 +85,7 @@ func newCommand(h *Handler) (*command, error) {
 				utils.StringsContain(canDie, e.OrigName),
 				utils.StringsContain(autoRestart, e.OrigName),
 				e.StopSignal,
+				e.RestartSignal,
 			)
 		}
 	}

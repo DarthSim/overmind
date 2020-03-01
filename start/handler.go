@@ -40,6 +40,7 @@ type Handler struct {
 	Formation          map[string]int
 	FormationPortStep  int
 	StopSignals        map[string]syscall.Signal
+	RestartSignals     map[string]syscall.Signal
 	Daemonize          bool
 	TmuxConfigPath     string
 }
@@ -66,6 +67,9 @@ func (h *Handler) Run(c *cli.Context) error {
 	utils.FatalOnErr(err)
 
 	err = h.parseStopSignals(c.String("stop-signals"))
+	utils.FatalOnErr(err)
+
+	err = h.parseRestartSignals(c.String("restart-signals"))
 	utils.FatalOnErr(err)
 
 	cmd, err := newCommand(h)
@@ -153,7 +157,36 @@ func (h *Handler) parseStopSignals(signals string) error {
 			if signal, ok := signalMap[pair[1]]; ok {
 				h.StopSignals[name] = signal
 			} else {
-				return fmt.Errorf("Invalid signal: %s", pair[1])
+				return fmt.Errorf("Invalid stop-signals signal: %s", pair[1])
+			}
+		}
+	}
+
+	return nil
+}
+
+func (h *Handler) parseRestartSignals(signals string) error {
+	if len(signals) > 0 {
+		entries := strings.Split(signals, ",")
+
+		h.RestartSignals = make(map[string]syscall.Signal)
+
+		for _, entry := range entries {
+			pair := strings.Split(entry, "=")
+
+			if len(pair) != 2 {
+				return errors.New("Invalid restart-signals format")
+			}
+
+			name := strings.TrimSpace(pair[0])
+			if len(name) == 0 {
+				return errors.New("Invalid restart-signals format")
+			}
+
+			if signal, ok := signalMap[pair[1]]; ok {
+				h.RestartSignals[name] = signal
+			} else {
+				return fmt.Errorf("Invalid restart-signals signal: %s", pair[1])
 			}
 		}
 	}
