@@ -180,7 +180,6 @@ func (t *tmuxClient) mapProcess(pane, name, pid string) {
 		}
 
 		t.processesByPane[pane] = p
-		p.tmuxPane = pane
 
 		if ipid, err := strconv.Atoi(pid); err == nil {
 			p.proc, _ = os.FindProcess(-ipid)

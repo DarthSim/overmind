@@ -26,8 +26,7 @@ type process struct {
 	interrupted  bool
 	restart      bool
 
-	tmux     *tmuxClient
-	tmuxPane string
+	tmux *tmuxClient
 
 	in  io.Writer
 	out io.Reader
