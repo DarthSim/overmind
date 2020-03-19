@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -199,7 +200,8 @@ func (t *tmuxClient) AddProcess(p *process) {
 }
 
 func (t *tmuxClient) RespawnProcess(p *process) {
-	t.sendCmd("neww -d -k -t %s -n %s -P -F %q %q", p.Name, p.Name, tmuxPaneFmt, p.Command)
+	command := strings.ReplaceAll(fmt.Sprintf("%q", p.Command), "$", "\\$")
+	t.sendCmd("neww -d -k -t %s -n %s -P -F %q %s", p.Name, p.Name, tmuxPaneFmt, command)
 }
 
 func (t *tmuxClient) ExitCode() (status int) {
