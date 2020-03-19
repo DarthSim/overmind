@@ -30,8 +30,8 @@ type tmuxClient struct {
 	inReader, outReader io.Reader
 	inWriter, outWriter io.Writer
 
+	processes       []*process
 	processesByPane processesMap
-	processesByName processesMap
 
 	cmdMutex sync.Mutex
 
@@ -65,7 +65,7 @@ func tmuxVersion() (int, int) {
 
 func newTmuxClient(session, socket, root, configPath string) *tmuxClient {
 	t := tmuxClient{
-		processesByName: make(processesMap),
+		processes:       make([]*process, 0),
 		processesByPane: make(processesMap),
 
 		configPath: configPath,
@@ -91,11 +91,11 @@ func (t *tmuxClient) Start() error {
 	}
 
 	first := true
-	for name, p := range t.processesByName {
+	for _, p := range t.processes {
 		if first {
 			first = false
 
-			args = append(args, "new", "-n", name, "-s", t.Session, "-P", "-F", tmuxPaneFmt, p.Command, ";")
+			args = append(args, "new", "-n", p.Name, "-s", t.Session, "-P", "-F", tmuxPaneFmt, p.Command, ";")
 
 			if major, minor := tmuxVersion(); major < 2 || (major == 2 && minor < 6) {
 				if w, h, err := terminal.GetSize(int(os.Stdin.Fd())); err == nil {
@@ -106,7 +106,7 @@ func (t *tmuxClient) Start() error {
 			args = append(args, "setw", "-g", "remain-on-exit", "on", ";")
 			args = append(args, "setw", "-g", "allow-rename", "off", ";")
 		} else {
-			args = append(args, "neww", "-n", name, "-P", "-F", tmuxPaneFmt, p.Command, ";")
+			args = append(args, "neww", "-n", p.Name, "-P", "-F", tmuxPaneFmt, p.Command, ";")
 		}
 	}
 
@@ -174,13 +174,19 @@ func (t *tmuxClient) observe() {
 }
 
 func (t *tmuxClient) mapProcess(pane, name, pid string) {
-	if p, ok := t.processesByName[name]; ok {
+	for _, p := range t.processes {
+		if p.Name != name {
+			continue
+		}
+
 		t.processesByPane[pane] = p
 		p.tmuxPane = pane
 
 		if ipid, err := strconv.Atoi(pid); err == nil {
 			p.proc, _ = os.FindProcess(-ipid)
 		}
+
+		break
 	}
 }
 
@@ -196,7 +202,7 @@ func (t *tmuxClient) sendOutput(name, str string) {
 }
 
 func (t *tmuxClient) AddProcess(p *process) {
-	t.processesByName[p.Name] = p
+	t.processes = append(t.processes, p)
 }
 
 func (t *tmuxClient) RespawnProcess(p *process) {
