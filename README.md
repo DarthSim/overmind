@@ -63,7 +63,7 @@ You can download the latest release [here](https://github.com/DarthSim/overmind/
 
 ### Build Overmind from source
 
-You need Go 1.6 or later to build the project.
+You need Go 1.12 or later to build the project.
 
 ```bash
 $ GO111MODULE=on go get -u github.com/DarthSim/overmind/v2
