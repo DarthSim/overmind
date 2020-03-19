@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/DarthSim/overmind/utils"
+	"github.com/DarthSim/overmind/v2/utils"
 )
 
 type commandCenter struct {

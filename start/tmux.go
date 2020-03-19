@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/DarthSim/overmind/utils"
+	"github.com/DarthSim/overmind/v2/utils"
 
 	"golang.org/x/crypto/ssh/terminal"
 )

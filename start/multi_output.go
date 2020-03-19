@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/DarthSim/overmind/utils"
+	"github.com/DarthSim/overmind/v2/utils"
 )
 
 type multiOutput struct {

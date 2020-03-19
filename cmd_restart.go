@@ -5,7 +5,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/DarthSim/overmind/utils"
+	"github.com/DarthSim/overmind/v2/utils"
 
 	"github.com/urfave/cli"
 )

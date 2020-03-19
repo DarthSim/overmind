@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"syscall"
 
-	"github.com/DarthSim/overmind/utils"
+	"github.com/DarthSim/overmind/v2/utils"
 )
 
 type procfileEntry struct {
