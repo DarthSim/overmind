@@ -167,7 +167,7 @@ If you need to gain access to process input, you can connect to its `tmux` windo
 $ overmind connect [process_name]
 ```
 
-You can safely disconnet from the window by hitting `Ctrl b` and then `d`.
+You can safely disconnect from the window by hitting `Ctrl b` and then `d`.
 
 ### Restarting a process
 
