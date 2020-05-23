@@ -19,13 +19,12 @@ type procfileEntry struct {
 
 type procfile []procfileEntry
 
-func parseProcfile(procfile string, portBase, portStep int, formation map[string]int, formationPortStep int, stopSignals map[string]syscall.Signal) (pf procfile) {
+func parseProcfile(procfile string, portController portController, formation map[string]int, stopSignals map[string]syscall.Signal) (pf procfile) {
 	re, _ := regexp.Compile(`^([\w-]+):\s+(.+)$`)
 
 	f, err := os.Open(procfile)
 	utils.FatalOnErr(err)
 
-	port := portBase
 	names := make(map[string]bool)
 
 	err = utils.ScanLines(f, func(b []byte) bool {
@@ -70,13 +69,13 @@ func parseProcfile(procfile string, portBase, portStep int, formation map[string
 					Name:       iname,
 					OrigName:   name,
 					Command:    cmd,
-					Port:       port + (i * formationPortStep),
+					Port:       portController.findNextPort(),
 					StopSignal: signal,
 				},
 			)
 		}
 
-		port += portStep
+		portController.nextFormation()
 
 		return true
 	})

@@ -31,7 +31,8 @@ type command struct {
 }
 
 func newCommand(h *Handler) (*command, error) {
-	pf := parseProcfile(h.Procfile, h.PortBase, h.PortStep, h.Formation, h.FormationPortStep, h.StopSignals)
+	pc := newPortController(h.PortBase, h.PortStep, h.FormationPortStep, 5)
+	pf := parseProcfile(h.Procfile, pc, h.Formation, h.StopSignals)
 
 	c := command{
 		timeout:   h.Timeout,
