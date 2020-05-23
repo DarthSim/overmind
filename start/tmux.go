@@ -153,7 +153,13 @@ func (t *tmuxClient) listen() {
 		case "output":
 			output := outputRe.FindStringSubmatch(tmuxOut[2])
 			if len(output) > 2 {
-				t.sendOutput(output[1], output[2])
+				text := output[2]
+				// the last line of the process output may not contain new line char
+				// but here we write to the pipe that consumed line by line
+				if !strings.HasSuffix(text, "\n") {
+					text = fmt.Sprintf("%s\r\n", text)
+				}
+				t.sendOutput(output[1], text)
 			}
 		}
 	}
