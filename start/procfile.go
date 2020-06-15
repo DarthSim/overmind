@@ -35,10 +35,19 @@ func resolveProcs(h *Handler) (ps procs) {
 
 	pf := parseProcfile(filepath.Clean(h.Procfile), root)
 	for i, p := range pf {
-		num := 1
 		name := p.Name
-		iname := fmt.Sprintf("%s:%s", name, p.Procfile)
+		iname := name
 
+		shortPath := p.Procfile
+		if filepath.Base(p.Procfile) == "Procfile" {
+			shortPath = filepath.Dir(p.Procfile)
+		}
+
+		if len(shortPath) > 1 {
+			iname = fmt.Sprintf("%s:%s", iname, shortPath)
+		}
+
+		num := 1
 		if fnum, ok := h.Formation[name]; ok {
 			num = fnum
 		} else if fnum, ok := h.Formation["all"]; ok {
@@ -46,7 +55,7 @@ func resolveProcs(h *Handler) (ps procs) {
 		}
 
 		if num > 1 {
-			iname = fmt.Sprintf("%s#%d", name, i+1)
+			iname = fmt.Sprintf("%s#%d", iname, i+1)
 		}
 
 		if names[iname] {
