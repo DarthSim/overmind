@@ -31,11 +31,11 @@ type command struct {
 }
 
 func newCommand(h *Handler) (*command, error) {
-	pf := parseProcfile(h.Procfile, h.PortBase, h.PortStep, h.Formation, h.FormationPortStep, h.StopSignals)
+	procs := resolveProcs(h)
 
 	c := command{
 		timeout:   h.Timeout,
-		doneTrig:  make(chan bool, len(pf)),
+		doneTrig:  make(chan bool, len(procs)),
 		stopTrig:  make(chan os.Signal),
 		processes: make(processesMap),
 		daemonize: h.Daemonize,
@@ -61,7 +61,7 @@ func newCommand(h *Handler) (*command, error) {
 	instanceID := fmt.Sprintf("overmind-%s-%s", session, nanoid)
 
 	c.tmux = newTmuxClient(session, instanceID, root, h.TmuxConfigPath)
-	c.output = newMultiOutput(pf.MaxNameLength())
+	c.output = newMultiOutput(procs.MaxNameLength())
 
 	procNames := utils.SplitAndTrim(h.ProcNames)
 
@@ -73,7 +73,7 @@ func newCommand(h *Handler) (*command, error) {
 	canDie := utils.SplitAndTrim(h.CanDie)
 	autoRestart := utils.SplitAndTrim(h.AutoRestart)
 
-	for i, e := range pf {
+	for i, e := range procs {
 		if len(procNames) == 0 || utils.StringsContain(procNames, e.OrigName) {
 			c.processes[e.Name] = newProcess(
 				c.tmux,
