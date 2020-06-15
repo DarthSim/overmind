@@ -33,11 +33,11 @@ func resolveProcs(h *Handler) (ps procs) {
 	root, _ := h.AbsRoot()
 	names := make(map[string]bool)
 
-	pf := parseProcfile(h.Procfile, root)
+	pf := parseProcfile(filepath.Clean(h.Procfile), root)
 	for i, p := range pf {
 		num := 1
 		name := p.Name
-		iname := fmt.Sprintf("%s#%s", name, p.Procfile)
+		iname := fmt.Sprintf("%s:%s", name, p.Procfile)
 
 		if fnum, ok := h.Formation[name]; ok {
 			num = fnum

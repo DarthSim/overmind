@@ -80,6 +80,7 @@ func newCommand(h *Handler) (*command, error) {
 				e.Name,
 				colors[i%len(colors)],
 				e.Command,
+				filepath.Dir(e.Procfile),
 				e.Port,
 				c.output,
 				utils.StringsContain(canDie, e.OrigName),
