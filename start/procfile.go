@@ -100,16 +100,7 @@ func parseProcfile(procfile string, absDir string) (pf procfile) {
 			nextPFPath := filepath.Join(filepath.Dir(procfile), nextProcfile)
 
 			npf := parseProcfile(nextPFPath, absDir)
-			for _, p := range npf {
-				pf = append(
-					pf,
-					procfileEntry{
-						Name:       p.Name,
-						Command:    p.Command,
-						Procfile:   p.Procfile,
-					},
-				)
-			}
+			pf = append(pf, npf...)
 		}
 
 		pparams := reProc.FindStringSubmatch(string(b))

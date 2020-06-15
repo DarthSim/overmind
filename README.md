@@ -294,6 +294,20 @@ $ overmind restart -s path/to/socket sidekiq
 $ overmind kill -s path/to/socket
 ```
 
+### Nested Procfile
+
+Overmind supports an extension to the Procfile syntax to reuse other Procfiles
+in your project.
+
+```Procfile
+assets: gulp watch
+-f backend/Procfile
+-f frontend/Procfile
+```
+
+A use case for this would be monorepos where multiple Procfiles are defined in
+sub-directories across the project.
+
 ## Known issues
 
 ### Overmind uses system Ruby/Node/etc instead of custom-defined one
