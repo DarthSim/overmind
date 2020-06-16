@@ -27,6 +27,10 @@ func (h *cmdConnectHandler) Run(c *cli.Context) error {
 		utils.Fatal("Specify a single name of process")
 	}
 
+	if f := os.Getenv("TMUX"); len(f) > 0 {
+		utils.Fatal("tmux sessions should be nested with care, unset $TMUX to force")
+	}
+
 	conn, err := net.Dial("unix", h.SocketPath)
 	utils.FatalOnErr(err)
 
