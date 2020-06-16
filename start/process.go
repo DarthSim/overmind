@@ -34,12 +34,12 @@ type process struct {
 	Name    string
 	Color   int
 	Command string
-	Directory string
+	Dir     string
 }
 
 type processesMap map[string]*process
 
-func newProcess(tmux *tmuxClient, name string, color int, command, directory string, port int, output *multiOutput, canDie bool, autoRestart bool, stopSignal syscall.Signal) *process {
+func newProcess(tmux *tmuxClient, name string, color int, command, dir string, port int, output *multiOutput, canDie bool, autoRestart bool, stopSignal syscall.Signal) *process {
 	out, in := io.Pipe()
 
 	proc := &process{
@@ -57,7 +57,7 @@ func newProcess(tmux *tmuxClient, name string, color int, command, directory str
 		Name:    name,
 		Color:   color,
 		Command: fmt.Sprintf("export PORT=%d; %s", port, command),
-		Directory:   directory,
+		Dir:     dir,
 	}
 
 	tmux.AddProcess(proc)

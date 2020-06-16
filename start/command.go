@@ -74,13 +74,17 @@ func newCommand(h *Handler) (*command, error) {
 	autoRestart := utils.SplitAndTrim(h.AutoRestart)
 
 	for i, e := range procs {
+		dir, err := filepath.Abs(filepath.Dir(e.Procfile))
+		if err != nil {
+			utils.FatalOnErr(err)
+		}
 		if len(procNames) == 0 || utils.StringsContain(procNames, e.OrigName) {
 			c.processes[e.Name] = newProcess(
 				c.tmux,
 				e.Name,
 				colors[i%len(colors)],
 				e.Command,
-				filepath.Dir(e.Procfile),
+				dir,
 				e.Port,
 				c.output,
 				utils.StringsContain(canDie, e.OrigName),

@@ -95,7 +95,7 @@ func (t *tmuxClient) Start() error {
 		if first {
 			first = false
 
-			args = append(args, "new", "-c", p.Directory, "-n", p.Name, "-s", t.Session, "-P", "-F", tmuxPaneFmt, p.Command, ";")
+			args = append(args, "new", "-c", p.Dir, "-n", p.Name, "-s", t.Session, "-P", "-F", tmuxPaneFmt, p.Command, ";")
 
 			if major, minor := tmuxVersion(); major < 2 || (major == 2 && minor < 6) {
 				if w, h, err := terminal.GetSize(int(os.Stdin.Fd())); err == nil {
@@ -106,7 +106,7 @@ func (t *tmuxClient) Start() error {
 			args = append(args, "setw", "-g", "remain-on-exit", "on", ";")
 			args = append(args, "setw", "-g", "allow-rename", "off", ";")
 		} else {
-			args = append(args, "neww", "-c", p.Directory, "-n", p.Name, "-P", "-F", tmuxPaneFmt, p.Command, ";")
+			args = append(args, "neww", "-c", p.Dir, "-n", p.Name, "-P", "-F", tmuxPaneFmt, p.Command, ";")
 		}
 	}
 
