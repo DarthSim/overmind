@@ -44,7 +44,7 @@ func resolveProcs(h *Handler) (ps procs) {
 		}
 
 		if len(shortPath) > 1 {
-			iname = fmt.Sprintf("%s:%s", iname, shortPath)
+			iname = fmt.Sprintf("%s:%s", shortPath, iname)
 		}
 
 		num := 1
