@@ -59,6 +59,9 @@ func newCommand(h *Handler) (*command, error) {
 	}
 
 	instanceID := fmt.Sprintf("overmind-%s-%s", session, nanoid)
+	if len(h.SocketName) > 0 {
+	    instanceID = h.SocketName
+	}
 
 	c.tmux = newTmuxClient(session, instanceID, root, h.TmuxConfigPath)
 	c.output = newMultiOutput(pf.MaxNameLength())

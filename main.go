@@ -48,6 +48,7 @@ func setupStartCmd() cli.Command {
 			cli.StringFlag{Name: "stop-signals, i", EnvVar: "OVERMIND_STOP_SIGNALS", Usage: "Specify a signal that will be sent to each process when Overmind will try to stop them. The value passed in should be in the format process=signal,process=signal. Supported signals are: ABRT, INT, KILL, QUIT, STOP, TERM, USR1, USR2"},
 			cli.BoolFlag{Name: "daemonize, D", EnvVar: "OVERMIND_DAEMONIZE", Usage: "Launch Overmind as a daemon. Use 'overmind echo' to view logs and 'overmind quit' to gracefully quit daemonized instance", Destination: &c.Daemonize},
 			cli.StringFlag{Name: "tmux-config, F", EnvVar: "OVERMIND_TMUX_CONFIG", Usage: "Specify an alternative tmux config path to be used by Overmind", Destination: &c.TmuxConfigPath},
+			cli.StringFlag{Name: "tmux-socket-name, L", EnvVar: "OVERMIND_TMUX_SOCKET_NAME", Usage: "Specify a tmux socket name to be used by Overmind", Destination: &c.SocketName},
 			socketFlag(&c.SocketPath),
 		},
 	}

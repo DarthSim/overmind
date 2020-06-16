@@ -34,6 +34,7 @@ type Handler struct {
 	PortBase, PortStep int
 	ProcNames          string
 	SocketPath         string
+	SocketName         string
 	CanDie             string
 	AutoRestart        string
 	Colors             []int
