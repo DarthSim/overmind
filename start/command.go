@@ -64,6 +64,7 @@ func newCommand(h *Handler) (*command, error) {
 	c.output = newMultiOutput(pf.MaxNameLength())
 
 	procNames := utils.SplitAndTrim(h.ProcNames)
+	ignoredProcNames := utils.SplitAndTrim(h.IgnoredProcNames)
 
 	colors := defaultColors
 	if len(h.Colors) > 0 {
@@ -74,7 +75,10 @@ func newCommand(h *Handler) (*command, error) {
 	autoRestart := utils.SplitAndTrim(h.AutoRestart)
 
 	for i, e := range pf {
-		if len(procNames) == 0 || utils.StringsContain(procNames, e.OrigName) {
+		shouldRun := len(procNames) == 0 || utils.StringsContain(procNames, e.OrigName)
+		isIgnored := len(ignoredProcNames) != 0 && utils.StringsContain(ignoredProcNames, e.OrigName)
+
+		if (shouldRun && !isIgnored) {
 			c.processes[e.Name] = newProcess(
 				c.tmux,
 				e.Name,

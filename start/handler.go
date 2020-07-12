@@ -33,6 +33,7 @@ type Handler struct {
 	Timeout            int
 	PortBase, PortStep int
 	ProcNames          string
+	IgnoredProcNames   string
 	SocketPath         string
 	CanDie             string
 	AutoRestart        string
