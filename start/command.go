@@ -177,7 +177,7 @@ func (c *command) runProcesses() {
 }
 
 func (c *command) waitForExit() {
-	signal.Notify(c.stopTrig, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(c.stopTrig, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
 	c.waitForDoneOrStop()
 
