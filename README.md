@@ -130,6 +130,24 @@ $ overmind start -l web,sidekiq
 $ OVERMIND_PROCESSES=web,sidekiq overmind start
 ```
 
+#### Not running the specified processes
+
+Similar to the above, if there are some processes in the Procfile that you do not want to run:
+
+```bash
+$ overmind start -x web,sidekiq
+$ OVERMIND_IGNORE_PROCESSES=web,sidekiq overmind start
+```
+
+This takes precedence over the previous `-l` flag. i.e. if you:
+
+```bash
+$ overmind start -l web -x web
+$ OVERMIND_IGNORE_PROCESSES=web OVERMIND_PROCESSES=web overmind start
+```
+
+Nothing will start.
+
 #### Processes that can die
 
 Usually, when a process dies, Overmind will interrupt all other processes. However, you can specify processes that can die without interrupting all other ones:
