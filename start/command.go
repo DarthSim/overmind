@@ -78,7 +78,7 @@ func newCommand(h *Handler) (*command, error) {
 		shouldRun := len(procNames) == 0 || utils.StringsContain(procNames, e.OrigName)
 		isIgnored := len(ignoredProcNames) != 0 && utils.StringsContain(ignoredProcNames, e.OrigName)
 
-		if (shouldRun && !isIgnored) {
+		if shouldRun && !isIgnored {
 			c.processes[e.Name] = newProcess(
 				c.tmux,
 				e.Name,
