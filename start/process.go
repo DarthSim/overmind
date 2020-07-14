@@ -29,7 +29,7 @@ type process struct {
 	tmux *tmuxClient
 
 	in  io.Writer
-	out io.Reader
+	out io.ReadCloser
 
 	Name    string
 	Color   int
@@ -162,6 +162,7 @@ func (p *process) observe() {
 	for range ticker.C {
 		if !p.Running() {
 			if !p.keepingAlive {
+				p.out.Close()
 				p.output.WriteBoldLine(p, []byte("Exited"))
 				p.keepingAlive = true
 			}
@@ -187,6 +188,9 @@ func (p *process) respawn() {
 	p.restart = false
 	p.canDieNow = p.canDie
 	p.interrupted = false
+
+	p.out, p.in = io.Pipe()
+	go p.scanOuput()
 
 	p.tmux.RespawnProcess(p)
 

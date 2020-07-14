@@ -109,7 +109,7 @@ func ScanLines(r io.Reader, callback func([]byte) bool) error {
 			buf.Reset()
 		}
 	}
-	if err != io.EOF {
+	if err != io.EOF && err != io.ErrClosedPipe {
 		return err
 	}
 	return nil
