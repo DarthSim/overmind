@@ -195,4 +195,5 @@ func (p *process) respawn() {
 	p.tmux.RespawnProcess(p)
 
 	p.waitPid()
+	p.output.WriteBoldLinef(p, "Restarted with pid %v...", p.Pid())
 }
