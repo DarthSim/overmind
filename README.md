@@ -121,6 +121,15 @@ $ overmind start -p 3000 -P 10
 $ OVERMIND_PORT=3000 OVERMIND_PORT_STEP=10 overmind start
 ```
 
+#### Disabling `PORT` variable
+
+If you don't want Overmind to set `PORT` variable, you can disable it:
+
+```bash
+$ overmind start -N
+$ OVERMIND_NO_PORT=1 overmind start
+```
+
 #### Running only the specified processes
 
 You can specify the names of processes you want to run:
@@ -147,6 +156,29 @@ $ OVERMIND_IGNORE_PROCESSES=web OVERMIND_PROCESSES=web overmind start
 ```
 
 Nothing will start.
+
+#### Scaling processes (formation)
+
+By default, Overmind starts one instance of each process, but you can set the number of each process instances to run:
+
+```bash
+$ overmind start -m web=2,worker=5
+$ OVERMIND_FORMATION=web=2,worker=5 overmind start
+```
+
+There is a special name `all` that you can use to scale all processes at once:
+
+```bash
+$ overmind start -m all=2,worker=5
+$ OVERMIND_FORMATION=all=2,worker=5 overmind start
+```
+
+If you set instances number of some process to zero, this process won't be run:
+
+```bash
+$ overmind start -m some_production_task=0
+$ OVERMIND_FORMATION=some_production_task=0 overmind start
+```
 
 #### Processes that can die
 
