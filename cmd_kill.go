@@ -2,19 +2,16 @@ package main
 
 import (
 	"fmt"
-	"net"
 
 	"github.com/DarthSim/overmind/v2/utils"
 
 	"github.com/urfave/cli"
 )
 
-type cmdKillHandler struct {
-	SocketPath string
-}
+type cmdKillHandler struct{ dialer }
 
-func (c *cmdKillHandler) Run(_ *cli.Context) error {
-	conn, err := net.Dial("unix", c.SocketPath)
+func (h *cmdKillHandler) Run(_ *cli.Context) error {
+	conn, err := h.Dial()
 	utils.FatalOnErr(err)
 
 	fmt.Fprintf(conn, "kill")

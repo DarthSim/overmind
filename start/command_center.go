@@ -15,18 +15,20 @@ type commandCenter struct {
 	stop     bool
 
 	SocketPath string
+	Network    string
 }
 
-func newCommandCenter(cmd *command, socket string) *commandCenter {
+func newCommandCenter(cmd *command, socket, network string) *commandCenter {
 	return &commandCenter{
 		cmd:        cmd,
 		SocketPath: socket,
+		Network:    network,
 	}
 }
 
 func (c *commandCenter) Start() (err error) {
-	if c.listener, err = net.Listen("unix", c.SocketPath); err != nil {
-		if strings.Contains(err.Error(), "address already in use") {
+	if c.listener, err = net.Listen(c.Network, c.SocketPath); err != nil {
+		if c.Network == "unix" && strings.Contains(err.Error(), "address already in use") {
 			err = fmt.Errorf("it looks like Overmind is already running. If it's not, remove %s and try again", c.SocketPath)
 		}
 		return

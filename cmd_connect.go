@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"net"
 	"os"
 	"os/exec"
 	"strings"
@@ -14,8 +13,9 @@ import (
 )
 
 type cmdConnectHandler struct {
+	dialer
+
 	ControlMode bool
-	SocketPath  string
 }
 
 func (h *cmdConnectHandler) Run(c *cli.Context) error {
@@ -27,7 +27,7 @@ func (h *cmdConnectHandler) Run(c *cli.Context) error {
 		utils.Fatal("Specify a single name of process")
 	}
 
-	conn, err := net.Dial("unix", h.SocketPath)
+	conn, err := h.Dial()
 	utils.FatalOnErr(err)
 
 	fmt.Fprintf(conn, "get-connection %v\n", c.Args().First())

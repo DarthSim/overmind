@@ -36,6 +36,7 @@ type Handler struct {
 	ProcNames          string
 	IgnoredProcNames   string
 	SocketPath         string
+	Network            string
 	CanDie             string
 	AutoRestart        string
 	Colors             []int

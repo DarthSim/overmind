@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,17 +11,14 @@ import (
 	"github.com/urfave/cli"
 )
 
-type cmdEchoHandler struct {
-	ControlMode bool
-	SocketPath  string
-}
+type cmdEchoHandler struct{ dialer }
 
 func (h *cmdEchoHandler) Run(c *cli.Context) error {
 	if c.Args().Present() {
 		utils.Fatal("Echo doesn't accept any arguments")
 	}
 
-	conn, err := net.Dial("unix", h.SocketPath)
+	conn, err := h.Dial()
 	utils.FatalOnErr(err)
 
 	stop := make(chan os.Signal)

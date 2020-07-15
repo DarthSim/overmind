@@ -9,9 +9,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-type cmdRunHandler struct {
-	SocketPath string
-}
+type cmdRunHandler struct{}
 
 func (h *cmdRunHandler) Run(c *cli.Context) error {
 	if !c.Args().Present() {

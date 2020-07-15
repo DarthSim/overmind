@@ -344,6 +344,21 @@ $ overmind restart -s path/to/socket sidekiq
 $ overmind kill -s path/to/socket
 ```
 
+#### Using TCP network
+
+Overmind can bind its command center to a TCP address instead of Unix socket. It is useful when you run it on a remote machine.
+
+```bash
+$ overmind start -s "0.0.0.0:4321" -S "tcp"
+$ OVERMIND_SOCKET="0.0.0.0:4321" OVERMIND_NETWORK="tcp" overmind start
+```
+
+You need to pass the same flags to other commands:
+
+```bash
+$ overmind connect -s "0.0.0.0:4321" -S "tcp" web
+```
+
 ## Known issues
 
 ### Overmind uses system Ruby/Node/etc instead of custom-defined one

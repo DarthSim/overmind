@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net"
 	"strings"
 
 	"github.com/DarthSim/overmind/v2/utils"
@@ -10,12 +9,10 @@ import (
 	"github.com/urfave/cli"
 )
 
-type cmdStopHandler struct {
-	SocketPath string
-}
+type cmdStopHandler struct{ dialer }
 
 func (h *cmdStopHandler) Run(c *cli.Context) error {
-	conn, err := net.Dial("unix", h.SocketPath)
+	conn, err := h.Dial()
 	utils.FatalOnErr(err)
 
 	fmt.Fprintf(conn, "stop %v\n", strings.Join(c.Args(), " "))
