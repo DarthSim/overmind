@@ -27,6 +27,7 @@ type command struct {
 	doneWg    sync.WaitGroup
 	stopTrig  chan os.Signal
 	processes processesMap
+	scriptDir string
 	daemonize bool
 }
 
@@ -74,17 +75,21 @@ func newCommand(h *Handler) (*command, error) {
 	canDie := utils.SplitAndTrim(h.CanDie)
 	autoRestart := utils.SplitAndTrim(h.AutoRestart)
 
+	c.scriptDir = filepath.Join(os.TempDir(), instanceID)
+	os.MkdirAll(c.scriptDir, 0700)
+
 	for i, e := range pf {
 		shouldRun := len(procNames) == 0 || utils.StringsContain(procNames, e.OrigName)
 		isIgnored := len(ignoredProcNames) != 0 && utils.StringsContain(ignoredProcNames, e.OrigName)
 
 		if shouldRun && !isIgnored {
+			scriptFilePath := c.createScriptFile(&e)
+
 			c.processes[e.Name] = newProcess(
 				c.tmux,
 				e.Name,
 				colors[i%len(colors)],
-				e.Command,
-				e.Port,
+				scriptFilePath,
 				c.output,
 				utils.StringsContain(canDie, e.OrigName),
 				utils.StringsContain(autoRestart, e.OrigName),
@@ -99,6 +104,7 @@ func newCommand(h *Handler) (*command, error) {
 }
 
 func (c *command) Run() (int, error) {
+	defer os.RemoveAll(c.scriptDir)
 	defer c.output.Stop()
 
 	fmt.Printf("\033]0;%s | overmind\007", c.title)
@@ -147,6 +153,22 @@ func (c *command) Run() (int, error) {
 
 func (c *command) Quit() {
 	c.stopTrig <- syscall.SIGINT
+}
+
+func (c *command) createScriptFile(e *procfileEntry) string {
+	scriptFile, err := os.Create(filepath.Join(c.scriptDir, e.Name))
+	utils.FatalOnErr(err)
+
+	fmt.Fprintln(scriptFile, "#!/bin/sh")
+	fmt.Fprintln(scriptFile, "set -e")
+	fmt.Fprintf(scriptFile, "export PORT=%d\n", e.Port)
+	fmt.Fprintln(scriptFile, e.Command)
+
+	utils.FatalOnErr(scriptFile.Chmod(0744))
+
+	utils.FatalOnErr(scriptFile.Close())
+
+	return scriptFile.Name()
 }
 
 func (c *command) checkTmux() bool {
