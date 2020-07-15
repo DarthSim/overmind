@@ -83,7 +83,7 @@ func newCommand(h *Handler) (*command, error) {
 		isIgnored := len(ignoredProcNames) != 0 && utils.StringsContain(ignoredProcNames, e.OrigName)
 
 		if shouldRun && !isIgnored {
-			scriptFilePath := c.createScriptFile(&e)
+			scriptFilePath := c.createScriptFile(&e, !h.NoPort)
 
 			c.processes[e.Name] = newProcess(
 				c.tmux,
@@ -155,13 +155,15 @@ func (c *command) Quit() {
 	c.stopTrig <- syscall.SIGINT
 }
 
-func (c *command) createScriptFile(e *procfileEntry) string {
+func (c *command) createScriptFile(e *procfileEntry, setPort bool) string {
 	scriptFile, err := os.Create(filepath.Join(c.scriptDir, e.Name))
 	utils.FatalOnErr(err)
 
 	fmt.Fprintln(scriptFile, "#!/bin/sh")
 	fmt.Fprintln(scriptFile, "set -e")
-	fmt.Fprintf(scriptFile, "export PORT=%d\n", e.Port)
+	if setPort {
+		fmt.Fprintf(scriptFile, "export PORT=%d\n", e.Port)
+	}
 	fmt.Fprintln(scriptFile, e.Command)
 
 	utils.FatalOnErr(scriptFile.Chmod(0744))

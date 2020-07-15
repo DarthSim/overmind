@@ -31,6 +31,7 @@ type Handler struct {
 	Procfile           string
 	Root               string
 	Timeout            int
+	NoPort             bool
 	PortBase, PortStep int
 	ProcNames          string
 	IgnoredProcNames   string
