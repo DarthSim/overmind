@@ -145,14 +145,14 @@ Similar to the above, if there are some processes in the Procfile that you do no
 
 ```bash
 $ overmind start -x web,sidekiq
-$ OVERMIND_IGNORE_PROCESSES=web,sidekiq overmind start
+$ OVERMIND_IGNORED_PROCESSES=web,sidekiq overmind start
 ```
 
 This takes precedence over the previous `-l` flag. i.e. if you:
 
 ```bash
 $ overmind start -l web -x web
-$ OVERMIND_IGNORE_PROCESSES=web OVERMIND_PROCESSES=web overmind start
+$ OVERMIND_IGNORED_PROCESSES=web OVERMIND_PROCESSES=web overmind start
 ```
 
 Nothing will start.
