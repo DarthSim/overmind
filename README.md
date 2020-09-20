@@ -379,7 +379,7 @@ All operating systems have limitations on Unix socket path length. Try to use a 
 
 ### Overmind exits after `pg_ctl --wait start` and keeps PostgreSQL server running
 
-Since version 12.0 `pg_ctl --wait start` exits right after starting the server. Just use `postres` command directly.
+Since version 12.0 `pg_ctl --wait start` exits right after starting the server. Just use `postgres` command directly.
 
 ## Author
 
