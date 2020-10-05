@@ -3,6 +3,7 @@ package main
 import (
 	"math/rand"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -193,7 +194,8 @@ func main() {
 
 func loadEnvFiles() {
 	// First load the specifically named overmind env files
-	godotenv.Overload("~/.overmind.env")
+	userHomeDir, _ := os.UserHomeDir()
+	godotenv.Overload(path.Join(userHomeDir, ".overmind.env"))
 	godotenv.Overload("./.overmind.env")
 
 	_, skipEnv := os.LookupEnv("OVERMIND_SKIP_ENV")
