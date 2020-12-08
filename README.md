@@ -359,6 +359,15 @@ You need to pass the same flags to other commands:
 $ overmind connect -s "0.0.0.0:4321" -S "tcp" web
 ```
 
+### Specifying tmux config
+
+Overmind can use a specified tmux config. This is useful if you want to differentiate from your main tmux window, for example adding a custom status line for Overmind or a different prefix key.
+
+```bash
+overmind start -F ~/overmind.tmux.conf
+OVERMIND_TMUX_CONFIG=~/.overmind.tmux.conf overmind start
+```
+
 ## Known issues
 
 ### Overmind uses system Ruby/Node/etc instead of custom-defined one
