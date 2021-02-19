@@ -217,7 +217,7 @@ If you need to gain access to process input, you can connect to its `tmux` windo
 $ overmind connect [process_name]
 ```
 
-You can safely disconnect from the window by hitting `Ctrl b` and then `d`.
+You can safely disconnect from the window by hitting `Ctrl b` (or your tmux prefix) and then `d`.
 
 ### Restarting a process
 
@@ -357,6 +357,15 @@ You need to pass the same flags to other commands:
 
 ```bash
 $ overmind connect -s "0.0.0.0:4321" -S "tcp" web
+```
+
+### Specifying tmux config
+
+Overmind can use a specified tmux config. This is useful if you want to differentiate from your main tmux window, for example adding a custom status line for Overmind or a different prefix key.
+
+```bash
+overmind start -F ~/overmind.tmux.conf
+OVERMIND_TMUX_CONFIG=~/.overmind.tmux.conf overmind start
 ```
 
 ## Known issues
