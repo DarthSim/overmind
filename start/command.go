@@ -174,7 +174,7 @@ func (c *command) createScriptFile(e *procfileEntry, setPort bool) string {
 }
 
 func (c *command) checkTmux() bool {
-	return utils.RunCmd("which", "tmux") == nil
+	return utils.RunCmd("tmux", "-V") == nil
 }
 
 func (c *command) startCommandCenter() {
