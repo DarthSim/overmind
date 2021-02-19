@@ -182,7 +182,7 @@ func (t *tmuxClient) mapProcess(pane, name, pid string) {
 		t.processesByPane[pane] = p
 
 		if ipid, err := strconv.Atoi(pid); err == nil {
-			p.proc, _ = os.FindProcess(-ipid)
+			p.pid = ipid
 		}
 
 		break
