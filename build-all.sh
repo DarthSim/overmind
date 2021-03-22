@@ -25,3 +25,7 @@ gzip -9 -S "-$version-freebsd-386.gz" dist/overmind
 
 env CGO_ENABLED=0 GOOS=freebsd GOARCH=amd64 go build -ldflags "-s -w" -a -o dist/overmind .
 gzip -9 -S "-$version-freebsd-amd64.gz" dist/overmind
+
+for filename in dist/*.gz; do
+  sha256sum -bz $filename | awk '{printf "%s",$1}' > "$filename.sha256sum"
+done
