@@ -98,6 +98,10 @@ func newCommand(h *Handler) (*command, error) {
 		}
 	}
 
+	if len(c.processes) == 0 {
+		return nil, errors.New("No processes to run")
+	}
+
 	c.cmdCenter = newCommandCenter(&c, h.SocketPath, h.Network)
 
 	return &c, nil
