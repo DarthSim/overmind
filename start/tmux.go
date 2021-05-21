@@ -170,7 +170,7 @@ func (t *tmuxClient) observe() {
 
 	exec.Command("tmux", "-L", t.Socket, "kill-session", "-t", t.Session).Run()
 
-	utils.Fatal("Tmux client unexpectidly exited")
+	utils.Fatal("Tmux client unexpectedly exited")
 }
 
 func (t *tmuxClient) mapProcess(pane, name, pid string) {
