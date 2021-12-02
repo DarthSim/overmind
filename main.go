@@ -53,6 +53,7 @@ func setupStartCmd() cli.Command {
 				cli.IntFlag{Name: "port-step, P", EnvVar: "OVERMIND_PORT_STEP", Usage: "Specify a step to increase port number", Value: 100, Destination: &c.PortStep},
 				cli.BoolFlag{Name: "no-port, N", EnvVar: "OVERMIND_NO_PORT", Usage: "Don't set $PORT variable for processes", Destination: &c.NoPort},
 				cli.StringFlag{Name: "can-die, c", EnvVar: "OVERMIND_CAN_DIE", Usage: "Specify names of process which can die without interrupting the other processes. Divide names with comma", Destination: &c.CanDie},
+				cli.BoolFlag{Name: "any-can-die", EnvVar: "OVERMIND_ANY_CAN_DIE", Usage: "No dead processes should stop Overmind. Overrides can-die", Destination: &c.AnyCanDie},
 				cli.StringFlag{Name: "auto-restart, r", EnvVar: "OVERMIND_AUTO_RESTART", Usage: "Specify names of process which will be auto restarted on death. Divide names with comma", Destination: &c.AutoRestart},
 				cli.StringFlag{Name: "colors, b", EnvVar: "OVERMIND_COLORS", Usage: "Specify the xterm color codes that will be used to colorize process names. Divide codes with comma"},
 				cli.StringFlag{Name: "formation, m", EnvVar: "OVERMIND_FORMATION", Usage: "Specify the number of each process type to run. The value passed in should be in the format process=num,process=num. Use 'all' as a process name to set value for all processes"},

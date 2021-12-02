@@ -38,6 +38,7 @@ type Handler struct {
 	SocketPath         string
 	Network            string
 	CanDie             string
+	AnyCanDie          bool
 	AutoRestart        string
 	Colors             []int
 	Formation          map[string]int

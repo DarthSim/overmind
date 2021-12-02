@@ -91,7 +91,7 @@ func newCommand(h *Handler) (*command, error) {
 				colors[i%len(colors)],
 				scriptFilePath,
 				c.output,
-				utils.StringsContain(canDie, e.OrigName),
+				(h.AnyCanDie || utils.StringsContain(canDie, e.OrigName)),
 				utils.StringsContain(autoRestart, e.OrigName),
 				e.StopSignal,
 			)
