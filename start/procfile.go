@@ -60,7 +60,7 @@ func parseProcfile(procfile string, portBase, portStep int, formation map[string
 			}
 
 			if names[iname] {
-				utils.Fatal("Process names must be uniq")
+				utils.Fatal("Process names must be unique")
 			}
 			names[iname] = true
 
@@ -84,7 +84,7 @@ func parseProcfile(procfile string, portBase, portStep int, formation map[string
 	utils.FatalOnErr(err)
 
 	if len(pf) == 0 {
-		utils.Fatal("No entries was found in Procfile")
+		utils.Fatal("No entries were found in Procfile")
 	}
 
 	return
