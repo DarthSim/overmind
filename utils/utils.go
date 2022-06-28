@@ -115,6 +115,13 @@ func ScanLines(r io.Reader, callback func([]byte) bool) error {
 	return nil
 }
 
+func FprintRpad(w io.Writer, str string, l int) {
+	fmt.Fprint(w, str)
+	for i := l - len(str); i > 0; i-- {
+		w.Write([]byte{' '})
+	}
+}
+
 // ConvertError converts specific errors to the standard error type
 func ConvertError(err error) error {
 	if exErr, ok := err.(*exec.ExitError); ok {

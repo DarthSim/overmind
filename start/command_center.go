@@ -4,9 +4,17 @@ import (
 	"fmt"
 	"net"
 	"regexp"
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/DarthSim/overmind/v2/utils"
+)
+
+const (
+	headerProcess = "PROCESS"
+	headerPid     = "PID"
+	headerStatus  = "STATUS"
 )
 
 type commandCenter struct {
@@ -85,6 +93,8 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 			c.processGetConnection(args, conn)
 		case "echo":
 			c.processEcho(conn)
+		case "status":
+			c.processStatus(conn)
 		}
 
 		return true
@@ -145,4 +155,41 @@ func (c *commandCenter) processGetConnection(args []string, conn net.Conn) {
 
 func (c *commandCenter) processEcho(conn net.Conn) {
 	c.cmd.output.Echo(conn)
+}
+
+func (c *commandCenter) processStatus(conn net.Conn) {
+	processes := make([]*process, 0, len(c.cmd.processes))
+
+	maxNameLen := 9
+	for _, p := range c.cmd.processes {
+		processes = append(processes, p)
+		if l := len(p.Name); l > maxNameLen {
+			maxNameLen = l
+		}
+	}
+
+	sort.Slice(processes, func(i, j int) bool {
+		return processes[i].pid < processes[j].pid
+	})
+
+	fmt.Fprint(conn, headerProcess)
+	for i := maxNameLen - len(headerProcess); i > -1; i-- {
+		conn.Write([]byte{' '})
+	}
+
+	fmt.Fprint(conn, headerPid)
+	fmt.Fprint(conn, "       ")
+	fmt.Fprintln(conn, headerStatus)
+
+	for _, p := range processes {
+		utils.FprintRpad(conn, p.Name, maxNameLen+1)
+		utils.FprintRpad(conn, strconv.Itoa(p.pid), 10)
+
+		if p.dead || p.keepingAlive {
+			fmt.Fprintln(conn, "dead")
+		} else {
+			fmt.Fprintln(conn, "running")
+		}
+	}
+	conn.Close()
 }

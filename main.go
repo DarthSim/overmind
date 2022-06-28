@@ -160,6 +160,18 @@ func setupEchoCmd() cli.Command {
 	}
 }
 
+func setupStatusCmd() cli.Command {
+	c := cmdStatusHandler{}
+
+	return cli.Command{
+		Name:    "status",
+		Aliases: []string{"ps"},
+		Usage:   "Prints process statuses",
+		Action:  c.Run,
+		Flags:   socketFlags(&c.SocketPath, &c.Network),
+	}
+}
+
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
@@ -189,6 +201,7 @@ func main() {
 		setupKillCmd(),
 		setupRunCmd(),
 		setupEchoCmd(),
+		setupStatusCmd(),
 	}
 
 	app.Run(os.Args)

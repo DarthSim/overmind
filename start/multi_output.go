@@ -89,15 +89,10 @@ func (o *multiOutput) WriteLine(proc *process, p []byte) {
 	}
 
 	colorStr := fmt.Sprintf("\033[1;38;5;%vm", color)
-
 	buf.WriteString(colorStr)
-	buf.WriteString(name)
-
-	for buf.Len()-len(colorStr) < o.maxNameLength {
-		buf.WriteByte(' ')
-	}
-
+	utils.FprintRpad(&buf, name, o.maxNameLength)
 	buf.WriteString("\033[0m | ")
+
 	buf.Write(p)
 	buf.WriteByte('\n')
 
