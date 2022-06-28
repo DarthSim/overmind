@@ -24,7 +24,7 @@ var tmuxOutputRe = regexp.MustCompile(`%(\S+) (.+)`)
 var tmuxProcessRe = regexp.MustCompile(`%(\d+) (.+) (\d+)`)
 var outputRe = regexp.MustCompile(`%(\d+) (.+)`)
 
-const tmuxPaneFmt = "%overmind-process #{pane_id} #{window_name} #{pane_pid}"
+const tmuxPaneMsgFmt = `%%overmind-process #{pane_id} %s #{pane_pid}`
 
 type tmuxClient struct {
 	inReader, outReader io.Reader
@@ -92,10 +92,12 @@ func (t *tmuxClient) Start() error {
 
 	first := true
 	for _, p := range t.processes {
+		tmuxPaneMsg := fmt.Sprintf(tmuxPaneMsgFmt, p.Name)
+
 		if first {
 			first = false
 
-			args = append(args, "new", "-n", p.Name, "-s", t.Session, "-P", "-F", tmuxPaneFmt, p.Command, ";")
+			args = append(args, "new", "-n", p.Name, "-s", t.Session, "-P", "-F", tmuxPaneMsg, p.Command, ";")
 
 			if major, minor := tmuxVersion(); major < 2 || (major == 2 && minor < 6) {
 				if w, h, err := terminal.GetSize(int(os.Stdin.Fd())); err == nil {
@@ -106,7 +108,7 @@ func (t *tmuxClient) Start() error {
 			args = append(args, "setw", "-g", "remain-on-exit", "on", ";")
 			args = append(args, "setw", "-g", "allow-rename", "off", ";")
 		} else {
-			args = append(args, "neww", "-n", p.Name, "-P", "-F", tmuxPaneFmt, p.Command, ";")
+			args = append(args, "neww", "-n", p.Name, "-P", "-F", tmuxPaneMsg, p.Command, ";")
 		}
 	}
 
@@ -206,7 +208,8 @@ func (t *tmuxClient) AddProcess(p *process) {
 
 func (t *tmuxClient) RespawnProcess(p *process) {
 	command := strings.ReplaceAll(fmt.Sprintf("%q", p.Command), "$", "\\$")
-	t.sendCmd("neww -d -k -t %s -n %s -P -F %q %s", p.Name, p.Name, tmuxPaneFmt, command)
+	tmuxPaneMsg := fmt.Sprintf(tmuxPaneMsgFmt, p.Name)
+	t.sendCmd("neww -d -k -t %s -n %s -P -F %q %s", p.Name, p.Name, tmuxPaneMsg, command)
 }
 
 func (t *tmuxClient) ExitCode() (status int) {
