@@ -46,6 +46,7 @@ type Handler struct {
 	StopSignals        map[string]syscall.Signal
 	Daemonize          bool
 	TmuxConfigPath     string
+	Shell              string
 }
 
 // AbsRoot returns absolute path to the working directory
