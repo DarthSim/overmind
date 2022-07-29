@@ -68,7 +68,7 @@ func WildcardMatch(pattern, str string) bool {
 	re := regexp.MustCompile(
 		fmt.Sprintf(
 			"^%s$",
-			strings.Replace(regexp.QuoteMeta(pattern), "\\*", ".*", -1),
+			strings.ReplaceAll(regexp.QuoteMeta(pattern), "\\*", ".*"),
 		),
 	)
 

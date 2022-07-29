@@ -1,12 +1,32 @@
+run:
+  skip-dirs:
+    - .tmp
+    - vendor
+
 linters:
-  fast: true
+  disable-all: true
   enable:
-    - golint
-    - govet
-    - gosimple
+    - deadcode
+    # - errcheck
+    - gocritic
     - goconst
     - goimports
+    - gosimple
+    - govet
+    - ineffassign
     - staticcheck
-  disable:
-    - errcheck
+    - structcheck
+    - stylecheck
+    - typecheck
+    - unused
+    - varcheck
 
+linters-settings:
+  govet:
+    # report about shadowed variables
+    check-shadowing: true
+
+issues:
+  exclude-rules:
+    - linters: [stylecheck]
+      text: "ST1005:"

@@ -14,8 +14,7 @@ import (
 	"time"
 
 	"github.com/DarthSim/overmind/v2/utils"
-
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 var tmuxVersionRe = regexp.MustCompile(`(\d+)\.(\d+)`)
@@ -100,7 +99,7 @@ func (t *tmuxClient) Start() error {
 			args = append(args, "new", "-n", p.Name, "-s", t.Session, "-P", "-F", tmuxPaneMsg, p.Command, ";")
 
 			if major, minor := tmuxVersion(); major < 2 || (major == 2 && minor < 6) {
-				if w, h, err := terminal.GetSize(int(os.Stdin.Fd())); err == nil {
+				if w, h, err := term.GetSize(int(os.Stdin.Fd())); err == nil {
 					args = append(args, "refresh", "-C", fmt.Sprintf("%d,%d", w, h), ";")
 				}
 			}

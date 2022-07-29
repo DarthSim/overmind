@@ -21,7 +21,7 @@ func (h *cmdEchoHandler) Run(c *cli.Context) error {
 	conn, err := h.Dial()
 	utils.FatalOnErr(err)
 
-	stop := make(chan os.Signal)
+	stop := make(chan os.Signal, 1)
 
 	go func() {
 		utils.ScanLines(conn, func(b []byte) bool {

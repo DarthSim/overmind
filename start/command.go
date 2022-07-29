@@ -37,7 +37,7 @@ func newCommand(h *Handler) (*command, error) {
 	c := command{
 		timeout:   h.Timeout,
 		doneTrig:  make(chan bool, len(pf)),
-		stopTrig:  make(chan os.Signal),
+		stopTrig:  make(chan os.Signal, 1),
 		processes: make([]*process, 0, len(pf)),
 		daemonize: h.Daemonize,
 	}

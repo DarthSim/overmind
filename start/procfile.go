@@ -9,6 +9,8 @@ import (
 	"github.com/DarthSim/overmind/v2/utils"
 )
 
+var procfileRe = regexp.MustCompile(`^([\w-]+):\s+(.+)$`)
+
 type procfileEntry struct {
 	Name       string
 	OrigName   string
@@ -20,8 +22,6 @@ type procfileEntry struct {
 type procfile []procfileEntry
 
 func parseProcfile(procfile string, portBase, portStep int, formation map[string]int, formationPortStep int, stopSignals map[string]syscall.Signal) (pf procfile) {
-	re, _ := regexp.Compile(`^([\w-]+):\s+(.+)$`)
-
 	f, err := os.Open(procfile)
 	utils.FatalOnErr(err)
 
@@ -33,7 +33,7 @@ func parseProcfile(procfile string, portBase, portStep int, formation map[string
 			return true
 		}
 
-		params := re.FindStringSubmatch(string(b))
+		params := procfileRe.FindStringSubmatch(string(b))
 		if len(params) != 3 {
 			return true
 		}
