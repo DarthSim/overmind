@@ -31,7 +31,7 @@ type tmuxClient struct {
 	inWriter, outWriter io.Writer
 
 	processes       []*process
-	processesByPane processesMap
+	processesByPane map[string]*process
 
 	cmdMutex sync.Mutex
 
@@ -66,7 +66,7 @@ func tmuxVersion() (int, int) {
 func newTmuxClient(session, socket, root, configPath string) *tmuxClient {
 	t := tmuxClient{
 		processes:       make([]*process, 0),
-		processesByPane: make(processesMap),
+		processesByPane: make(map[string]*process),
 
 		configPath: configPath,
 

@@ -26,7 +26,7 @@ type command struct {
 	doneTrig  chan bool
 	doneWg    sync.WaitGroup
 	stopTrig  chan os.Signal
-	processes processesMap
+	processes []*process
 	scriptDir string
 	daemonize bool
 }
@@ -38,7 +38,7 @@ func newCommand(h *Handler) (*command, error) {
 		timeout:   h.Timeout,
 		doneTrig:  make(chan bool, len(pf)),
 		stopTrig:  make(chan os.Signal),
-		processes: make(processesMap),
+		processes: make([]*process, 0, len(pf)),
 		daemonize: h.Daemonize,
 	}
 
@@ -85,7 +85,7 @@ func newCommand(h *Handler) (*command, error) {
 		if shouldRun && !isIgnored {
 			scriptFilePath := c.createScriptFile(&e, h.Shell, !h.NoPort)
 
-			c.processes[e.Name] = newProcess(
+			c.processes = append(c.processes, newProcess(
 				c.tmux,
 				e.Name,
 				colors[i%len(colors)],
@@ -94,7 +94,7 @@ func newCommand(h *Handler) (*command, error) {
 				(h.AnyCanDie || utils.StringsContain(canDie, e.OrigName)),
 				utils.StringsContain(autoRestart, e.OrigName),
 				e.StopSignal,
-			)
+			))
 		}
 	}
 

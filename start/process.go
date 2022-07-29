@@ -35,8 +35,6 @@ type process struct {
 	Command string
 }
 
-type processesMap map[string]*process
-
 func newProcess(tmux *tmuxClient, name string, color int, command string, output *multiOutput, canDie bool, autoRestart bool, stopSignal syscall.Signal) *process {
 	out, in := io.Pipe()
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -102,14 +101,14 @@ func (c *commandCenter) handleConnection(conn net.Conn) {
 }
 
 func (c *commandCenter) processRestart(args []string) {
-	for name, p := range c.cmd.processes {
+	for _, p := range c.cmd.processes {
 		if len(args) == 0 {
 			p.Restart()
 			continue
 		}
 
 		for _, pattern := range args {
-			if utils.WildcardMatch(pattern, name) {
+			if utils.WildcardMatch(pattern, p.Name) {
 				p.Restart()
 				break
 			}
@@ -118,14 +117,14 @@ func (c *commandCenter) processRestart(args []string) {
 }
 
 func (c *commandCenter) processStop(args []string) {
-	for name, p := range c.cmd.processes {
+	for _, p := range c.cmd.processes {
 		if len(args) == 0 {
 			p.Stop(true)
 			continue
 		}
 
 		for _, pattern := range args {
-			if utils.WildcardMatch(pattern, name) {
+			if utils.WildcardMatch(pattern, p.Name) {
 				p.Stop(true)
 				break
 			}
@@ -145,12 +144,17 @@ func (c *commandCenter) processQuit() {
 
 func (c *commandCenter) processGetConnection(args []string, conn net.Conn) {
 	if len(args) > 0 {
-		if proc, ok := c.cmd.processes[args[0]]; ok {
-			fmt.Fprintf(conn, "%s %s\n", proc.tmux.Socket, proc.WindowID())
-		} else {
-			fmt.Fprintln(conn, "")
+		name := args[0]
+
+		for _, p := range c.cmd.processes {
+			if name == p.Name {
+				fmt.Fprintf(conn, "%s %s\n", p.tmux.Socket, p.WindowID())
+				return
+			}
 		}
 	}
+
+	fmt.Fprintln(conn, "")
 }
 
 func (c *commandCenter) processEcho(conn net.Conn) {
@@ -158,19 +162,12 @@ func (c *commandCenter) processEcho(conn net.Conn) {
 }
 
 func (c *commandCenter) processStatus(conn net.Conn) {
-	processes := make([]*process, 0, len(c.cmd.processes))
-
 	maxNameLen := 9
 	for _, p := range c.cmd.processes {
-		processes = append(processes, p)
 		if l := len(p.Name); l > maxNameLen {
 			maxNameLen = l
 		}
 	}
-
-	sort.Slice(processes, func(i, j int) bool {
-		return processes[i].pid < processes[j].pid
-	})
 
 	fmt.Fprint(conn, headerProcess)
 	for i := maxNameLen - len(headerProcess); i > -1; i-- {
@@ -181,7 +178,7 @@ func (c *commandCenter) processStatus(conn net.Conn) {
 	fmt.Fprint(conn, "       ")
 	fmt.Fprintln(conn, headerStatus)
 
-	for _, p := range processes {
+	for _, p := range c.cmd.processes {
 		utils.FprintRpad(conn, p.Name, maxNameLen+1)
 		utils.FprintRpad(conn, strconv.Itoa(p.pid), 10)
 
