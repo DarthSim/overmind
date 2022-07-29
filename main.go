@@ -218,7 +218,10 @@ func loadEnvFiles() {
 		godotenv.Overload("./.env")
 	}
 
-	if f := os.Getenv("OVERMIND_ENV"); len(f) > 0 {
-		godotenv.Overload(f)
+	envs := strings.Split(os.Getenv("OVERMIND_ENV"), ",")
+	for _, e := range envs {
+		if len(e) > 0 {
+			godotenv.Overload(e)
+		}
 	}
 }

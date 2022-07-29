@@ -189,6 +189,13 @@ $ overmind start -c assets,npm_install
 $ OVERMIND_CAN_DIE=assets,npm_install overmind start
 ```
 
+Also, you can allow all processes to die:
+
+```bash
+$ overmind start --any-can-die
+$ OVERMIND_ANY_CAN_DIE=1 overmind start
+```
+
 #### Auto-restarting processes
 
 If some of your processes tend to randomly crash, you can tell Overmind to restart them automatically when they die:
@@ -283,10 +290,10 @@ OVERMIND_PORT=3000
 
 For example, if you want to use a separate `Procfile.dev` by default on a local environment, create `.overmind.env` file with `OVERMIND_PROCFILE=Procfile.dev`. Now, Overmind uses `Procfile.dev` by default.
 
-You can specify additional env file to load with `OVERMIND_ENV` variable:
+You can specify additional env files to load with `OVERMIND_ENV` variable:
 
 ```bash
-$ OVERMIND_ENV=path/to/env overmind s
+$ OVERMIND_ENV=./.env.local,./.env.development overmind s
 ```
 
 The files will be loaded in the following order:
