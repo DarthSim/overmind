@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if ! git diff --staged --name-only | grep -qe ".*\.go$"; then
+  echo "Nothing to lint"
+  exit 0;
+fi
+
+golangci-lint run
