@@ -143,18 +143,26 @@ func (c *commandCenter) processQuit() {
 }
 
 func (c *commandCenter) processGetConnection(args []string, conn net.Conn) {
+	var proc *process
+
 	if len(args) > 0 {
 		name := args[0]
 
 		for _, p := range c.cmd.processes {
 			if name == p.Name {
-				fmt.Fprintf(conn, "%s %s\n", p.tmux.Socket, p.WindowID())
-				return
+				proc = p
+				break
 			}
 		}
+	} else {
+		proc = c.cmd.processes[0]
 	}
 
-	fmt.Fprintln(conn, "")
+	if proc != nil {
+		fmt.Fprintf(conn, "%s %s\n", proc.tmux.Socket, proc.WindowID())
+	} else {
+		fmt.Fprintln(conn, "")
+	}
 }
 
 func (c *commandCenter) processEcho(conn net.Conn) {

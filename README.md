@@ -221,10 +221,12 @@ If you want Overmind to always use these colors, you can specify them in the [en
 If you need to gain access to process input, you can connect to its `tmux` window:
 
 ```bash
-$ overmind connect [process_name]
+$ overmind connect <process_name>
 ```
 
 You can safely disconnect from the window by hitting `Ctrl b` (or your tmux prefix) and then `d`.
+
+You can omit the process name to connect to the first process defined in the Procfile.
 
 ### Restarting a process
 
