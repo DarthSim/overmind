@@ -104,11 +104,12 @@ func (t *tmuxClient) Start() error {
 				}
 			}
 
-			args = append(args, "setw", "-g", "remain-on-exit", "on", ";")
 			args = append(args, "setw", "-g", "allow-rename", "off", ";")
 		} else {
 			args = append(args, "neww", "-n", p.Name, "-P", "-F", tmuxPaneMsg, p.Command, ";")
 		}
+
+		args = append(args, "set", "-p", "remain-on-exit", "on", ";")
 	}
 
 	t.cmd = exec.Command("tmux", args...)
