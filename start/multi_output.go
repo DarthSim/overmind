@@ -35,6 +35,10 @@ func newMultiOutput(maxNameLength int) *multiOutput {
 	return &o
 }
 
+func (o *multiOutput) Offset() int {
+	return o.maxNameLength + 3
+}
+
 func (o *multiOutput) listen() {
 	for b := range o.ch {
 		os.Stdout.Write(b)

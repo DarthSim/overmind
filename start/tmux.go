@@ -17,7 +17,6 @@ import (
 	"golang.org/x/term"
 )
 
-var tmuxVersionRe = regexp.MustCompile(`(\d+)\.(\d+)`)
 var tmuxUnescapeRe = regexp.MustCompile(`\\(\d{3})`)
 var tmuxOutputRe = regexp.MustCompile(`%(\S+) (.+)`)
 var tmuxProcessRe = regexp.MustCompile(`%(\d+) (.+) (\d+)`)
@@ -40,34 +39,21 @@ type tmuxClient struct {
 
 	shutdown bool
 
+	outputOffset int
+
 	Root    string
 	Socket  string
 	Session string
 }
 
-func tmuxVersion() (int, int) {
-	output, err := exec.Command("tmux", "-V").Output()
-	if err != nil {
-		return 0, 0
-	}
-
-	version := tmuxVersionRe.FindStringSubmatch(string(output))
-	if len(version) < 3 {
-		return 0, 0
-	}
-
-	major, _ := strconv.Atoi(version[1])
-	minor, _ := strconv.Atoi(version[2])
-
-	return major, minor
-}
-
-func newTmuxClient(session, socket, root, configPath string) *tmuxClient {
+func newTmuxClient(session, socket, root, configPath string, outputOffset int) *tmuxClient {
 	t := tmuxClient{
 		processes:       make([]*process, 0),
 		processesByPane: make(map[string]*process),
 
 		configPath: configPath,
+
+		outputOffset: outputOffset,
 
 		Root:    root,
 		Session: session,
@@ -98,10 +84,12 @@ func (t *tmuxClient) Start() error {
 
 			args = append(args, "new", "-n", p.Name, "-s", t.Session, "-P", "-F", tmuxPaneMsg, p.Command, ";")
 
-			if major, minor := tmuxVersion(); major < 2 || (major == 2 && minor < 6) {
-				if w, h, err := term.GetSize(int(os.Stdin.Fd())); err == nil {
-					args = append(args, "refresh", "-C", fmt.Sprintf("%d,%d", w, h), ";")
+			if w, h, err := term.GetSize(int(os.Stdin.Fd())); err == nil {
+				if w > t.outputOffset {
+					w -= t.outputOffset
 				}
+
+				args = append(args, "refresh", "-C", fmt.Sprintf("%d,%d", w, h), ";")
 			}
 
 			args = append(args, "setw", "-g", "remain-on-exit", "on", ";")
