@@ -14,20 +14,25 @@ import (
 type multiOutput struct {
 	maxNameLength int
 
-	ch   chan []byte
+	ch   chan *bytes.Buffer
 	done chan struct{}
 
 	echoes    map[int64]io.Writer
 	echoInd   int64
 	echoMutex sync.Mutex
+
+	bufPool sync.Pool
 }
 
 func newMultiOutput(maxNameLength int) *multiOutput {
 	o := multiOutput{
 		maxNameLength: utils.Max(maxNameLength, 6),
-		ch:            make(chan []byte, 128),
+		ch:            make(chan *bytes.Buffer, 128),
 		done:          make(chan struct{}),
 		echoes:        make(map[int64]io.Writer),
+		bufPool: sync.Pool{
+			New: func() interface{} { return new(bytes.Buffer) },
+		},
 	}
 
 	go o.listen()
@@ -40,12 +45,16 @@ func (o *multiOutput) Offset() int {
 }
 
 func (o *multiOutput) listen() {
-	for b := range o.ch {
+	for buf := range o.ch {
+		b := buf.Bytes()
+
 		os.Stdout.Write(b)
 
 		if len(o.echoes) > 0 {
 			o.writeToEchoes(b)
 		}
+
+		o.bufPool.Put(buf)
 	}
 	close(o.done)
 }
@@ -79,10 +88,12 @@ func (o *multiOutput) Echo(w io.Writer) {
 
 func (o *multiOutput) WriteLine(proc *process, p []byte) {
 	var (
-		buf   bytes.Buffer
 		name  string
 		color int
 	)
+
+	buf := o.bufPool.Get().(*bytes.Buffer)
+	buf.Reset()
 
 	if proc != nil {
 		name = proc.Name
@@ -94,13 +105,13 @@ func (o *multiOutput) WriteLine(proc *process, p []byte) {
 
 	colorStr := fmt.Sprintf("\033[1;38;5;%vm", color)
 	buf.WriteString(colorStr)
-	utils.FprintRpad(&buf, name, o.maxNameLength)
+	utils.FprintRpad(buf, name, o.maxNameLength)
 	buf.WriteString("\033[0m | ")
 
 	buf.Write(p)
 	buf.WriteByte('\n')
 
-	o.ch <- buf.Bytes()
+	o.ch <- buf
 }
 
 func (o *multiOutput) WriteBoldLine(proc *process, p []byte) {
