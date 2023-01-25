@@ -56,6 +56,7 @@ func setupStartCmd() cli.Command {
 				cli.BoolFlag{Name: "any-can-die", EnvVar: "OVERMIND_ANY_CAN_DIE", Usage: "No dead processes should stop Overmind. Overrides can-die", Destination: &c.AnyCanDie},
 				cli.StringFlag{Name: "auto-restart, r", EnvVar: "OVERMIND_AUTO_RESTART", Usage: "Specify names of process which will be auto restarted on death. Divide names with comma", Destination: &c.AutoRestart},
 				cli.StringFlag{Name: "colors, b", EnvVar: "OVERMIND_COLORS", Usage: "Specify the xterm color codes that will be used to colorize process names. Divide codes with comma"},
+				cli.BoolFlag{Name: "show-timestamps, T", EnvVar: "OVERMIND_SHOW_TIMESTAMPS", Usage: "Add timestamps to the output", Destination: &c.ShowTimestamps},
 				cli.StringFlag{Name: "formation, m", EnvVar: "OVERMIND_FORMATION", Usage: "Specify the number of each process type to run. The value passed in should be in the format process=num,process=num. Use 'all' as a process name to set value for all processes"},
 				cli.IntFlag{Name: "formation-port-step", EnvVar: "OVERMIND_FORMATION_PORT_STEP", Usage: "Specify a step to increase port number for the next instance of a process", Value: 10, Destination: &c.FormationPortStep},
 				cli.StringFlag{Name: "stop-signals, i", EnvVar: "OVERMIND_STOP_SIGNALS", Usage: "Specify a signal that will be sent to each process when Overmind will try to stop them. The value passed in should be in the format process=signal,process=signal. Supported signals are: ABRT, INT, KILL, QUIT, STOP, TERM, USR1, USR2"},

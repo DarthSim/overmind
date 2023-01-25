@@ -216,6 +216,15 @@ $ OVERMIND_COLORS=123,123,125,126,127 overmind start
 
 If you want Overmind to always use these colors, you can specify them in the [environment file](https://github.com/DarthSim/overmind#overmind-environment) located in your home directory.
 
+### Show timestamps
+
+By default, Overmind doesn't show timestamps in its output since it expects your processes to add timestamps to their own output. But you can make Overmind to add timestamps to its output:
+
+```bash
+$ overmind start -T
+$ OVERMIND_SHOW_TIMESTAMPS=1 overmind start
+```
+
 ### Connecting to a process
 
 If you need to gain access to process input, you can connect to its `tmux` window:

@@ -41,6 +41,7 @@ type Handler struct {
 	AnyCanDie          bool
 	AutoRestart        string
 	Colors             []int
+	ShowTimestamps     bool
 	Formation          map[string]int
 	FormationPortStep  int
 	StopSignals        map[string]syscall.Signal

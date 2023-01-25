@@ -7,12 +7,19 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/DarthSim/overmind/v2/utils"
 )
 
+const (
+	timestampFormat = "15:04:05"
+	outputSeparator = " | "
+)
+
 type multiOutput struct {
-	maxNameLength int
+	maxNameLength  int
+	showTimestamps bool
 
 	ch   chan *bytes.Buffer
 	done chan struct{}
@@ -24,12 +31,13 @@ type multiOutput struct {
 	bufPool sync.Pool
 }
 
-func newMultiOutput(maxNameLength int) *multiOutput {
+func newMultiOutput(maxNameLength int, showTimestamps bool) *multiOutput {
 	o := multiOutput{
-		maxNameLength: utils.Max(maxNameLength, 6),
-		ch:            make(chan *bytes.Buffer, 128),
-		done:          make(chan struct{}),
-		echoes:        make(map[int64]io.Writer),
+		maxNameLength:  utils.Max(maxNameLength, 6),
+		showTimestamps: showTimestamps,
+		ch:             make(chan *bytes.Buffer, 128),
+		done:           make(chan struct{}),
+		echoes:         make(map[int64]io.Writer),
 		bufPool: sync.Pool{
 			New: func() interface{} { return new(bytes.Buffer) },
 		},
@@ -41,7 +49,11 @@ func newMultiOutput(maxNameLength int) *multiOutput {
 }
 
 func (o *multiOutput) Offset() int {
-	return o.maxNameLength + 3
+	of := o.maxNameLength + len(outputSeparator)
+	if o.showTimestamps {
+		of += len(timestampFormat) + 1
+	}
+	return of
 }
 
 func (o *multiOutput) listen() {
@@ -103,10 +115,15 @@ func (o *multiOutput) WriteLine(proc *process, p []byte) {
 		color = 7
 	}
 
-	colorStr := fmt.Sprintf("\033[1;38;5;%vm", color)
-	buf.WriteString(colorStr)
+	if o.showTimestamps {
+		fmt.Fprintf(buf, "\033[0;38;5;%dm", color)
+		buf.WriteString(time.Now().Format(timestampFormat))
+		buf.WriteByte(' ')
+	}
+	fmt.Fprintf(buf, "\033[1;38;5;%dm", color)
 	utils.FprintRpad(buf, name, o.maxNameLength)
-	buf.WriteString("\033[0m | ")
+	buf.WriteString("\033[0m")
+	buf.WriteString(outputSeparator)
 
 	buf.Write(p)
 	buf.WriteByte('\n')
