@@ -127,6 +127,10 @@ func (p *process) Kill(keepAlive bool) {
 	}
 }
 
+func (p *process) Info() {
+	p.groupSignal(syscall.SIGINFO)
+}
+
 func (p *process) Restart() {
 	p.restart = true
 	p.Stop(false)

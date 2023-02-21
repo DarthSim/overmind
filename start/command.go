@@ -26,6 +26,7 @@ type command struct {
 	doneTrig  chan bool
 	doneWg    sync.WaitGroup
 	stopTrig  chan os.Signal
+	infoTrig  chan os.Signal
 	processes []*process
 	scriptDir string
 	daemonize bool
@@ -38,6 +39,7 @@ func newCommand(h *Handler) (*command, error) {
 		timeout:   h.Timeout,
 		doneTrig:  make(chan bool, len(pf)),
 		stopTrig:  make(chan os.Signal, 1),
+		infoTrig:  make(chan os.Signal, 1),
 		processes: make([]*process, 0, len(pf)),
 		daemonize: h.Daemonize,
 	}
@@ -144,6 +146,8 @@ func (c *command) Run() (int, error) {
 
 	go c.waitForExit()
 
+	go c.handleInfo()
+
 	c.doneWg.Wait()
 
 	exitCode := c.tmux.ExitCode()
@@ -216,6 +220,16 @@ func (c *command) waitForExit() {
 
 	for _, proc := range c.processes {
 		proc.Kill(false)
+	}
+}
+
+func (c *command) handleInfo() {
+	signal.Notify(c.infoTrig, syscall.SIGINFO)
+
+	for range c.infoTrig {
+		for _, proc := range c.processes {
+			proc.Info()
+		}
 	}
 }
 
