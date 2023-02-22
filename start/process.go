@@ -11,6 +11,8 @@ import (
 
 const runningCheckInterval = 100 * time.Millisecond
 
+const SIGINFO syscall.Signal = 29
+
 type process struct {
 	output *multiOutput
 
@@ -128,7 +130,7 @@ func (p *process) Kill(keepAlive bool) {
 }
 
 func (p *process) Info() {
-	p.groupSignal(syscall.SIGINFO)
+	p.groupSignal(SIGINFO)
 }
 
 func (p *process) Restart() {

@@ -224,7 +224,7 @@ func (c *command) waitForExit() {
 }
 
 func (c *command) handleInfo() {
-	signal.Notify(c.infoTrig, syscall.SIGINFO)
+	signal.Notify(c.infoTrig, SIGINFO)
 
 	for range c.infoTrig {
 		for _, proc := range c.processes {
