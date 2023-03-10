@@ -1,9 +1,16 @@
-# Overmind
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="logo-dark.svg" />
+    <img src="logo.svg" alt="Overmind" />
+  </picture>
+</p>
 
-<img align="right" width="224" height="74" title="Overmind logo"
-     src="https://cdn.rawgit.com/DarthSim/overmind/master/logo.svg">
+<p align="center">
+  <a href="https://github.com/DarthSim/overmind/releases/latest"><img alt="Release" src="https://img.shields.io/github/release/DarthSim/overmind.svg?style=for-the-badge" /></a>
+  <a href="https://travis-ci.org/DarthSim/overmind"><img alt="Build Status" src="https://img.shields.io/travis/DarthSim/overmind.svg?style=for-the-badge" /></a>
+</p>
 
-[![Release](https://img.shields.io/github/release/DarthSim/overmind.svg?style=for-the-badge)](https://github.com/DarthSim/overmind/releases/latest) [![Build Status](https://img.shields.io/travis/DarthSim/overmind.svg?style=for-the-badge)](https://travis-ci.org/DarthSim/overmind)
+---
 
 Overmind is a process manager for Procfile-based applications and [tmux](https://tmux.github.io/). With Overmind, you can easily run several processes from your `Procfile` in a single terminal.
 
@@ -14,8 +21,19 @@ There are some good Procfile-based process management tools, including [foreman]
 See this article for a good intro and all the juicy details! [Introducing
 Overmind and Hivemind](https://evilmartians.com/chronicles/introducing-overmind-and-hivemind)
 
-<a href="https://evilmartians.com/?utm_source=overmind">
-<img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54">
+<a href="https://evilmartians.com/?utm_source=opensource">
+  <picture>
+    <source
+      media="(prefers-color-scheme: dark)"
+      srcset="https://evilmartians.com/badges/sponsored-by-evil-martians_v2.0_for-dark-bg@2x.png"
+    >
+    <img
+      src="https://evilmartians.com/badges/sponsored-by-evil-martians_v2.0@2x.png"
+      alt="Sponsored by Evil Martians"
+      width="236"
+      height="54"
+    >
+  </picture>
 </a>
 
 ## Overmind features
@@ -68,6 +86,8 @@ You need Go 1.17 or later to build the project.
 ```bash
 $ go install github.com/DarthSim/overmind/v2
 ```
+
+The Overmind binary will be installed to `$(go env GOPATH)/bin`. Make sure that you added it to your `PATH`.
 
 **Note:** You can update Overmind the same way.
 
