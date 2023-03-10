@@ -9,7 +9,7 @@ Overmind is a process manager for Procfile-based applications and [tmux](https:/
 
 Procfile is a simple format to specify types of processes your application provides (such as web application server, background queue process, front-end builder) and commands to run those processes. It can significantly simplify process management for developers and is used by popular hosting platforms, such as Heroku and Deis. You can learn more about the `Procfile` format [here](https://devcenter.heroku.com/articles/procfile).
 
-There are some good Procfile-based process management tools, including [foreman](https://github.com/ddollar/foreman) by David Dollar, which started it all. The problem with most of those tools is that processes you want to manage start to think they are logging their output into a file, and that can lead to all sorts of problems: severe lagging, losing or breaking colored output. Tools can also add vanity information (unneeded timestamps in logs). Overmind was created to fix those problems once and for all.
+There are some good Procfile-based process management tools, including [foreman](https://github.com/ddollar/foreman) by David Dollar, which started it all. The problem with most of those tools is that processes you want to manage start to think they are logging their output into a file, and that can lead to all sorts of problems: severe lagging, and losing or breaking colored output. Tools can also add vanity information (unneeded timestamps in logs). Overmind was created to fix those problems once and for all.
 
 See this article for a good intro and all the juicy details! [Introducing
 Overmind and Hivemind](https://evilmartians.com/chronicles/introducing-overmind-and-hivemind)
@@ -25,7 +25,7 @@ You may know several Procfile process management tools, but Overmind has some un
 * Overmind starts processes in a tmux session, so you can easily connect to any process and gain control over it;
 * Overmind can restart a single process on the fly — you don't need to restart the whole stack;
 * Overmind allows a specified process to die without interrupting all of the other ones;
-* Overmind can restart a specified processes automatically when they die;
+* Overmind can restart specified processes automatically when they die;
 * Overmind uses tmux's control mode to capture process output — so it won't be clipped, delayed, and it won't break colored output;
 * Overmind can read environment variables from a file and use them as parameters so that you can configure Overmind behavior globally and/or per directory.
 
@@ -47,7 +47,7 @@ $ brew install tmux
 $ apt-get install tmux
 ```
 
-**Note:** You can find installation manual for other systems here: https://github.com/tmux/tmux
+**Note:** You can find installation manuals for other systems here: https://github.com/tmux/tmux
 
 There are three ways to install Overmind:
 
@@ -108,22 +108,22 @@ $ OVERMIND_PROCFILE=path/to/your/Procfile overmind start
 
 #### Specifying the ports
 
-Overmind sets environment variable `PORT` for each process in your Procfile so that you can do things like this:
+Overmind sets the environment variable `PORT` for each process in your Procfile so that you can do things like this:
 
 ```Procfile
 web: bin/rails server -p $PORT
 ```
 
-Overmind assigns the port base (5000 by default) to `PORT` for the first process and increases `PORT` by port step (100 by default) for the each next one. You can specify port base and port step like this:
+Overmind assigns the port base (5000 by default) to `PORT` for the first process and increases `PORT` by port step (100 by default) for each subsequent one. You can specify the port base and port step like this:
 
 ```bash
 $ overmind start -p 3000 -P 10
 $ OVERMIND_PORT=3000 OVERMIND_PORT_STEP=10 overmind start
 ```
 
-#### Disabling `PORT` variable
+#### Disabling `PORT`
 
-If you don't want Overmind to set `PORT` variable, you can disable it:
+If you don't want Overmind to set the `PORT` variable, you can disable it:
 
 ```bash
 $ overmind start -N
@@ -207,7 +207,7 @@ $ OVERMIND_AUTO_RESTART=rails,webpack overmind start
 
 #### Specifying the colors
 
-Overmind colorizes process names with different colors. May happen that these colors don't match well with your color scheme. In this case, you can define your own colors using xterm color codes:
+Overmind colorizes process names with different colors. It may happen that these colors don't match well with your color scheme. In that case, you can specify your own colors using xterm color codes:
 
 ```bash
 $ overmind start -b 123,123,125,126,127
@@ -333,7 +333,7 @@ $ overmind start -D
 $ OVERMIND_DAEMONIZE=1 overmind start
 ```
 
-Use `echo` command for the logs:
+Use the `echo` command for the logs:
 
 ```bash
 $ overmind echo
@@ -364,7 +364,7 @@ $ overmind kill -s path/to/socket
 
 #### Using TCP network
 
-Overmind can bind its command center to a TCP address instead of Unix socket. It is useful when you run it on a remote machine.
+Overmind can bind its command center to a TCP address instead of Unix socket. This is useful when you run it on a remote machine.
 
 ```bash
 $ overmind start -s "0.0.0.0:4321" -S "tcp"
@@ -388,11 +388,11 @@ OVERMIND_TMUX_CONFIG=~/.overmind.tmux.conf overmind start
 
 ## Known issues
 
-### Overmind uses system Ruby/Node/etc instead of custom-defined one
+### Overmind uses the system Ruby/Node/etc instead of a custom-defined one
 
 This may happen if your Ruby/Node/etc version manager isn't configured properly. Make sure that the path to your custom binaries is included in your `PATH` before the system binaries path.
 
-### Overmind does not stop Docker process properly
+### Overmind does not stop the Docker process properly
 
 Unfortunately, this is how Docker works. When you send `SIGINT` to a `docker run ...` process, it just detaches container and exits. You can solve this by using named containers and signal traps:
 
@@ -400,13 +400,13 @@ Unfortunately, this is how Docker works. When you send `SIGINT` to a `docker run
 mydocker: trap 'docker stop mydocker' EXIT > /dev/null; docker run --name mydocker ...
 ```
 
-### Overmind can't start because of `bind: invalid argument` error
+### Overmind can't start because of a `bind: invalid argument` error
 
-All operating systems have limitations on Unix socket path length. Try to use a shorter socket path.
+All operating systems have limits on Unix socket path length. Try to use a shorter socket path.
 
 ### Overmind exits after `pg_ctl --wait start` and keeps PostgreSQL server running
 
-Since version 12.0 `pg_ctl --wait start` exits right after starting the server. Just use `postgres` command directly.
+Since version 12.0 `pg_ctl --wait start` exits right after starting the server. Just use the `postgres` command directly.
 
 ## Author
 
