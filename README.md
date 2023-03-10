@@ -7,7 +7,8 @@
 
 <p align="center">
   <a href="https://github.com/DarthSim/overmind/releases/latest"><img alt="Release" src="https://img.shields.io/github/release/DarthSim/overmind.svg?style=for-the-badge" /></a>
-  <a href="https://travis-ci.org/DarthSim/overmind"><img alt="Build Status" src="https://img.shields.io/travis/DarthSim/overmind.svg?style=for-the-badge" /></a>
+  <a href="https://github.com/DarthSim/overmind/actions"><img alt="GH Build" src="https://img.shields.io/github/actions/workflow/status/DarthSim/overmind/build.yml?branch=master&label=Build&style=for-the-badge" /></a>
+  <a href="https://github.com/DarthSim/overmind/actions"><img alt="GH Lint" src="https://img.shields.io/github/actions/workflow/status/DarthSim/overmind/lint.yml?branch=master&label=Lint&style=for-the-badge" /></a>
 </p>
 
 ---
