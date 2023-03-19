@@ -17,6 +17,9 @@ gzip -9 -S "-$version-linux-amd64.gz" dist/overmind
 env CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w" -a -o dist/overmind .
 gzip -9 -S "-$version-macos-amd64.gz" dist/overmind
 
+env CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags "-s -w" -a -o dist/overmind .
+gzip -9 -S "-$version-macos-arm64.gz" dist/overmind
+
 env CGO_ENABLED=0 GOOS=freebsd GOARCH=arm go build -ldflags "-s -w" -a -o dist/overmind .
 gzip -9 -S "-$version-freebsd-arm.gz" dist/overmind
 
