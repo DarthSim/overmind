@@ -226,6 +226,13 @@ $ overmind start -r rails,webpack
 $ OVERMIND_AUTO_RESTART=rails,webpack overmind start
 ```
 
+The special name `all` can also be used to restart all processes automatically when they die:
+
+```bash
+$ overmind start -r all
+$ OVERMIND_AUTO_RESTART=all overmind start
+```
+
 #### Specifying the colors
 
 Overmind colorizes process names with different colors. It may happen that these colors don't match well with your color scheme. In that case, you can specify your own colors using xterm color codes:
