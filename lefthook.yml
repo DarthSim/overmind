@@ -1,4 +1,5 @@
 pre-commit:
-  scripts:
+  commands:
     lint:
-      tags: lint
+      glob: "*.go"
+      run: golangci-lint run
