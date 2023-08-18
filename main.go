@@ -1,11 +1,9 @@
 package main
 
 import (
-	"math/rand"
 	"os"
 	"path"
 	"strings"
-	"time"
 
 	"github.com/DarthSim/godotenv"
 	"github.com/DarthSim/overmind/v2/start"
@@ -171,10 +169,6 @@ func setupStatusCmd() cli.Command {
 		Action:  c.Run,
 		Flags:   socketFlags(&c.SocketPath, &c.Network),
 	}
-}
-
-func init() {
-	rand.Seed(time.Now().UTC().UnixNano())
 }
 
 func main() {
