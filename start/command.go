@@ -94,7 +94,7 @@ func newCommand(h *Handler) (*command, error) {
 				scriptFilePath,
 				c.output,
 				(h.AnyCanDie || utils.StringsContain(canDie, e.OrigName)),
-				utils.StringsContain(autoRestart, e.OrigName),
+				(utils.StringsContain(autoRestart, e.OrigName) || utils.StringsContain(autoRestart, "all")),
 				e.StopSignal,
 			))
 		}
