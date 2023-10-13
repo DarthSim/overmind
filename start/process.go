@@ -19,6 +19,7 @@ type process struct {
 	pid int
 
 	stopSignal   syscall.Signal
+	delayed      bool
 	canDie       bool
 	canDieNow    bool
 	autoRestart  bool
@@ -32,12 +33,13 @@ type process struct {
 	in  io.Writer
 	out io.ReadCloser
 
-	Name    string
-	Color   int
-	Command string
+	Name           string
+	Color          int
+	Command        string
+	DelayedCommand string
 }
 
-func newProcess(tmux *tmuxClient, name string, color int, command string, output *multiOutput, canDie bool, autoRestart bool, stopSignal syscall.Signal) *process {
+func newProcess(tmux *tmuxClient, name string, color int, command string, delayedCommand string, output *multiOutput, delayed bool, canDie bool, autoRestart bool, stopSignal syscall.Signal) *process {
 	out, in := io.Pipe()
 
 	proc := &process{
@@ -45,6 +47,7 @@ func newProcess(tmux *tmuxClient, name string, color int, command string, output
 		tmux:   tmux,
 
 		stopSignal:  stopSignal,
+		delayed:     delayed,
 		canDie:      canDie,
 		canDieNow:   canDie,
 		autoRestart: autoRestart,
@@ -52,9 +55,10 @@ func newProcess(tmux *tmuxClient, name string, color int, command string, output
 		in:  in,
 		out: out,
 
-		Name:    name,
-		Color:   color,
-		Command: command,
+		Name:           name,
+		Color:          color,
+		Command:        command,
+		DelayedCommand: delayedCommand,
 	}
 
 	tmux.AddProcess(proc)
