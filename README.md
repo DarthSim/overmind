@@ -85,7 +85,7 @@ You can download the latest release [here](https://github.com/DarthSim/overmind/
 You need Go 1.21 or later to build the project.
 
 ```bash
-$ go install github.com/DarthSim/overmind/v2
+$ go install github.com/DarthSim/overmind/v2@latest
 ```
 
 The Overmind binary will be installed to `$(go env GOPATH)/bin`. Make sure that you added it to your `PATH`.
