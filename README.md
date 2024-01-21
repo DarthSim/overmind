@@ -422,7 +422,14 @@ This may happen if your Ruby/Node/etc version manager isn't configured properly.
 
 ### Overmind does not stop the Docker process properly
 
-Unfortunately, this is how Docker works. When you send `SIGINT` to a `docker run ...` process, it just detaches container and exits. You can solve this by using named containers and signal traps:
+This is how Docker works. When you send `SIGINT` to a `docker run ...` process, it just detaches container and exits.
+
+Docker `v >= 1.25`: use `--init` option when running container. That will pass signal to the process.
+```
+docker run --init  ...
+```
+
+Docker `v < 1.25`: use named containers and signal traps:
 
 ```procfile
 mydocker: trap 'docker stop mydocker' EXIT > /dev/null; docker run --name mydocker ...
