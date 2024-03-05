@@ -78,12 +78,11 @@ func (t *tmuxClient) Start() error {
 	first := true
 	for _, p := range t.processes {
 		tmuxPaneMsg := fmt.Sprintf(tmuxPaneMsgFmt, p.Name)
-		commandWithEnv := fmt.Sprintf("OVERMIND_WORKER_NAME=%s %s", p.Name, p.Command)
 
 		if first {
 			first = false
 
-			args = append(args, "new", "-n", p.Name, "-s", t.Session, "-P", "-F", tmuxPaneMsg, commandWithEnv, ";")
+			args = append(args, "new", "-n", p.Name, "-s", t.Session, "-P", "-F", tmuxPaneMsg, p.Command, ";")
 
 			if w, h, err := term.GetSize(int(os.Stdin.Fd())); err == nil {
 				if w > t.outputOffset {
@@ -96,7 +95,7 @@ func (t *tmuxClient) Start() error {
 			args = append(args, "setw", "-g", "remain-on-exit", "on", ";")
 			args = append(args, "setw", "-g", "allow-rename", "off", ";")
 		} else {
-			args = append(args, "neww", "-n", p.Name, "-P", "-F", tmuxPaneMsg, commandWithEnv, ";")
+			args = append(args, "neww", "-n", p.Name, "-P", "-F", tmuxPaneMsg, p.Command, ";")
 		}
 	}
 
