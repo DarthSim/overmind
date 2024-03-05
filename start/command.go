@@ -171,6 +171,7 @@ func (c *command) createScriptFile(e *procfileEntry, shell string, setPort bool)
 	if setPort {
 		fmt.Fprintf(scriptFile, "export PORT=%d\n", e.Port)
 	}
+	fmt.Fprintf(scriptFile, "export PS=%s\n", e.Name)
 	fmt.Fprintln(scriptFile, e.Command)
 
 	utils.FatalOnErr(scriptFile.Chmod(0744))
