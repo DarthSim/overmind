@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -205,18 +206,27 @@ func main() {
 func loadEnvFiles() {
 	// First load the specifically named overmind env files
 	userHomeDir, _ := os.UserHomeDir()
-	godotenv.Overload(path.Join(userHomeDir, ".overmind.env"))
-	godotenv.Overload("./.overmind.env")
+	loadEnvFile(path.Join(userHomeDir, ".overmind.env"))
+	loadEnvFile("./.overmind.env")
 
 	_, skipEnv := os.LookupEnv("OVERMIND_SKIP_ENV")
 	if !skipEnv {
-		godotenv.Overload("./.env")
+		loadEnvFile("./.env")
 	}
 
 	envs := strings.Split(os.Getenv("OVERMIND_ENV"), ",")
 	for _, e := range envs {
 		if len(e) > 0 {
-			godotenv.Overload(e)
+			loadEnvFile(e)
+		}
+	}
+}
+
+func loadEnvFile(file string) {
+	err := godotenv.Overload(file)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			fmt.Fprintln(os.Stderr, "overmind: skipping", file, "due to error:", err)
 		}
 	}
 }
