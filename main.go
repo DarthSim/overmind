@@ -5,8 +5,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/DarthSim/godotenv"
 	"github.com/DarthSim/overmind/v2/start"
+	"github.com/joho/godotenv"
 
 	"github.com/urfave/cli"
 )

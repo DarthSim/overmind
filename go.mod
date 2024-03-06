@@ -3,7 +3,7 @@ module github.com/DarthSim/overmind/v2
 go 1.21
 
 require (
-	github.com/DarthSim/godotenv v1.3.1
+	github.com/joho/godotenv v1.5.1
 	github.com/matoous/go-nanoid v1.5.0
 	github.com/sevlyar/go-daemon v0.1.6
 	github.com/urfave/cli v1.22.12
@@ -16,3 +16,5 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect
 )
+
+replace github.com/joho/godotenv => github.com/Envek/godotenv v0.0.0-20240306122526-83ef30cd3c69
