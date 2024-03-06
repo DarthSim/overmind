@@ -111,7 +111,7 @@ func (p *process) Stop(keepAlive bool) {
 	if p.Running() {
 		p.output.WriteBoldLine(p, []byte("Interrupting..."))
 		if err := p.groupSignal(p.stopSignal); err != nil {
-			p.output.WriteErr(p, fmt.Errorf("Can's stop: %s", err))
+			p.output.WriteErr(p, fmt.Errorf("Can't stop: %s", err))
 		}
 	}
 
@@ -124,7 +124,7 @@ func (p *process) Kill(keepAlive bool) {
 	if p.Running() {
 		p.output.WriteBoldLine(p, []byte("Killing..."))
 		if err := p.groupSignal(syscall.SIGKILL); err != nil {
-			p.output.WriteErr(p, fmt.Errorf("Can's kill: %s", err))
+			p.output.WriteErr(p, fmt.Errorf("Can't kill: %s", err))
 		}
 	}
 }
