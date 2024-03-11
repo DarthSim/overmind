@@ -175,7 +175,8 @@ func (p *process) observe() {
 		if !p.Running() {
 			if !p.keepingAlive {
 				p.out.Close()
-				p.output.WriteBoldLine(p, []byte("Exited"))
+
+				p.reportExitCode()
 				p.keepingAlive = true
 			}
 
@@ -208,4 +209,15 @@ func (p *process) respawn() {
 
 	p.waitPid()
 	p.output.WriteBoldLinef(p, "Restarted with pid %v...", p.pid)
+}
+
+func (p *process) reportExitCode() {
+	exitCode := p.tmux.ExitCode()
+	message := "Exited"
+
+	if exitCode != 0 {
+		message = fmt.Sprintf("Exited with code %d", exitCode)
+	}
+
+	p.output.WriteBoldLine(p, []byte(message))
 }
