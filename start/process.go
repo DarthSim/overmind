@@ -212,12 +212,8 @@ func (p *process) respawn() {
 }
 
 func (p *process) reportExitCode() {
-	exitCode := p.tmux.ExitCode()
-	message := "Exited"
-
-	if exitCode != 0 {
-		message = fmt.Sprintf("Exited with code %d", exitCode)
-	}
+	exitCode := p.tmux.WindowExitCode(p.WindowID())
+	message := fmt.Sprintf("Exited with code %d", exitCode)
 
 	p.output.WriteBoldLine(p, []byte(message))
 }

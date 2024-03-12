@@ -235,3 +235,20 @@ func (t *tmuxClient) Shutdown() {
 	case <-time.After(5 * time.Second):
 	}
 }
+
+func (t *tmuxClient) WindowExitCode(windowID string) (status int) {
+	cmd := exec.Command("tmux", "-L", t.Socket, "list-panes", "-t", windowID, "-F", "#{pane_dead_status}")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = os.Stderr
+	cmd.Run()
+
+	scanner := bufio.NewScanner(&out)
+	for scanner.Scan() {
+		if s, err := strconv.Atoi(scanner.Text()); err == nil && s > status {
+			status = s
+		}
+	}
+
+	return status
+}
