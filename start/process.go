@@ -26,6 +26,7 @@ type process struct {
 	dead         bool
 	interrupted  bool
 	restart      bool
+	paneID       string
 
 	tmux *tmuxClient
 
@@ -48,9 +49,8 @@ func newProcess(tmux *tmuxClient, name string, color int, command string, output
 		canDie:      canDie,
 		canDieNow:   canDie,
 		autoRestart: autoRestart,
-
-		in:  in,
-		out: out,
+		in:          in,
+		out:         out,
 
 		Name:    name,
 		Color:   color,
@@ -212,7 +212,7 @@ func (p *process) respawn() {
 }
 
 func (p *process) reportExitCode() {
-	exitCode := p.tmux.WindowExitCode(p.WindowID())
+	exitCode := p.tmux.PaneExitCode(p.paneID)
 	message := fmt.Sprintf("Exited with code %d", exitCode)
 
 	p.output.WriteBoldLine(p, []byte(message))

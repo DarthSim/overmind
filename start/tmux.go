@@ -169,6 +169,7 @@ func (t *tmuxClient) mapProcess(pane, name, pid string) {
 		}
 
 		t.processesByPane[pane] = p
+		p.paneID = pane // save the tmux paneID in the process
 
 		if ipid, err := strconv.Atoi(pid); err == nil {
 			p.pid = ipid
@@ -236,19 +237,22 @@ func (t *tmuxClient) Shutdown() {
 	}
 }
 
-func (t *tmuxClient) WindowExitCode(windowID string) (status int) {
-	cmd := exec.Command("tmux", "-L", t.Socket, "list-panes", "-t", windowID, "-F", "#{pane_dead_status}")
+func (t *tmuxClient) PaneExitCode(paneID string) (status int) {
+	cmd := exec.Command("tmux", "-L", t.Socket, "list-panes", "-t", paneID, "-F", "#{pane_dead_status}")
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = os.Stderr
 	cmd.Run()
 
-	scanner := bufio.NewScanner(&out)
-	for scanner.Scan() {
-		if s, err := strconv.Atoi(scanner.Text()); err == nil && s > status {
-			status = s
-		}
+	output := strings.TrimSpace(out.String())
+	if output == "" {
+		return 0
 	}
 
-	return status
+	status, err := strconv.Atoi(output)
+	if err != nil {
+		utils.Fatal(fmt.Sprintf("Unknown status pane. paneID: %s", paneID))
+	}
+
+	return
 }
