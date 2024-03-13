@@ -16,7 +16,8 @@ const SIGINFO syscall.Signal = 29
 type process struct {
 	output *multiOutput
 
-	pid int
+	pid    int
+	paneID string
 
 	stopSignal   syscall.Signal
 	canDie       bool
@@ -175,7 +176,7 @@ func (p *process) observe() {
 		if !p.Running() {
 			if !p.keepingAlive {
 				p.out.Close()
-				p.output.WriteBoldLine(p, []byte("Exited"))
+				p.output.WriteBoldLinef(p, "Exited with code %d", p.tmux.PaneExitCode(p.paneID))
 				p.keepingAlive = true
 			}
 

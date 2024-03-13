@@ -169,6 +169,7 @@ func (t *tmuxClient) mapProcess(pane, name, pid string) {
 		}
 
 		t.processesByPane[pane] = p
+		p.paneID = pane // save the tmux paneID in the process
 
 		if ipid, err := strconv.Atoi(pid); err == nil {
 			p.pid = ipid
@@ -234,4 +235,16 @@ func (t *tmuxClient) Shutdown() {
 	case <-stopped:
 	case <-time.After(5 * time.Second):
 	}
+}
+
+func (t *tmuxClient) PaneExitCode(paneID string) int {
+	cmd := exec.Command("tmux", "-L", t.Socket, "display-message", "-p", "-t", "%"+paneID, "#{pane_dead_status}")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = os.Stderr
+	cmd.Run()
+
+	status, _ := strconv.Atoi(strings.TrimSpace(out.String()))
+
+	return status
 }
