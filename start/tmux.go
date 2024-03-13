@@ -238,7 +238,7 @@ func (t *tmuxClient) Shutdown() {
 }
 
 func (t *tmuxClient) PaneExitCode(paneID string) (status int) {
-	cmd := exec.Command("tmux", "-L", t.Socket, "list-panes", "-t", paneID, "-F", "#{pane_dead_status}")
+	cmd := exec.Command("tmux", "-L", t.Socket, "display-message", "-p", "-t", "%"+paneID, "#{pane_dead_status}")
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = os.Stderr
