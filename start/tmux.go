@@ -237,22 +237,14 @@ func (t *tmuxClient) Shutdown() {
 	}
 }
 
-func (t *tmuxClient) PaneExitCode(paneID string) (status int) {
+func (t *tmuxClient) PaneExitCode(paneID string) int {
 	cmd := exec.Command("tmux", "-L", t.Socket, "display-message", "-p", "-t", "%"+paneID, "#{pane_dead_status}")
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = os.Stderr
 	cmd.Run()
 
-	output := strings.TrimSpace(out.String())
-	if output == "" {
-		return 0
-	}
+	status, _ := strconv.Atoi(strings.TrimSpace(out.String()))
 
-	status, err := strconv.Atoi(output)
-	if err != nil {
-		utils.Fatal(fmt.Sprintf("Unknown status pane. paneID: %s", paneID))
-	}
-
-	return
+	return status
 }

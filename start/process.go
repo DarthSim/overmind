@@ -49,8 +49,9 @@ func newProcess(tmux *tmuxClient, name string, color int, command string, output
 		canDie:      canDie,
 		canDieNow:   canDie,
 		autoRestart: autoRestart,
-		in:          in,
-		out:         out,
+
+		in:  in,
+		out: out,
 
 		Name:    name,
 		Color:   color,
