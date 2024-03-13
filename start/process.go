@@ -16,7 +16,8 @@ const SIGINFO syscall.Signal = 29
 type process struct {
 	output *multiOutput
 
-	pid int
+	pid    int
+	paneID string
 
 	stopSignal   syscall.Signal
 	canDie       bool
@@ -26,7 +27,6 @@ type process struct {
 	dead         bool
 	interrupted  bool
 	restart      bool
-	paneID       string
 
 	tmux *tmuxClient
 
@@ -176,8 +176,7 @@ func (p *process) observe() {
 		if !p.Running() {
 			if !p.keepingAlive {
 				p.out.Close()
-
-				p.reportExitCode()
+				p.output.WriteBoldLinef(p, "Exited with code %d", p.tmux.PaneExitCode(p.paneID))
 				p.keepingAlive = true
 			}
 
@@ -210,11 +209,4 @@ func (p *process) respawn() {
 
 	p.waitPid()
 	p.output.WriteBoldLinef(p, "Restarted with pid %v...", p.pid)
-}
-
-func (p *process) reportExitCode() {
-	exitCode := p.tmux.PaneExitCode(p.paneID)
-	message := fmt.Sprintf("Exited with code %d", exitCode)
-
-	p.output.WriteBoldLine(p, []byte(message))
 }
