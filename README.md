@@ -76,6 +76,14 @@ There are three ways to install Overmind:
 brew install overmind
 ```
 
+### With Ruby
+
+```bash
+gem install overmind
+```
+
+You can read about installing on Ruby On Rails [here] (https://github.com/DarthSim/overmind/blob/master/packaging/rubygems/README.md)
+
 ### Download the latest Overmind release binary
 
 You can download the latest release [here](https://github.com/DarthSim/overmind/releases/latest).
