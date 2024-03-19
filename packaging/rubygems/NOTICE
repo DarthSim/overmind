@@ -1,3 +1,17 @@
+LIST OF OPEN SOURCE SOFTWARE DEPENDENCIES AND LICENCES
+
+This file includes acknowledgments for the third‐parties whose software has been
+used in permissible forms with the overmind software. The information below
+lists the third party software and the license that applies for that software.
+
+The licenses that apply to these third-party resources are provided beneath the
+table in text. Please be aware that when using overmind, these third-party
+resources are under the protection of their respective license.
+
+================================================================================
+
+tmux
+
 THIS IS FOR INFORMATION ONLY, CODE IS UNDER THE LICENCE AT THE TOP OF ITS FILE.
 
 The README, CHANGES, FAQ and TODO files are licensed under the ISC license. All

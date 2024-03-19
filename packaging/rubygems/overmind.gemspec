@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = "Overmind is a process manager for Procfile-based applications and tmux."
   spec.homepage = "https://github.com/DarthSim/overmind"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 2.7"
+  spec.required_ruby_version = ">= 2.3"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/DarthSim/overmind"

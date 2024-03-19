@@ -12,7 +12,3 @@ libexec/*
 
 tmp/*
 !tmp/.gitkeep
-
-data/*
-!data/.gitkeep
-!data/Dockerfile
