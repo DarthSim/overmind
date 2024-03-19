@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 require_relative "base_downloader"
+require_relative "../../lib/overmind/version"
 
 module Overmind
   module Downloader
     # Class for downloading Overmind binaries.
     class OvermindDownloader < BaseDownloader
       NAME = "overmind"
-      DEFAULT_VERSION = "2.4.0"
+      DEFAULT_VERSION = ::Overmind::VERSION
       BASE_URL = "https://github.com/DarthSim/overmind/releases/download/v%s/%s"
       TARGET_PATH = "libexec/overmind"
       ALLOWED_PLATFORMS = %w[
