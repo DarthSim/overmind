@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'overmind/cli'
+
+begin
+  cli = Overmind::CLI.new
+  exit_code = cli.run(ARGV)
+  exit exit_code
+rescue StandardError => e
+  warn e.message
+  exit 1
+end

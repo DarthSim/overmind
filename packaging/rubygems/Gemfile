@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+ruby '>= 3.0.0'
+
+source 'https://rubygems.org'
+
+# Specify your gem's dependencies in overmind.gemspec
+gemspec
+
+eval_gemfile "gemfiles/rubocop.gemfile"
+
+gem 'faraday', '~> 2.9'
+gem 'faraday-follow_redirects'

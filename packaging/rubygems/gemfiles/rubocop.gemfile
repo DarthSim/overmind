@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org' do
+  gem 'rubocop-md', '~> 1.0'
+  gem 'rubocop-rspec'
+  gem 'standard', '~> 1.0'
+end
