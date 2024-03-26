@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/DarthSim/overmind/v2/start"
-	"github.com/joho/godotenv"
+	"github.com/Envek/godotenv"
 
 	"github.com/urfave/cli"
 )

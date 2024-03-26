@@ -1,6 +1,6 @@
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
-github.com/Envek/godotenv v0.0.0-20240306122526-83ef30cd3c69 h1:qcFwHMDPqNAmrSJZbXUWPJfNl2X3+Y8AWXLC8x9h6jw=
-github.com/Envek/godotenv v0.0.0-20240306122526-83ef30cd3c69/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
+github.com/Envek/godotenv v0.0.0-20240326021258-e36c8a003587 h1:8oTcABPw+30WG+jMYb/uNKgIuIlk2W+GSv9kX+mdkOU=
+github.com/Envek/godotenv v0.0.0-20240326021258-e36c8a003587/go.mod h1:byf6gDXuYSvbwm1fZ4B1x40aOLxgcMx1AdF+/UPly/0=
 github.com/cpuguy83/go-md2man/v2 v2.0.2 h1:p1EgwI/C7NhT0JmVkwCD2ZBK8j4aeHQX2pMHHBfMQ6w=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
