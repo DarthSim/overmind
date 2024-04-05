@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    overmind (0.1.2)
+    overmind (2.5.1)
 
 GEM
   remote: https://rubygems.org/

@@ -5,8 +5,7 @@ require 'overmind/cli'
 
 begin
   cli = Overmind::CLI.new
-  exit_code = cli.run(ARGV)
-  exit exit_code
+  cli.run(ARGV)
 rescue StandardError => e
   warn e.message
   exit 1

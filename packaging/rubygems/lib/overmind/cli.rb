@@ -23,12 +23,8 @@ module Overmind
       # Use prebuild tmux if found
       path_with_tmux = File.exist?(TMUX_PATH) ? "#{TMUX_FOLDER_PATH}:#{ENV["PATH"]}" : ENV["PATH"]
 
-      # Spawns the Overmind process with modified PATH if necessary
-      pid = spawn({"PATH" => path_with_tmux}, "#{OVERMIND_PATH} #{args.join(" ")}")
-
-      Process.wait(pid)
-
-      $?.exitstatus
+      # exec the Overmind process with modified PATH if necessary
+      exec({"PATH" => path_with_tmux}, "#{OVERMIND_PATH} #{args.join(" ")}")
     end
 
     private
