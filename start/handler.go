@@ -35,6 +35,7 @@ type Handler struct {
 	PortBase, PortStep int
 	ProcNames          string
 	IgnoredProcNames   string
+	DelayedProcNames   string
 	SocketPath         string
 	Network            string
 	CanDie             string
