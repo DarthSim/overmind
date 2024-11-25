@@ -241,6 +241,9 @@ $ overmind start -r all
 $ OVERMIND_AUTO_RESTART=all overmind start
 ```
 
+> [!NOTE] 
+> `OVERMIND_CAN_DIE` supersedes `OVERMIND_AUTO_RESTART`; if you want a restarting process, only put it in `OVERMIND_AUTO_RESTART` 
+
 #### Specifying the colors
 
 Overmind colorizes process names with different colors. It may happen that these colors don't match well with your color scheme. In that case, you can specify your own colors using xterm color codes:
