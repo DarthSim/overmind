@@ -68,6 +68,7 @@ func newCommand(h *Handler) (*command, error) {
 
 	procNames := utils.SplitAndTrim(h.ProcNames)
 	ignoredProcNames := utils.SplitAndTrim(h.IgnoredProcNames)
+	delayedProcNames := utils.SplitAndTrim(h.DelayedProcNames)
 
 	colors := defaultColors
 	if len(h.Colors) > 0 {
@@ -80,9 +81,18 @@ func newCommand(h *Handler) (*command, error) {
 	c.scriptDir = filepath.Join(os.TempDir(), instanceID)
 	os.MkdirAll(c.scriptDir, 0700)
 
+	delayedScriptFilePath := c.createScriptFile(&procfileEntry{
+		Name:       "delayed",
+		OrigName:   "delayed",
+		Command:    ":",
+		Port:       0,
+		StopSignal: syscall.SIGINT,
+	}, h.Shell, !h.NoPort)
+
 	for i, e := range pf {
 		shouldRun := len(procNames) == 0 || utils.StringsContain(procNames, e.OrigName)
 		isIgnored := len(ignoredProcNames) != 0 && utils.StringsContain(ignoredProcNames, e.OrigName)
+		isDelayed := len(delayedProcNames) != 0 && utils.StringsContain(delayedProcNames, e.OrigName)
 
 		if shouldRun && !isIgnored {
 			scriptFilePath := c.createScriptFile(&e, h.Shell, !h.NoPort)
@@ -92,8 +102,10 @@ func newCommand(h *Handler) (*command, error) {
 				e.Name,
 				colors[i%len(colors)],
 				scriptFilePath,
+				delayedScriptFilePath,
 				c.output,
-				(h.AnyCanDie || utils.StringsContain(canDie, e.OrigName)),
+				isDelayed,
+				(h.AnyCanDie || utils.StringsContain(canDie, e.OrigName) || isDelayed),
 				(utils.StringsContain(autoRestart, e.OrigName) || utils.StringsContain(autoRestart, "all")),
 				e.StopSignal,
 			))
