@@ -85,7 +85,7 @@ func newCommand(h *Handler) (*command, error) {
 		isIgnored := len(ignoredProcNames) != 0 && utils.StringsContain(ignoredProcNames, e.OrigName)
 
 		if shouldRun && !isIgnored {
-			scriptFilePath := c.createScriptFile(&e, h.Shell, !h.NoPort)
+			scriptFilePath := c.createScriptFile(&e, h.Shell, !h.NoPort, !h.NoOtherProcessPorts)
 
 			c.processes = append(c.processes, newProcess(
 				c.tmux,
@@ -163,7 +163,7 @@ func (c *command) Quit() {
 	c.stopTrig <- syscall.SIGINT
 }
 
-func (c *command) createScriptFile(e *procfileEntry, shell string, setPort bool) string {
+func (c *command) createScriptFile(e *procfileEntry, shell string, setPort bool, setOtherProcessPorts bool) string {
 	scriptFile, err := os.Create(filepath.Join(c.scriptDir, e.Name))
 	utils.FatalOnErr(err)
 
@@ -171,6 +171,12 @@ func (c *command) createScriptFile(e *procfileEntry, shell string, setPort bool)
 	if setPort {
 		fmt.Fprintf(scriptFile, "export PORT=%d\n", e.Port)
 	}
+	if setPort && setOtherProcessPorts {
+		for processName, port := range e.OtherProcessPorts {
+			fmt.Fprintf(scriptFile, "export OVERMIND_PROCESS_%s_PORT=%d\n", processName, port)
+		}
+	}
+
 	fmt.Fprintf(scriptFile, "export PS=%s\n", e.Name)
 	fmt.Fprintln(scriptFile, e.Command)
 

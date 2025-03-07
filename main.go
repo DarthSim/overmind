@@ -51,6 +51,7 @@ func setupStartCmd() cli.Command {
 				cli.IntFlag{Name: "port, p", EnvVar: "OVERMIND_PORT,PORT", Usage: "Specify a port to use as the base", Value: 5000, Destination: &c.PortBase},
 				cli.IntFlag{Name: "port-step, P", EnvVar: "OVERMIND_PORT_STEP", Usage: "Specify a step to increase port number", Value: 100, Destination: &c.PortStep},
 				cli.BoolFlag{Name: "no-port, N", EnvVar: "OVERMIND_NO_PORT", Usage: "Don't set $PORT variable for processes", Destination: &c.NoPort},
+				cli.BoolFlag{Name: "no-other-process-ports, O", EnvVar: "OVERMIND_NO_OTHER_PROCESS_PORTS", Usage: "Don't set OVERMIND_PROCESS_*_PORT variable for processes", Destination: &c.NoOtherProcessPorts},
 				cli.StringFlag{Name: "can-die, c", EnvVar: "OVERMIND_CAN_DIE", Usage: "Specify names of process which can die without interrupting the other processes. Divide names with comma", Destination: &c.CanDie},
 				cli.BoolFlag{Name: "any-can-die", EnvVar: "OVERMIND_ANY_CAN_DIE", Usage: "No dead processes should stop Overmind. Overrides can-die", Destination: &c.AnyCanDie},
 				cli.StringFlag{Name: "auto-restart, r", EnvVar: "OVERMIND_AUTO_RESTART", Usage: "Specify names of process which will be auto restarted on death. Divide names with comma. Use 'all' as a process name to auto restart all processes on death.", Destination: &c.AutoRestart},
