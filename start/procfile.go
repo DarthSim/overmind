@@ -12,12 +12,11 @@ import (
 var procfileRe = regexp.MustCompile(`^([\w-]+):\s+(.+)$`)
 
 type procfileEntry struct {
-	Name              string
-	OrigName          string
-	Command           string
-	Port              int
-	OtherProcessPorts map[string]int
-	StopSignal        syscall.Signal
+	Name       string
+	OrigName   string
+	Command    string
+	Port       int
+	StopSignal syscall.Signal
 }
 
 type procfile []procfileEntry
@@ -28,7 +27,6 @@ func parseProcfile(procfile string, portBase, portStep int, formation map[string
 
 	port := portBase
 	names := make(map[string]bool)
-	processPortMap := make(map[string]int)
 
 	err = utils.ScanLines(f, func(b []byte) bool {
 		if len(b) == 0 {
@@ -76,25 +74,12 @@ func parseProcfile(procfile string, portBase, portStep int, formation map[string
 					StopSignal: signal,
 				},
 			)
-
-			processPortMap[iname] = port + (i * formationPortStep)
 		}
 
 		port += portStep
 
 		return true
 	})
-
-	// amend all the procefile entries with the ports of the other processes
-	for i, entry := range pf {
-		otherProcessPorts := make(map[string]int)
-		for name, port := range processPortMap {
-			if name != entry.Name {
-				otherProcessPorts[name] = port
-			}
-		}
-		pf[i].OtherProcessPorts = otherProcessPorts
-	}
 
 	utils.FatalOnErr(err)
 

@@ -86,7 +86,7 @@ func newCommand(h *Handler) (*command, error) {
 		isIgnored := len(ignoredProcNames) != 0 && utils.StringsContain(ignoredProcNames, e.OrigName)
 
 		if shouldRun && !isIgnored {
-			scriptFilePath := c.createScriptFile(&e, h.Shell, !h.NoPort)
+			scriptFilePath := c.createScriptFile(&e, pf, h.Shell, !h.NoPort)
 
 			c.processes = append(c.processes, newProcess(
 				c.tmux,
@@ -164,7 +164,7 @@ func (c *command) Quit() {
 	c.stopTrig <- syscall.SIGINT
 }
 
-func (c *command) createScriptFile(e *procfileEntry, shell string, setPort bool) string {
+func (c *command) createScriptFile(e *procfileEntry, procFile procfile, shell string, setPort bool) string {
 	scriptFile, err := os.Create(filepath.Join(c.scriptDir, e.Name))
 	utils.FatalOnErr(err)
 
@@ -172,12 +172,11 @@ func (c *command) createScriptFile(e *procfileEntry, shell string, setPort bool)
 	if setPort {
 		fmt.Fprintf(scriptFile, "export PORT=%d\n", e.Port)
 
-		for processName, port := range e.OtherProcessPorts {
-			// = is not allowed in environment variable names, but might appear in the process name.
-			// This is not currently possible in Overmind, but if it ever is, this is a cheap
-			// protection that will save the developer much sad debugging time.
-			safeProcessName := strings.ReplaceAll(processName, "=", "_")
-			fmt.Fprintf(scriptFile, "export OVERMIND_PROCESS_%s_PORT=%d\n", safeProcessName, port)
+		for _, pf := range procFile {
+			if pf.Name != e.Name {
+				safeProcessName := strings.ReplaceAll(pf.Name, "=", "_")
+				fmt.Fprintf(scriptFile, "export OVERMIND_PROCESS_%s_PORT=%d\n", safeProcessName, pf.Port)
+			}
 		}
 	}
 
