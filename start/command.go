@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"strings"
+	"regexp"
 	"sync"
 	"syscall"
 	"time"
@@ -174,7 +174,7 @@ func (c *command) createScriptFile(e *procfileEntry, procFile procfile, shell st
 
 		for _, pf := range procFile {
 			if pf.Name != e.Name {
-				safeProcessName := strings.ReplaceAll(pf.Name, "=", "_")
+				safeProcessName := sanitizeProcName(pf.Name)
 				fmt.Fprintf(scriptFile, "export OVERMIND_PROCESS_%s_PORT=%d\n", safeProcessName, pf.Port)
 			}
 		}
@@ -255,4 +255,8 @@ func (c *command) waitForTimeoutOrStop() {
 	case <-time.After(time.Duration(c.timeout) * time.Second):
 	case <-c.stopTrig:
 	}
+}
+
+func sanitizeProcName(name string) string {
+	return regexp.MustCompile(`[^a-zA-Z0-9]`).ReplaceAllString(name, "_")
 }
