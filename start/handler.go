@@ -27,28 +27,27 @@ var signalMap = map[string]syscall.Signal{
 
 // Handler handles args and flags for the start command
 type Handler struct {
-	Title               string
-	Procfile            string
-	Root                string
-	Timeout             int
-	NoPort              bool
-	NoOtherProcessPorts bool
-	PortBase, PortStep  int
-	ProcNames           string
-	IgnoredProcNames    string
-	SocketPath          string
-	Network             string
-	CanDie              string
-	AnyCanDie           bool
-	AutoRestart         string
-	Colors              []int
-	ShowTimestamps      bool
-	Formation           map[string]int
-	FormationPortStep   int
-	StopSignals         map[string]syscall.Signal
-	Daemonize           bool
-	TmuxConfigPath      string
-	Shell               string
+	Title              string
+	Procfile           string
+	Root               string
+	Timeout            int
+	NoPort             bool
+	PortBase, PortStep int
+	ProcNames          string
+	IgnoredProcNames   string
+	SocketPath         string
+	Network            string
+	CanDie             string
+	AnyCanDie          bool
+	AutoRestart        string
+	Colors             []int
+	ShowTimestamps     bool
+	Formation          map[string]int
+	FormationPortStep  int
+	StopSignals        map[string]syscall.Signal
+	Daemonize          bool
+	TmuxConfigPath     string
+	Shell              string
 }
 
 // AbsRoot returns absolute path to the working directory
