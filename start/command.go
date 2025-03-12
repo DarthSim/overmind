@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"regexp"
 	"sync"
 	"syscall"
 	"time"
@@ -16,6 +17,11 @@ import (
 )
 
 var defaultColors = []int{2, 3, 4, 5, 6, 42, 130, 103, 129, 108}
+
+// This is a set of characters that are not allowed in a process name.
+// It's expressed as a negation; all character not matching the set of allowed
+// characters will be replaced with an underscore.
+var disallowedProcNameCharacters = regexp.MustCompile(`[^a-zA-Z0-9_]`)
 
 type command struct {
 	title     string
@@ -85,7 +91,7 @@ func newCommand(h *Handler) (*command, error) {
 		isIgnored := len(ignoredProcNames) != 0 && utils.StringsContain(ignoredProcNames, e.OrigName)
 
 		if shouldRun && !isIgnored {
-			scriptFilePath := c.createScriptFile(&e, h.Shell, !h.NoPort)
+			scriptFilePath := c.createScriptFile(&e, pf, h.Shell, !h.NoPort)
 
 			c.processes = append(c.processes, newProcess(
 				c.tmux,
@@ -163,14 +169,22 @@ func (c *command) Quit() {
 	c.stopTrig <- syscall.SIGINT
 }
 
-func (c *command) createScriptFile(e *procfileEntry, shell string, setPort bool) string {
+func (c *command) createScriptFile(e *procfileEntry, procFile procfile, shell string, setPort bool) string {
 	scriptFile, err := os.Create(filepath.Join(c.scriptDir, e.Name))
 	utils.FatalOnErr(err)
 
 	fmt.Fprintf(scriptFile, "#!/usr/bin/env %s\n", shell)
 	if setPort {
 		fmt.Fprintf(scriptFile, "export PORT=%d\n", e.Port)
+
+		for _, pf := range procFile {
+			if pf.Name != e.Name {
+				safeProcessName := sanitizeProcName(pf.Name)
+				fmt.Fprintf(scriptFile, "export OVERMIND_PROCESS_%s_PORT=%d\n", safeProcessName, pf.Port)
+			}
+		}
 	}
+
 	fmt.Fprintf(scriptFile, "export PS=%s\n", e.Name)
 	fmt.Fprintln(scriptFile, e.Command)
 
@@ -246,4 +260,8 @@ func (c *command) waitForTimeoutOrStop() {
 	case <-time.After(time.Duration(c.timeout) * time.Second):
 	case <-c.stopTrig:
 	}
+}
+
+func sanitizeProcName(name string) string {
+	return disallowedProcNameCharacters.ReplaceAllString(name, "_")
 }

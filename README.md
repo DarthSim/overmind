@@ -159,6 +159,17 @@ $ overmind start -N
 $ OVERMIND_NO_PORT=1 overmind start
 ```
 
+#### Referencing the ports of other processes
+
+If overmind is specifying a port, each other process will be provided with environment variables that include them. Those variables will be have the format `OVERMIND_PROCESS_<name>_PORT` where "name" is the name of the process from the procfile, with any characters that are invalid in an environment variable replaced with `_`.
+
+If processes are scaled, those port names will be numbered as well, based on the scaling of the process.
+
+```Procfile
+web: bin/rails server -p $PORT
+proxy: ngrok http --subdomain overmind $OVERMIND_PROCESS_web_PORT
+```
+
 #### Running only the specified processes
 
 You can specify the names of processes you want to run:
