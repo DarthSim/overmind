@@ -18,6 +18,11 @@ import (
 
 var defaultColors = []int{2, 3, 4, 5, 6, 42, 130, 103, 129, 108}
 
+// This is a set of characters that are not allowed in a process name.
+// It's expressed as a negation; all character not matching the set of allowed
+// characters will be replaced with an underscore.
+var disallowedProcNameCharacters = regexp.MustCompile(`[^a-zA-Z0-9_]`)
+
 type command struct {
 	title     string
 	timeout   int
@@ -258,5 +263,5 @@ func (c *command) waitForTimeoutOrStop() {
 }
 
 func sanitizeProcName(name string) string {
-	return regexp.MustCompile(`[^a-zA-Z0-9]`).ReplaceAllString(name, "_")
+	return disallowedProcNameCharacters.ReplaceAllString(name, "_")
 }
