@@ -79,10 +79,17 @@ func (t *tmuxClient) Start() error {
 	for _, p := range t.processes {
 		tmuxPaneMsg := fmt.Sprintf(tmuxPaneMsgFmt, p.Name)
 
+		var command string
+		if p.delayed {
+			command = p.DelayedCommand
+		} else {
+			command = p.Command
+		}
+
 		if first {
 			first = false
 
-			args = append(args, "new", "-n", p.Name, "-s", t.Session, "-P", "-F", tmuxPaneMsg, p.Command, ";")
+			args = append(args, "new", "-n", p.Name, "-s", t.Session, "-P", "-F", tmuxPaneMsg, command, ";")
 
 			if w, h, err := term.GetSize(int(os.Stdin.Fd())); err == nil {
 				if w > t.outputOffset {
@@ -95,7 +102,7 @@ func (t *tmuxClient) Start() error {
 			args = append(args, "setw", "-g", "remain-on-exit", "on", ";")
 			args = append(args, "setw", "-g", "allow-rename", "off", ";")
 		} else {
-			args = append(args, "neww", "-n", p.Name, "-P", "-F", tmuxPaneMsg, p.Command, ";")
+			args = append(args, "neww", "-n", p.Name, "-P", "-F", tmuxPaneMsg, command, ";")
 		}
 	}
 
