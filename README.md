@@ -287,7 +287,7 @@ You can safely disconnect from the window by hitting `Ctrl b` (or your tmux pref
 
 You can omit the process name to connect to the first process defined in the Procfile.
 
-If you were already in a `tmux` session when you ran `overmind connect` then you will be in a nested `tmux session`.
+If you were already in a `tmux` session when you ran `overmind connect` then you will be in a nested `tmux` session.
 To disconnect only from the `overmind` session, use `Ctrl b Ctrl b, d`. Sending `Ctrl b` twice will cause the command
 to be sent to the nested session.
 
